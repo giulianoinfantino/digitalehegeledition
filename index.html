@@ -1,102 +1,23 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wissenschaft der Logik – Zweiter Band (GW 12)</title>
-    <link rel="stylesheet" href="../assets/style.css">
-    <style>
-        body {
-            font-family: Georgia, serif;
-            line-height: 1.78;
-            max-width: 720px;
-            margin: 40px auto;
-            padding: 20px;
-            color: #222;
-        }
-        .container { display: flex; gap: 40px; }
-        .toc { width: 280px; position: sticky; top: 30px; align-self: flex-start; }
-        main { flex: 1; }
-
-        h1, h2.chapter-title {
-            text-align: center;
-            margin: 3em 0 1.8em 0;
-            font-weight: normal;
-            letter-spacing: 0.5px;
-        }
-        h1 { font-size: 2.1em; margin-top: 1em; }
-        h2.chapter-title { font-size: 1.65em; border-bottom: 1px solid #ccc; padding-bottom: 12px; }
-
-        .paragraph {
-            margin-bottom: 1.45em;
-            text-align: justify;
-            hyphens: auto;
-        }
-        .page-num {
-            float: right;
-            font-size: 0.85em;
-            color: #555;
-            margin-left: 15px;
-            font-family: sans-serif;
-        }
-        em { font-style: italic; color: #111; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Start — Hegel Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="container">
-        <nav class="toc">
-            <h2 style="text-align:center; margin-bottom:25px;">Inhaltsverzeichnis</h2>
-            <ul id="toc-list"></ul>
-        </nav>
-
-        <main>
-            <h1>Wissenschaft der Logik</h1>
-            <h2>Zweiter Band – Die subjective Logik oder Lehre vom Begriff</h2>
-            <div id="content"></div>
-        </main>
+<header class="site-header">
+    <a href="index.html" class="site-title"><span class="site-title-eyebrow">Digitale Edition</span><span class="site-title-main">Hegel · Werke</span></a>
+    <nav class="sitenav"><ul><li><a href="index.html" class="current">Start</a></li><li><a href="text.html">Text lesen</a></li><li><a href="search.html">Suche</a></li></ul></nav>
+</header>
+<main>
+    <div style="text-align: center; margin-top: 10vh;">
+        <h1 style="font-size: 3rem; font-family: var(--font-text);">Wissenschaft der Logik</h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 40px auto;">Eine digitale, durchsuchbare Edition basierend auf der Theorie-Werkausgabe.</p>
+        <a href="text.html" style="background: var(--accent); color: white; padding: 15px 30px; text-decoration: none; border-radius: 4px; font-weight: 500;">Edition betreten</a>
     </div>
-
-    <script>
-        Promise.all([
-            fetch('data/paragraphs.json').then(r => r.json()),
-            fetch('data/chapters.json').then(r => r.json())
-        ]).then(([paragraphs, chapters]) => {
-            const contentDiv = document.getElementById('content');
-            const tocList = document.getElementById('toc-list');
-
-            // Inhaltsverzeichnis
-            chapters.forEach(ch => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#chapter-${ch.id}">${ch.title}</a>`;
-                tocList.appendChild(li);
-            });
-
-            let currentChapter = '';
-            paragraphs.forEach(para => {
-                const chapter = chapters.find(c => para.idx >= c.para_start && para.idx <= c.para_end);
-                if (chapter && chapter.id !== currentChapter) {
-                    const h2 = document.createElement('h2');
-                    h2.id = `chapter-${chapter.id}`;
-                    h2.className = 'chapter-title';
-                    h2.textContent = chapter.title;
-                    contentDiv.appendChild(h2);
-                    currentChapter = chapter.id;
-                }
-
-                const p = document.createElement('p');
-                p.className = 'paragraph';
-                p.innerHTML = `
-                    <span class="page-num">[GW ${para.gw}]</span>
-                    ${para.text}
-                `;
-                contentDiv.appendChild(p);
-            });
-
-            console.log('✅ text.html Version 4 erfolgreich geladen');
-        }).catch(err => {
-            console.error(err);
-            document.getElementById('content').innerHTML = `<p style="color:red;">Fehler beim Laden der JSON-Dateien. Bitte prüfe, ob data/paragraphs.json und data/chapters.json existieren.</p>`;
-        });
-    </script>
+</main>
 </body>
 </html>
