@@ -82,8 +82,39 @@ async function loadHegel() {
                     <div class="marginalie">${pSigel}</div>
                     <div class="content">`;
             
-            if (pBlocks.length > 0) {
-                pBlocks.forEach(block => { pageHtml += `<p>${block}</p>`; });
+if (pBlocks.length > 0) {
+                let mainContent = "";
+                let footnotes = "";
+
+                pBlocks.forEach(block => {
+                    // Abwärtskompatibilität, falls die alte JSON noch geladen wird
+                    if (typeof block === 'string') {
+                        mainContent += `<p>${block}</p>`;
+                        return;
+                    }
+
+                    // Das neue, smarte Rendering
+                    if (block.type === "heading") {
+                        mainContent += `<h2 class="chapter-heading">${block.content}</h2>`;
+                    } else if (block.type === "footnote") {
+                        footnotes += `<div class="footnote-item">${block.content}</div>`;
+                    } else {
+                        mainContent += `<p>${block.content}</p>`;
+                    }
+                });
+
+                // Zuerst den Haupttext einfügen
+                pageHtml += mainContent;
+
+                // Wenn es Fußnoten auf dieser Seite gab, rendern wir einen edlen Trennstrich
+                if (footnotes !== "") {
+                    pageHtml += `
+                        <div class="footnote-container">
+                            <hr class="footnote-divider">
+                            ${footnotes}
+                        </div>`;
+                }
+
             } else {
                 pageHtml += `<p><em>[Kein Text]</em></p>`;
             }

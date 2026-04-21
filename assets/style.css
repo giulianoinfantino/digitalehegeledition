@@ -92,3 +92,38 @@ body[data-theme="dark"] .site-header {
   border-color: var(--accent);
   color: var(--text-main);
 }
+
+/* =========================================
+   TYPOGRAFIE: ÜBERSCHRIFTEN & FUßNOTEN
+   ========================================= */
+
+.chapter-heading {
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+
+.footnote-container {
+  margin-top: 40px;
+  padding-top: 10px;
+}
+
+.footnote-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  width: 30%; /* Ein kurzer, klassischer Buch-Trennstrich */
+  margin-left: 0;
+  margin-bottom: 15px;
+}
+
+.footnote-item {
+  font-family: var(--font-text);
+  font-size: 1rem; /* Sichtbar kleiner als der Fließtext (1.35rem) */
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-align: justify;
+}
