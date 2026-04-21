@@ -6,56 +6,25 @@
     <title>Wissenschaft der Logik – Zweiter Band (GW 12)</title>
     <link rel="stylesheet" href="../assets/style.css">
     <style>
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.75;
-            max-width: 720px;
-            margin: 40px auto;
-            padding: 20px;
-            color: #222;
-        }
+        body { font-family: Georgia, serif; line-height: 1.75; max-width: 720px; margin: 40px auto; padding: 20px; color: #222; }
         .container { display: flex; gap: 40px; }
         .toc { width: 280px; position: sticky; top: 30px; align-self: flex-start; }
         main { flex: 1; }
-
-        h1, h2.chapter-title {
-            text-align: center;
-            margin: 3em 0 1.8em 0;
-            font-weight: normal;
-            letter-spacing: 0.5px;
-        }
-        h1 { font-size: 2.1em; margin-top: 1em; }
+        h1, h2.chapter-title { text-align: center; margin: 3em 0 1.8em; font-weight: normal; }
+        h1 { font-size: 2.1em; }
         h2.chapter-title { font-size: 1.65em; border-bottom: 1px solid #ccc; padding-bottom: 12px; }
-
-        .paragraph {
-            margin-bottom: 1.4em;
-            text-align: justify;
-            hyphens: auto;
-        }
-        .page-num {
-            float: right;
-            font-size: 0.85em;
-            color: #555;
-            margin-left: 12px;
-            font-family: sans-serif;
-        }
-        em { font-style: italic; font-weight: normal; } /* Sperrschrift wird hier kursiv */
-
-        .toc ul { list-style: none; padding: 0; }
-        .toc li { margin: 8px 0; }
-        .toc a { color: #222; text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
+        .paragraph { margin-bottom: 1.4em; text-align: justify; }
+        .page-num { float: right; font-size: 0.85em; color: #555; margin-left: 12px; }
+        em { font-style: italic; }
+        .error { color: red; background: #fee; padding: 20px; border: 2px solid red; margin: 40px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar -->
         <nav class="toc">
-            <h2 style="text-align:center; margin-bottom:20px;">Inhaltsverzeichnis</h2>
+            <h2 style="text-align:center;">Inhaltsverzeichnis</h2>
             <ul id="toc-list"></ul>
         </nav>
-
-        <!-- Haupttext -->
         <main>
             <h1>Wissenschaft der Logik</h1>
             <h2>Zweiter Band – Die subjective Logik oder Lehre vom Begriff</h2>
@@ -64,17 +33,12 @@
     </div>
 
     <script>
-        function applyEmphasis(text) {
-            // Sperrschrift → Kursiv (typische Hegel-Muster)
-            return text
-                .replace(/\b([A-ZÄÖÜ][A-ZÄÖÜ\s-]{4,})\b/g, '<em>$1</em>')  // längere Großbuchstaben-Sequenzen
-                .replace(/§\s*GW/g, '<em>§ GW</em>'); // weitere typische Betonungen
-        }
-
         Promise.all([
-            fetch('data/paragraphs.json').then(r => r.json()),
-            fetch('data/chapters.json').then(r => r.json())
-        ]).then(([paragraphs, chapters]) => {
+            fetch('data/paragraphs.json').then(r => { if (!r.ok) throw new Error('paragraphs.json nicht gefunden'); return r.json(); }),
+            fetch('data/chapters.json').then(r => { if (!r.ok) throw new Error('chapters.json nicht gefunden'); return r.json(); })
+        ])
+        .then(([paragraphs, chapters]) => {
+            console.log('✅ JSONs erfolgreich geladen –', paragraphs.length, 'Absätze');
             const contentDiv = document.getElementById('content');
             const tocList = document.getElementById('toc-list');
 
@@ -98,15 +62,24 @@
 
                 const p = document.createElement('p');
                 p.className = 'paragraph';
-                const formattedText = applyEmphasis(para.text);
                 p.innerHTML = `
                     <span class="page-num">[GW ${para.gw}]</span>
-                    ${formattedText}
+                    ${para.text.replace(/\b([A-ZÄÖÜ][A-ZÄÖÜ\s-]{4,})\b/g, '<em>$1</em>')}
                 `;
                 contentDiv.appendChild(p);
             });
-
-            console.log('✅ Version 3 geladen –', paragraphs.length, 'Absätze');
+        })
+        .catch(err => {
+            console.error('❌ Fehler:', err);
+            document.getElementById('content').innerHTML = `
+                <div class="error">
+                    <strong>Die Seite konnte nicht geladen werden.</strong><br><br>
+                    ${err.message}<br><br>
+                    Bitte stelle sicher, dass im Ordner <strong>gw/gw12/data/</strong> beide Dateien liegen:<br>
+                    • paragraphs.json<br>
+                    • chapters.json<br><br>
+                    Danach Seite mit Cmd + Shift + R neu laden.
+                </div>`;
         });
     </script>
 </body>
