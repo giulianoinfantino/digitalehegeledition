@@ -2,115 +2,82 @@
   "metadata": {
     "band": "5",
     "titel": "Wissenschaft der Logik",
-    "generator": "gemini-extractor-v3.py",
+    "generator": "gemini-extractor.py",
     "toc": [
-      {
-        "title": "Vorrede zur ersten Ausgabe",
-        "page_pdf": 12,
-        "level": 1
-      },
-      {
-        "title": "Vorrede zur zweiten Ausgabe",
-        "page_pdf": 18,
-        "level": 1
-      }
-    ],
-    "document_headings": [
       {
         "title": "Georg Wilhelm Friedrich Hegel",
         "page_pdf": 1,
-        "level": 1,
-        "section_type": "frontmatter"
+        "level": 1
       },
       {
         "title": "Werke 5",
         "page_pdf": 1,
-        "level": 2,
-        "section_type": "frontmatter"
+        "level": 2
       },
       {
         "title": "Georg Wilhelm Friedrich Hegel",
         "page_pdf": 2,
-        "level": 1,
-        "section_type": "frontmatter"
+        "level": 1
       },
       {
         "title": "Wissenschaft der Logik I",
         "page_pdf": 2,
-        "level": 2,
-        "section_type": "frontmatter"
+        "level": 2
       },
       {
         "title": "Erster Teil\nDie objektive Logik\nErstes Buch",
         "page_pdf": 2,
-        "level": 1,
-        "section_type": "frontmatter"
+        "level": 3
       },
       {
         "title": "INHALT",
         "page_pdf": 4,
-        "level": 1,
-        "section_type": "toc"
+        "level": 1
       },
       {
         "title": "ERSTER TEIL",
         "page_pdf": 4,
-        "level": 2,
-        "section_type": "toc"
+        "level": 2
       },
       {
         "title": "DIE OBJEKTIVE LOGIK [ERSTES BUCH]",
         "page_pdf": 4,
-        "level": 2,
-        "section_type": "toc"
+        "level": 2
       },
       {
         "title": "EINLEITUNG 35",
         "page_pdf": 4,
-        "level": 2,
-        "section_type": "toc"
+        "level": 3
       },
       {
         "title": "ERSTES BUCH",
         "page_pdf": 4,
-        "level": 2,
-        "section_type": "toc"
+        "level": 2
       },
       {
         "title": "DIE LEHRE VOM SEIN",
         "page_pdf": 4,
-        "level": 2,
-        "section_type": "toc"
+        "level": 2
       },
       {
         "title": "WISSENSCHAFT DER LOGIKI",
         "page_pdf": 10,
-        "level": 2,
-        "section_type": "frontmatter"
+        "level": 1
       },
       {
         "title": "ERSTER TEIL",
         "page_pdf": 10,
-        "level": 2,
-        "section_type": "frontmatter"
+        "level": 2
       },
       {
         "title": "DIE OBJEKTIVE LOGIK",
         "page_pdf": 10,
-        "level": 2,
-        "section_type": "frontmatter"
+        "level": 2
       },
       {
         "title": "Vorrede zur ersten Ausgabe",
         "page_pdf": 12,
-        "level": 1,
-        "section_type": "maintext"
-      },
-      {
-        "title": "Vorrede zur zweiten Ausgabe",
-        "page_pdf": 18,
-        "level": 1,
-        "section_type": "maintext"
+        "level": 1
       }
     ]
   },
@@ -205,7 +172,7 @@
           "confidence": 1.0,
           "spaced_text": false,
           "italic": false,
-          "level": 1
+          "level": 3
         },
         {
           "id": "p2_b4",
@@ -286,7 +253,7 @@
           "text_raw": "suhrkamp taschenbuch Wissenschaft 605\nErste Auflage 1986\n© Suhrkamp Verlag Frankfurt am M a i n 1969\nSuhrkamp Taschenbuch Verlag\nAlle Rechte vorbehalten, insbesondere das\ndes öffentlichen Vortrags, der Übertragung durch\nRundfunk und Fernsehen\nsowie der Übersetzung, auch einzelner Teile.\nKein Teil des Werkes darf in irgendeiner F o r m\n(durch Fotografie, Mikrofilm oder andere Verfahren)\nohne schriftliche Genehmigung des Verlages\nreproduziert oder unter Verwendung\nelektronischer Systeme verarbeitet,\nvervielfältigt oder verbreitet werden.\nDruck: N o m o s Verlagsgesellschaft, Baden-Baden\nPrinted in Germany\nUmschlag nach Entwürfen von\nWilly Fleckhaus und Rolf Staudt\nI S B N 3-518-28205-0",
           "text_normalized": "suhrkamp taschenbuch Wissenschaft 605\nErste Auflage 1986\n© Suhrkamp Verlag Frankfurt am Main 1969\nSuhrkamp Taschenbuch Verlag\nAlle Rechte vorbehalten, insbesondere das\ndes öffentlichen Vortrags, der Übertragung durch\nRundfunk und Fernsehen\nsowie der Übersetzung, auch einzelner Teile.\nKein Teil des Werkes darf in irgendeiner Form\n(durch Fotografie, Mikrofilm oder andere Verfahren)\nohne schriftliche Genehmigung des Verlages\nreproduziert oder unter Verwendung\nelektronischer Systeme verarbeitet,\nvervielfältigt oder verbreitet werden.\nDruck: Nomos Verlagsgesellschaft, Baden-Baden\nPrinted in Germany\nUmschlag nach Entwürfen von\nWilly Fleckhaus und Rolf Staudt\nISBN 3-518-28205-0",
           "confidence": 0.95,
-          "spaced_text": true,
+          "spaced_text": false,
           "italic": false
         },
         {
@@ -403,7 +370,7 @@
           "confidence": 1.0,
           "spaced_text": true,
           "italic": false,
-          "level": 2
+          "level": 3
         },
         {
           "id": "p4_b7",
@@ -469,7 +436,7 @@
         },
         {
           "id": "p4_b11",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             32.880001068115234,
             202.06399536132812,
@@ -477,7 +444,22 @@
             211.15199279785156
           ],
           "text_raw": "Womit muß der Anfang der Wissenschaft gemacht",
-          "text_normalized": "Womit muß der Anfang der Wissenschaft gemacht werden? 65",
+          "text_normalized": "Womit muß der Anfang der Wissenschaft gemacht",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p4_b12",
+          "type": "unknown",
+          "bbox": [
+            42.119998931884766,
+            213.94400024414062,
+            276.2083435058594,
+            223.03199768066406
+          ],
+          "text_raw": "werden?\n65",
+          "text_normalized": "werden?\n65",
           "confidence": 0.0,
           "spaced_text": false,
           "italic": false
@@ -589,7 +571,7 @@
         },
         {
           "id": "p4_b20",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             61.439998626708984,
             329.7439880371094,
@@ -597,14 +579,29 @@
             338.8320007324219
           ],
           "text_raw": "Anmerkung 1. Der Gegensatz von Sein und",
-          "text_normalized": "Anmerkung 1. Der Gegensatz von Sein und Nichts in der Vorstellung 84",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung 1. Der Gegensatz von Sein und",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p4_b21",
+          "type": "unknown",
+          "bbox": [
+            61.560001373291016,
+            341.3840026855469,
+            276.7626953125,
+            350.4720153808594
+          ],
+          "text_raw": "Nichts in der Vorstellung\n84",
+          "text_normalized": "Nichts in der Vorstellung\n84",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p4_b22",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             61.20000076293945,
             353.02398681640625,
@@ -613,13 +610,13 @@
           ],
           "text_raw": "Anmerkung 2. Mangelhaftigkeit des Ausdrucks:",
           "text_normalized": "Anmerkung 2. Mangelhaftigkeit des Ausdrucks:",
-          "confidence": 0.65,
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p4_b23",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             61.79999923706055,
             364.66400146484375,
@@ -627,14 +624,14 @@
             373.75201416015625
           ],
           "text_raw": "Einheit, Identität des Seins und Nichts\n92",
-          "text_normalized": "Einheit, Identität des Seins und Nichts 92",
-          "confidence": 0.65,
+          "text_normalized": "Einheit, Identität des Seins und Nichts\n92",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p4_b24",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             61.560001373291016,
             376.42401123046875,
@@ -643,13 +640,13 @@
           ],
           "text_raw": "Anmerkung 3. Das Isolieren dieser",
           "text_normalized": "Anmerkung 3. Das Isolieren dieser",
-          "confidence": 0.65,
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p4_b25",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             61.20000076293945,
             388.1839904785156,
@@ -657,8 +654,8 @@
             397.2720031738281
           ],
           "text_raw": "Abstraktionen\n97",
-          "text_normalized": "Abstraktionen 97",
-          "confidence": 0.65,
+          "text_normalized": "Abstraktionen\n97",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -672,7 +669,22 @@
             408.9119873046875
           ],
           "text_raw": "Anmerkung 4. Unbegreiflichkeit\ndes Anfangs\n109",
-          "text_normalized": "Anmerkung 4. Unbegreiflichkeit des Anfangs 109 b. Momente des Werdens 111",
+          "text_normalized": "Anmerkung 4. Unbegreiflichkeit des Anfangs 109",
+          "confidence": 1.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p4_b27",
+          "type": "toc",
+          "bbox": [
+            51.959999084472656,
+            411.7039794921875,
+            276.065673828125,
+            420.7919921875
+          ],
+          "text_raw": "b. Momente des Werdens\ni n",
+          "text_normalized": "b. Momente des Werdens 111",
           "confidence": 1.0,
           "spaced_text": false,
           "italic": false
@@ -694,7 +706,7 @@
             37.99201965332031
           ],
           "text_raw": "c. Aufheben des Werdens\n113\nAnmerkung. Der Ausdruck: Aufheben\n113",
-          "text_normalized": "c. Aufheben des Werdens 113 Anmerkung. Der Ausdruck: Aufheben 113",
+          "text_normalized": "c. Aufheben des Werdens 113\nAnmerkung. Der Ausdruck: Aufheben 113",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -724,7 +736,7 @@
             85.03199768066406
           ],
           "text_raw": "A . Dasein als solches\n116\na. Dasein überhaupt\n116",
-          "text_normalized": "A. Dasein als solches 116 a. Dasein überhaupt 116",
+          "text_normalized": "A. Dasein als solches 116\na. Dasein überhaupt 116",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -739,7 +751,7 @@
             120.19200134277344
           ],
           "text_raw": "b. Qualität\n117\nAnmerkung. Realität und Negation\n119\nc. Etwas\n122",
-          "text_normalized": "b. Qualität 117 Anmerkung. Realität und Negation 119 c. Etwas 122",
+          "text_normalized": "b. Qualität 117\nAnmerkung. Realität und Negation 119\nc. Etwas 122",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -754,7 +766,7 @@
             143.59202575683594
           ],
           "text_raw": "B. Die Endlichkeit\n125\na. Etwas und ein Anderes\n125",
-          "text_normalized": "B. Die Endlichkeit 125 a. Etwas und ein Anderes 125",
+          "text_normalized": "B. Die Endlichkeit 125\na. Etwas und ein Anderes 125",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -784,7 +796,7 @@
             190.3920135498047
           ],
           "text_raw": "c. Die Endlichkeit\n139\na. Die Unmittelbarkeit der Endlichkeit\n140\nß. Die Schranke und das Sollen\n142",
-          "text_normalized": "c. Die Endlichkeit 139 a. Die Unmittelbarkeit der Endlichkeit 140 ß. Die Schranke und das Sollen 142",
+          "text_normalized": "c. Die Endlichkeit 139\na. Die Unmittelbarkeit der Endlichkeit 140\nß. Die Schranke und das Sollen 142",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -799,7 +811,7 @@
             213.91200256347656
           ],
           "text_raw": "Anmerkung. Das Sollen\n144\ny. Übergang des Endlichen in das Unendliche . .\n148",
-          "text_normalized": "Anmerkung. Das Sollen 144 y. Übergang des Endlichen in das Unendliche 148",
+          "text_normalized": "Anmerkung. Das Sollen 144\ny. Übergang des Endlichen in das Unendliche 148",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -814,7 +826,7 @@
             237.55201721191406
           ],
           "text_raw": "C. Die Unendlichkeit\n149\na. Das Unendliche überhaupt\n150",
-          "text_normalized": "C. Die Unendlichkeit 149 a. Das Unendliche überhaupt 150",
+          "text_normalized": "C. Die Unendlichkeit 149\na. Das Unendliche überhaupt 150",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -859,7 +871,7 @@
             307.87200927734375
           ],
           "text_raw": "Der Ubergang\n166\nAnmerkung 1. Der unendliche Progreß\n166\nAnmerkung 2. Der Idealismus\n172",
-          "text_normalized": "Der Übergang 166 Anmerkung 1. Der unendliche Progreß 166 Anmerkung 2. Der Idealismus 172",
+          "text_normalized": "Der Übergang 166\nAnmerkung 1. Der unendliche Progreß 166\nAnmerkung 2. Der Idealismus 172",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -889,7 +901,7 @@
             354.6720275878906
           ],
           "text_raw": "A . Das Fürsichsein als solches\n174\na. Dasein und Fürsichsein\n176",
-          "text_normalized": "A. Das Fürsichsein als solches 174 a. Dasein und Fürsichsein 176",
+          "text_normalized": "A. Das Fürsichsein als solches 174\na. Dasein und Fürsichsein 176",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -904,7 +916,7 @@
             390.1920166015625
           ],
           "text_raw": "b. Sein-für-Eines\n176\nAnmerkung. Ausdruck: Was für eines?\n177\nc. Eins\n182",
-          "text_normalized": "b. Sein-für-Eines 176 Anmerkung. Ausdruck: Was für eines? 177 c. Eins 182",
+          "text_normalized": "b. Sein-für-Eines 176\nAnmerkung. Ausdruck: Was für eines? 177\nc. Eins 182",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -919,7 +931,7 @@
             413.4720153808594
           ],
           "text_raw": "B. Eines und Vieles\n182\na. Das Eins an ihm selbst\n183",
-          "text_normalized": "B. Eines und Vieles 182 a. Das Eins an ihm selbst 183",
+          "text_normalized": "B. Eines und Vieles 182\na. Das Eins an ihm selbst 183",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -934,7 +946,7 @@
             436.75201416015625
           ],
           "text_raw": "b. Das Eins und das Leere\n184\nAnmerkung. Die Atomistik\n184",
-          "text_normalized": "b. Das Eins und das Leere 184 Anmerkung. Die Atomistik 184",
+          "text_normalized": "b. Das Eins und das Leere 184\nAnmerkung. Die Atomistik 184",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -1008,7 +1020,7 @@
         },
         {
           "id": "p6_b5",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.08000183105469,
             61.54400634765625,
@@ -1016,8 +1028,23 @@
             70.63200378417969
           ],
           "text_raw": "Anmerkung. Satz der Einheit des Eins und",
-          "text_normalized": "Anmerkung. Satz der Einheit des Eins und des Vielen 192",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung. Satz der Einheit des Eins und",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b6",
+          "type": "unknown",
+          "bbox": [
+            70.55999755859375,
+            73.18402099609375,
+            276.9007568359375,
+            82.27201843261719
+          ],
+          "text_raw": "des Vielen\n192",
+          "text_normalized": "des Vielen\n192",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -1053,7 +1080,7 @@
         },
         {
           "id": "p6_b9",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.44000244140625,
             108.34402465820312,
@@ -1061,8 +1088,38 @@
             117.43202209472656
           ],
           "text_raw": "Anmerkung. Die Kantische Konstruktion",
-          "text_normalized": "Anmerkung. Die Kantische Konstruktion der Materie aus der Attraktiv- und Repulsivkraft 200",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung. Die Kantische Konstruktion",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b10",
+          "type": "unknown",
+          "bbox": [
+            70.80000305175781,
+            119.9840087890625,
+            211.78213500976562,
+            129.07200622558594
+          ],
+          "text_raw": "der Materie aus der Attraktiv- und",
+          "text_normalized": "der Materie aus der Attraktiv- und",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b11",
+          "type": "unknown",
+          "bbox": [
+            70.31999969482422,
+            131.864013671875,
+            276.8000793457031,
+            140.95201110839844
+          ],
+          "text_raw": "Repulsivkraft\n200",
+          "text_normalized": "Repulsivkraft\n200",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -1143,7 +1200,7 @@
         },
         {
           "id": "p6_b17",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.44000244140625,
             237.34400939941406,
@@ -1151,8 +1208,38 @@
             246.4320068359375
           ],
           "text_raw": "Anmerkung 2. Kantische Antinomie der",
-          "text_normalized": "Anmerkung 2. Kantische Antinomie der Unteilbarkeit und der unendlichen Teilbarkeit der Zeit, des Raums, der Materie 216",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung 2. Kantische Antinomie der",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b18",
+          "type": "unknown",
+          "bbox": [
+            70.31999969482422,
+            249.10400390625,
+            252.4703369140625,
+            258.1920166015625
+          ],
+          "text_raw": "Unteilbarkeit und der unendlichen Teilbarkeit",
+          "text_normalized": "Unteilbarkeit und der unendlichen Teilbarkeit",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b19",
+          "type": "unknown",
+          "bbox": [
+            70.68000030517578,
+            260.7440185546875,
+            276.8331298828125,
+            269.83203125
+          ],
+          "text_raw": "der Zeit, des Raums, der Materie\n216",
+          "text_normalized": "der Zeit, des Raums, der Materie\n216",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -1233,7 +1320,7 @@
         },
         {
           "id": "p6_b25",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.31999969482422,
             354.5840148925781,
@@ -1241,14 +1328,44 @@
             363.6720275878906
           ],
           "text_raw": "Anmerkung 1. Rechnungsarten der",
-          "text_normalized": "Anmerkung 1. Rechnungsarten der Arithmetik. Kantische synthetische Sätze a priori der Anschauung 234",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung 1. Rechnungsarten der",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b26",
+          "type": "unknown",
+          "bbox": [
+            70.80000305175781,
+            366.2239990234375,
+            233.6890106201172,
+            375.31201171875
+          ],
+          "text_raw": "Arithmetik. Kantische synthetische Sätze",
+          "text_normalized": "Arithmetik. Kantische synthetische Sätze",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b27",
+          "type": "unknown",
+          "bbox": [
+            70.55999755859375,
+            377.864013671875,
+            276.8363952636719,
+            386.9520263671875
+          ],
+          "text_raw": "a priori der Anschauung\n234",
+          "text_normalized": "a priori der Anschauung\n234",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p6_b28",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.44000244140625,
             389.6240234375,
@@ -1256,14 +1373,29 @@
             398.7120361328125
           ],
           "text_raw": "Anmerkung 2. Gebrauch der",
-          "text_normalized": "Anmerkung 2. Gebrauch der Zahlbestimmungen für den Ausdruck",
-          "confidence": 0.65,
+          "text_normalized": "Anmerkung 2. Gebrauch der",
+          "confidence": 0.0,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p6_b29",
+          "type": "unknown",
+          "bbox": [
+            70.91999816894531,
+            401.2640075683594,
+            218.9364776611328,
+            410.3520202636719
+          ],
+          "text_raw": "Zahlbestimmungen für den Ausdruck",
+          "text_normalized": "Zahlbestimmungen für den Ausdruck",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
         {
           "id": "p6_b30",
-          "type": "toc",
+          "type": "unknown",
           "bbox": [
             70.80000305175781,
             413.1440124511719,
@@ -1271,8 +1403,8 @@
             422.2320251464844
           ],
           "text_raw": "philosophischer Begriffe\n243",
-          "text_normalized": "philosophischer Begriffe 243",
-          "confidence": 0.65,
+          "text_normalized": "philosophischer Begriffe\n243",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -1503,7 +1635,22 @@
             421.75201416015625
           ],
           "text_raw": "B. Spezifizierendes Maß\n398",
-          "text_normalized": "B. Spezifizierendes Maß 398 a. Die Regel 399",
+          "text_normalized": "B. Spezifizierendes Maß 398",
+          "confidence": 0.9,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p7_b15",
+          "type": "toc",
+          "bbox": [
+            51.47999954223633,
+            424.5439758300781,
+            276.21832275390625,
+            433.6319885253906
+          ],
+          "text_raw": "a. Die Regel\n399",
+          "text_normalized": "a. Die Regel 399",
           "confidence": 0.9,
           "spaced_text": false,
           "italic": false
@@ -1525,7 +1672,7 @@
             47.11198425292969
           ],
           "text_raw": "b. Das spezifizierende Maß\n399\nAnmerkung\n401\nc. Verhältnis beider Seiten als Qualitäten\n402",
-          "text_normalized": "b. Das spezifizierende Maß 399 Anmerkung 401 c. Verhältnis beider Seiten als Qualitäten 402",
+          "text_normalized": "b. Das spezifizierende Maß 399\nAnmerkung 401\nc. Verhältnis beider Seiten als Qualitäten 402",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -1540,7 +1687,7 @@
             70.51197814941406
           ],
           "text_raw": "Anmerkung\n405\nC. Das Fürsichsein im Maße\n408",
-          "text_normalized": "Anmerkung 405 C. Das Fürsichsein im Maße 408",
+          "text_normalized": "Anmerkung 405\nC. Das Fürsichsein im Maße 408",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -1570,7 +1717,7 @@
             117.31199645996094
           ],
           "text_raw": "A . Das Verhältnis selbständiger Maße\n413\na. Verbindung zweier Maße\n414",
-          "text_normalized": "A. Das Verhältnis selbständiger Maße 413 a. Verbindung zweier Maße 414",
+          "text_normalized": "A. Das Verhältnis selbständiger Maße 413\na. Verbindung zweier Maße 414",
           "confidence": 0.98,
           "spaced_text": false,
           "italic": false
@@ -1585,7 +1732,7 @@
             175.8719940185547
           ],
           "text_raw": "b. Das Maß als Reihe von Maß Verhältnissen\n416\nc. Wahlverwandtschaft\n420\nAnmerkung. Berthollet über die chemische\nWahlverwandtschaft und Berzelius' Theorie\ndarüber\n423",
-          "text_normalized": "b. Das Maß als Reihe von Maßverhältnissen 416 c. Wahlverwandtschaft 420 Anmerkung. Berthollet über die chemische Wahlverwandtschaft und Berzelius' Theorie darüber 423",
+          "text_normalized": "b. Das Maß als Reihe von Maßverhältnissen 416\nc. Wahlverwandtschaft 420\nAnmerkung. Berthollet über die chemische Wahlverwandtschaft und Berzelius' Theorie darüber 423",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -1615,8 +1762,23 @@
             210.91197204589844
           ],
           "text_raw": "Anmerkung. Beispiele solcher Knotenlinien;\ndarüber daß es keinen Sprung in der Natur",
-          "text_normalized": "Anmerkung. Beispiele solcher Knotenlinien; darüber daß es keinen Sprung in der Natur gebe 438 gebe 438",
+          "text_normalized": "Anmerkung. Beispiele solcher Knotenlinien; darüber daß es keinen Sprung in der Natur gebe 438",
           "confidence": 0.95,
+          "spaced_text": false,
+          "italic": false
+        },
+        {
+          "id": "p8_b8",
+          "type": "unknown",
+          "bbox": [
+            70.44000244140625,
+            214.42398071289062,
+            273.1691589355469,
+            223.51197814941406
+          ],
+          "text_raw": "gebe\n43 8",
+          "text_normalized": "gebe\n43 8",
+          "confidence": 0.0,
           "spaced_text": false,
           "italic": false
         },
@@ -1690,7 +1852,7 @@
             328.2720031738281
           ],
           "text_raw": "Anmerkung. Über Zentripetal- und\nZentrifugalkraft\n451\nC. Übergang in das Wesen\n456",
-          "text_normalized": "Anmerkung. Über Zentripetal- und Zentrifugalkraft 451 C. Übergang in das Wesen 456",
+          "text_normalized": "Anmerkung. Über Zentripetal- und Zentrifugalkraft 451\nC. Übergang in das Wesen 456",
           "confidence": 0.95,
           "spaced_text": false,
           "italic": false
@@ -1722,7 +1884,7 @@
           "confidence": 1.0,
           "spaced_text": true,
           "italic": false,
-          "level": 2
+          "level": 1
         },
         {
           "id": "p10_b2",
@@ -2304,271 +2466,6 @@
           "text_raw": "16",
           "text_normalized": "16",
           "confidence": 0.0,
-          "spaced_text": false,
-          "italic": false
-        }
-      ]
-    },
-    {
-      "page_pdf": 16,
-      "page_index": 15,
-      "section_type": "maintext",
-      "blocks": [
-        {
-          "id": "p16_b1",
-          "type": "main_text",
-          "bbox": [
-            31.31999969482422,
-            14.384000778198242,
-            276.8750915527344,
-            430.87200927734375
-          ],
-          "text_raw": "Wie der Verstand als etwas Getrenntes von der Vernunft\nüberhaupt, so pflegt auch die dialektische Vernunft als etwas\nGetrenntes von der positiven Vernunft genommen zu wer-\nden. Aber in ihrer Wahrheit ist die Vernunft Geist, der höher\nals beides, verständige Vernunft oder vernünftiger Verstand\nist. Er ist das Negative, dasjenige, welches die Qualität so-\nwohl der dialektischen Vernunft als des Verstandes aus-\nmacht; - er negiert das Einfache, so setzt er den bestimmten\nUnterschied des Verstandes; er löst ihn ebensosehr auf, so ist\ner dialektisch. Er hält sich aber nicht im Nichts dieses Resul-\ntates, sondern ist darin ebenso positiv und hat so das erste\nEinfache damit hergestellt, aber als Allgemeines, das in sich\nkonkret ist; unter dieses wird nicht ein gegebenes Besonderes\nsubsumiert, sondern in jenem Bestimmen und in der Auflö-\nsung desselben hat sich das Besondere schon mit bestimmt.\nDiese geistige Bewegung,\ndie sich in ihrer Einfachheit\nihre Bestimmtheit und in dieser ihre Gleichheit mit sich\nselbst gibt, die somit die immanente Entwicklung des Begrif-\nfes ist, ist die absolute Methode des Erkennens und zugleich\ndie immanente Seele des Inhalts selbst. - Auf diesem sich\nselbst konstruierenden Wege allein, behaupte ich, ist die Phi-\nlosophie fähig, objektive, demonstrierte Wissenschaft zu sein.\n- In dieser Weise habe ich das Bewußtsein in der Phänome-\nnologie des Geistes darzustellen versucht. Das Bewußtsein ist\nder Geist als konkretes, und zwar in der Äußerlichkeit be-\nfangenes Wissen; aber die Fortbewegung dieses Gegenstan-\ndes beruht allein, wie die Entwicklung alles natürlichen und\ngeistigen Lebens, auf der Natur der reinen Wesenheiten, die\nden Inhalt der Logik ausmachen. Das Bewußtsein, als der\nerscheinende Geist, welcher sich auf seinem Wege von seiner\nUnmittelbarkeit und äußerlichen Konkretion befreit, wird\nzum reinen Wissen, das sich jene reinen Wesenheiten selbst,\nwie sie an und für sich sind, zum Gegenstand gibt. Sie sind die\nreinen Gedanken, der sein Wesen denkende Geist. Ihre Selbst-\nbewegung ist ihr geistiges Leben und ist das, wodurch sich die\nWissenschaft konstituiert und dessen Darstellung sie ist.",
-          "text_normalized": "Wie der Verstand als etwas Getrenntes von der Vernunft überhaupt, so pflegt auch die dialektische Vernunft als etwas Getrenntes von der positiven Vernunft genommen zu werden. Aber in ihrer Wahrheit ist die Vernunft Geist, der höher als beides, verständige Vernunft oder vernünftiger Verstand ist. Er ist das Negative, dasjenige, welches die Qualität sowohl der dialektischen Vernunft als des Verstandes ausmacht; - er negiert das Einfache, so setzt er den bestimmten Unterschied des Verstandes; er löst ihn ebensosehr auf, so ist er dialektisch. Er hält sich aber nicht im Nichts dieses Resultates, sondern ist darin ebenso positiv und hat so das erste Einfache damit hergestellt, aber als Allgemeines, das in sich konkret ist; unter dieses wird nicht ein gegebenes Besonderes subsumiert, sondern in jenem Bestimmen und in der Auflösung desselben hat sich das Besondere schon mit bestimmt. Diese geistige Bewegung, die sich in ihrer Einfachheit ihre Bestimmtheit und in dieser ihre Gleichheit mit sich selbst gibt, die somit die immanente Entwicklung des Begriffes ist, ist die absolute Methode des Erkennens und zugleich die immanente Seele des Inhalts selbst. - Auf diesem sich selbst konstruierenden Wege allein, behaupte ich, ist die Philosophie fähig, objektive, demonstrierte Wissenschaft zu sein. - In dieser Weise habe ich das Bewußtsein in der Phänomenologie des Geistes darzustellen versucht. Das Bewußtsein ist der Geist als konkretes, und zwar in der Äußerlichkeit befangenes Wissen; aber die Fortbewegung dieses Gegenstandes beruht allein, wie die Entwicklung alles natürlichen und geistigen Lebens, auf der Natur der reinen Wesenheiten, die den Inhalt der Logik ausmachen. Das Bewußtsein, als der erscheinende Geist, welcher sich auf seinem Wege von seiner Unmittelbarkeit und äußerlichen Konkretion befreit, wird zum reinen Wissen, das sich jene reinen Wesenheiten selbst, wie sie an und für sich sind, zum Gegenstand gibt. Sie sind die reinen Gedanken, der sein Wesen denkende Geist. Ihre Selbstbewegung ist ihr geistiges Leben und ist das, wodurch sich die Wissenschaft konstituiert und dessen Darstellung sie ist.",
-          "confidence": 0.98,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0001",
-          "continues_previous_paragraph": false
-        },
-        {
-          "id": "p16_b2",
-          "type": "page_number",
-          "bbox": [
-            148.8000030517578,
-            441.4640197753906,
-            157.9674072265625,
-            450.5520324707031
-          ],
-          "text_raw": "17",
-          "text_normalized": "17",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false
-        }
-      ]
-    },
-    {
-      "page_pdf": 17,
-      "page_index": 16,
-      "section_type": "maintext",
-      "blocks": [
-        {
-          "id": "p17_b1",
-          "type": "main_text",
-          "bbox": [
-            32.15999984741211,
-            14.384000778198242,
-            276.650146484375,
-            58.39201354980469
-          ],
-          "text_raw": "Es ist hiermit die Beziehung der Wissenschaft, die ich Phäno-\nmenologie des Geistes nenne, zur Logik angegeben. - Was\ndas äußerliche Verhältnis betrifft, so war dem ersten Teil des\nSystems der Wissenschaft'*, der die Phänomenologie enthält,",
-          "text_normalized": "Es ist hiermit die Beziehung der Wissenschaft, die ich Phänomenologie des Geistes nenne, zur Logik angegeben. - Was das äußerliche Verhältnis betrifft, so war dem ersten Teil des Systems der Wissenschaft*, der die Phänomenologie enthält,",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0001",
-          "continues_previous_paragraph": false
-        },
-        {
-          "id": "p17_b2",
-          "type": "main_text",
-          "bbox": [
-            31.920000076293945,
-            60.944000244140625,
-            276.324951171875,
-            209.71202087402344
-          ],
-          "text_raw": "ein zweiter Teil zu folgen bestimmt, welcher die Logik und\ndie beiden realen Wissenschaften der Philosophie, die Philo-\nsophie der Natur und die Philosophie des Geistes, enthalten\nsollte und das System der Wissenschaft beschlossen haben\nwürde. Aber die notwendige Ausdehnung, welche die Logik\nfür sich erhalten mußte, hat mich veranlaßt, diese besonders\nans Licht treten zu lassen; sie macht also in einem erweiter-\nten Plane die erste Folge zur Phänomenologie des Geistes\naus. Späterhin werde ich die Bearbeitung der beiden genann-\nten realen Wissenschaften der Philosophie folgen lassen. -\nDieser erste Band der Logik aber enthält als erstes Buch die\nLehre vom Sein; das zweite Buch, die Lehre vom Wesen, als\nzweite Abteilung des ersten Bandes 1; der zweite Band aber",
-          "text_normalized": "ein zweiter Teil zu folgen bestimmt, welcher die Logik und die beiden realen Wissenschaften der Philosophie, die Philosophie der Natur und die Philosophie des Geistes, enthalten sollte und das System der Wissenschaft beschlossen haben würde. Aber die notwendige Ausdehnung, welche die Logik für sich erhalten mußte, hat mich veranlaßt, diese besonders ans Licht treten zu lassen; sie macht also in einem erweiterten Plane die erste Folge zur Phänomenologie des Geistes aus. Späterhin werde ich die Bearbeitung der beiden genannten realen Wissenschaften der Philosophie folgen lassen. - Dieser erste Band der Logik aber enthält als erstes Buch die Lehre vom Sein; das zweite Buch, die Lehre vom Wesen, als zweite Abteilung des ersten Bandes 1; der zweite Band aber",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0001",
-          "continues_previous_paragraph": true
-        },
-        {
-          "id": "p17_b3",
-          "type": "main_text",
-          "bbox": [
-            31.920000076293945,
-            212.26400756835938,
-            274.5240783691406,
-            232.99200439453125
-          ],
-          "text_raw": "wird die subjektive\nLogik oder die Lehre vom Begriff ent-\nhalten.",
-          "text_normalized": "wird die subjektive Logik oder die Lehre vom Begriff enthalten.",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0001",
-          "continues_previous_paragraph": true
-        },
-        {
-          "id": "p17_b4",
-          "type": "main_text",
-          "bbox": [
-            32.040000915527344,
-            237.10400390625,
-            152.52793884277344,
-            246.19200134277344
-          ],
-          "text_raw": "Nürnberg, den 22. März 1812",
-          "text_normalized": "Nürnberg, den 22. März 1812",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0002",
-          "continues_previous_paragraph": false
-        },
-        {
-          "id": "p17_b5",
-          "type": "footnote",
-          "bbox": [
-            31.799999237060547,
-            337.8179931640625,
-            275.91790771484375,
-            395.03399658203125
-          ],
-          "text_raw": "* (Bamberg und Würzburg bei Göbhard\n1807.) Dieser Titel w i r d\nder\nzweiten Ausgabe, die auf nächste Ostern erscheinen w i r d , nicht mehr bei-\ngegeben werden. - A n die Stelle des im folgenden erwähnten Vorhabens\neines zweiten Teils, der die sämtlichen anderen philosophischen Wissen-\nschaften enthalten sollte, habe ich seitdem die Enzyklopädie\nder\nphiloso-\nphischen\nWissenschafien,\nvoriges Jahr in der dritten Ausgabe, ans Licht\ntreten lassen. [ A n m . 1831]",
-          "text_normalized": "* (Bamberg und Würzburg bei Göbhard 1807.) Dieser Titel wird der zweiten Ausgabe, die auf nächste Ostern erscheinen wird, nicht mehr beigegeben werden. - An die Stelle des im folgenden erwähnten Vorhabens eines zweiten Teils, der die sämtlichen anderen philosophischen Wissenschaften enthalten sollte, habe ich seitdem die Enzyklopädie der philosophischen Wissenschaften, voriges Jahr in der dritten Ausgabe, ans Licht treten lassen. [Anm. 1831]",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false
-        },
-        {
-          "id": "p17_b6",
-          "type": "footnote",
-          "bbox": [
-            32.040000915527344,
-            417.61798095703125,
-            275.7552795410156,
-            432.9540100097656
-          ],
-          "text_raw": "1 in A lautet dieser Satz vollständig: »das zweite Buch . . .\nist bereits\nunter der Presse«",
-          "text_normalized": "1 in A lautet dieser Satz vollständig: »das zweite Buch . . . ist bereits unter der Presse«",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false
-        },
-        {
-          "id": "p17_b7",
-          "type": "page_number",
-          "bbox": [
-            149.39999389648438,
-            439.54400634765625,
-            159.0287322998047,
-            448.63201904296875
-          ],
-          "text_raw": "18",
-          "text_normalized": "18",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false
-        }
-      ]
-    },
-    {
-      "page_pdf": 18,
-      "page_index": 17,
-      "section_type": "maintext",
-      "blocks": [
-        {
-          "id": "p18_b1",
-          "type": "heading",
-          "bbox": [
-            89.4000015258789,
-            13.947011947631836,
-            220.60458374023438,
-            24.17101287841797
-          ],
-          "text_raw": "Vorrede zur zweiten Ausgabe",
-          "text_normalized": "Vorrede zur zweiten Ausgabe",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "level": 1
-        },
-        {
-          "id": "p18_b2",
-          "type": "main_text",
-          "bbox": [
-            32.52000045776367,
-            38.503997802734375,
-            276.7640075683594,
-            163.9920196533203
-          ],
-          "text_raw": "A n diese neue Bearbeitung der \"Wissenschaft der Logik, wo-\nvon hiermit der erste Band erscheint, bin ich wohl mit dem\nganzen Bewußtsein sowohl der Schwierigkeit des Gegen-\nstandes für sich und dann seiner Darstellung als der Unvoll¬\nkommenheit, welche die Bearbeitung desselben in der ersten\nAusgabe an sich trägt, gegangen; sosehr ich nach weiterer\nvieljähriger Beschäftigung mit dieser Wissenschaft bemüht\ngewesen, dieser Unvollkommenheit abzuhelfen, so fühle ich,\nnoch Ursache genug zu haben, die Nachsicht des Lesers in\nAnspruch zu nehmen. Ein Titel solchen Anspruchs aber zu-\nnächst darf wohl auf den Umstand gegründet werden, daß",
-          "text_normalized": "An diese neue Bearbeitung der Wissenschaft der Logik, wovon hiermit der erste Band erscheint, bin ich wohl mit dem ganzen Bewußtsein sowohl der Schwierigkeit des Gegenstandes für sich und dann seiner Darstellung als der Unvollkommenheit, welche die Bearbeitung desselben in der ersten Ausgabe an sich trägt, gegangen; sosehr ich nach weiterer vieljähriger Beschäftigung mit dieser Wissenschaft bemüht gewesen, dieser Unvollkommenheit abzuhelfen, so fühle ich, noch Ursache genug zu haben, die Nachsicht des Lesers in Anspruch zu nehmen. Ein Titel solchen Anspruchs aber zunächst darf wohl auf den Umstand gegründet werden, daß",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0002",
-          "continues_previous_paragraph": false
-        },
-        {
-          "id": "p18_b3",
-          "type": "main_text",
-          "bbox": [
-            32.15999984741211,
-            166.54400634765625,
-            276.25653076171875,
-            233.83201599121094
-          ],
-          "text_raw": "sich für den Inhalt vornehmlich nur äußerliches Material in\nder früheren Metaphysik und Logik vorgefunden hat. So\nallgemein und häufig dieselben, die letztere noch bis auf un-\nsere Zeiten fort, getrieben worden, sowenig hat solche Bear-\nbeitung die spekulative Seite betroffen; vielmehr ist im Gan-\nzen dasselbe Material wiederholt, abwechselnd bald bis zu",
-          "text_normalized": "sich für den Inhalt vornehmlich nur äußerliches Material in der früheren Metaphysik und Logik vorgefunden hat. So allgemein und häufig dieselben, die letztere noch bis auf unsere Zeiten fort, getrieben worden, sowenig hat solche Bearbeitung die spekulative Seite betroffen; vielmehr ist im Ganzen dasselbe Material wiederholt, abwechselnd bald bis zu",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0002",
-          "continues_previous_paragraph": true
-        },
-        {
-          "id": "p18_b4",
-          "type": "main_text",
-          "bbox": [
-            31.559999465942383,
-            236.38401794433594,
-            276.0260314941406,
-            292.03204345703125
-          ],
-          "text_raw": "trivialer Oberflächlichkeit verdünnt, bald der alte Ballast\numfangreicher von neuem hervorgeholt und mitgeschleppt\nworden, so daß durch solche, häufig ganz nur mechanische\nBemühungen dem philosophischen Gehalt kein Gewinn zu-\nwachsen konnte. Das Reich des Gedankens philosophisch,",
-          "text_normalized": "trivialer Oberflächlichkeit verdünnt, bald der alte Ballast umfangreicher von neuem hervorgeholt und mitgeschleppt worden, so daß durch solche, häufig ganz nur mechanische Bemühungen dem philosophischen Gehalt kein Gewinn zuwachsen konnte. Das Reich des Gedankens philosophisch,",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0002",
-          "continues_previous_paragraph": true
-        },
-        {
-          "id": "p18_b5",
-          "type": "main_text",
-          "bbox": [
-            31.31999969482422,
-            294.5840148925781,
-            275.6327819824219,
-            408.4320068359375
-          ],
-          "text_raw": "d. i . in seiner eigenen immanenten Tätigkeit oder, was das-\nselbe ist, in seiner notwendigen Entwicklung darzustellen,\nmußte deswegen ein neues Unternehmen sein und dabei von\nvorne angefangen werden; jenes erworbene Material, die be-\nkannten Denkformen, aber ist als eine höchst wichtige Vor-\nlage, ja eine notwendige Bedingung [und] dankbar anzuer-\nkennende Voraussetzung anzusehen, wenn dieselbe auch nur\nhie und da einen dürren Faden oder die leblosen Knochen\neines Skeletts, sogar in Unordnung untereinander geworfen,\ndargibt.",
-          "text_normalized": "d. i. in seiner eigenen immanenten Tätigkeit oder, was dasselbe ist, in seiner notwendigen Entwicklung darzustellen, mußte deswegen ein neues Unternehmen sein und dabei von vorne angefangen werden; jenes erworbene Material, die bekannten Denkformen, aber ist als eine höchst wichtige Vorlage, ja eine notwendige Bedingung [und] dankbar anzuerkennende Voraussetzung anzusehen, wenn dieselbe auch nur hie und da einen dürren Faden oder die leblosen Knochen eines Skeletts, sogar in Unordnung untereinander geworfen, dargibt.",
-          "confidence": 1.0,
-          "spaced_text": false,
-          "italic": false,
-          "paragraph_id": "p0002",
-          "continues_previous_paragraph": true
-        },
-        {
-          "id": "p18_b6",
-          "type": "page_number",
-          "bbox": [
-            148.44000244140625,
-            419.0240173339844,
-            158.5491485595703,
-            428.1120300292969
-          ],
-          "text_raw": "*9",
-          "text_normalized": "19",
-          "confidence": 0.9,
           "spaced_text": false,
           "italic": false
         }
