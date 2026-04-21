@@ -147,12 +147,123 @@ main.main {
 }
 
 /* Band-Liste */
+.section-header {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--accent);
+  margin: 2.5rem 0 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--accent-wash);
+  letter-spacing: 0.01em;
+}
+.section-intro {
+  font-family: var(--serif);
+  color: var(--ink-soft);
+  margin: 0 0 1.8rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 44rem;
+}
 .baende-list {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  margin: 2rem 0 3rem;
+  margin: 1.5rem 0 2.5rem;
 }
+
+/* Planned groups */
+.baende-planned {
+  margin: 3rem 0 2rem;
+}
+.planned-group {
+  margin-bottom: 2.5rem;
+}
+.planned-group-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 0.3rem;
+}
+.planned-group-desc {
+  font-family: var(--serif);
+  font-size: 0.92rem;
+  color: var(--ink-mute);
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+.planned-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  background: var(--bg-paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+.planned-item {
+  padding: 1rem 1.3rem;
+  border-bottom: 1px solid var(--rule);
+}
+.planned-item:last-child {
+  border-bottom: none;
+}
+.planned-head {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+.planned-gw {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+.planned-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.planned-title {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink);
+  font-style: italic;
+}
+.planned-subtitle {
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  font-style: normal;
+}
+.planned-year {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.planned-abstract {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0.4rem 0 0.4rem;
+  padding-left: 4.5rem;
+}
+.planned-copyright {
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  color: var(--ink-mute);
+  margin: 0;
+  padding-left: 4.5rem;
+}
+
 .band-card {
   background: var(--bg-paper);
   border: 1px solid var(--rule);
@@ -338,4 +449,14 @@ main.main {
   .hero h1 { font-size: 2.4rem; }
   .band-header { flex-direction: column; gap: 0.3rem; }
   .band-card { padding: 1.3rem 1.4rem; }
+  .planned-head {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+  .planned-abstract, .planned-copyright {
+    padding-left: 0;
+  }
+  .planned-year {
+    text-align: left;
+  }
 }
