@@ -6,70 +6,37 @@
     <title>Wissenschaft der Logik – Zweiter Band (GW 12)</title>
     <link rel="stylesheet" href="../assets/style.css">
     <style>
-        .page-num { float: right; font-size: 0.85em; color: #666; margin-left: 15px; }
-        .chapter-title { font-size: 1.4em; margin: 2.5em 0 1em; border-bottom: 2px solid #333; padding-bottom: 8px; }
-        .paragraph { margin-bottom: 1.2em; line-height: 1.65; }
-        .toc { position: sticky; top: 20px; max-height: 90vh; overflow-y: auto; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Sidebar mit Inhaltsverzeichnis -->
-        <nav class="toc">
-            <h2>Inhaltsverzeichnis</h2>
-            <ul id="toc-list"></ul>
-        </nav>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.75;
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #222;
+        }
+        .container { display: flex; gap: 40px; }
+        .toc { width: 280px; position: sticky; top: 30px; align-self: flex-start; }
+        main { flex: 1; }
 
-        <!-- Haupttext -->
-        <main id="main-text">
-            <h1>Wissenschaft der Logik</h1>
-            <h2>Zweiter Band – Die subjective Logik oder Lehre vom Begriff</h2>
-            <div id="content"></div>
-        </main>
-    </div>
+        h1, h2.chapter-title {
+            text-align: center;
+            margin: 3em 0 1.8em 0;
+            font-weight: normal;
+            letter-spacing: 0.5px;
+        }
+        h1 { font-size: 2.1em; margin-top: 1em; }
+        h2.chapter-title { font-size: 1.65em; border-bottom: 1px solid #ccc; padding-bottom: 12px; }
 
-    <script>
-        // Lade beide JSONs
-        Promise.all([
-            fetch('data/paragraphs.json').then(r => r.json()),
-            fetch('data/chapters.json').then(r => r.json())
-        ]).then(([paragraphs, chapters]) => {
-            
-            const contentDiv = document.getElementById('content');
-            const tocList = document.getElementById('toc-list');
-
-            // Inhaltsverzeichnis bauen
-            chapters.forEach(ch => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#chapter-${ch.id}">${ch.title}</a>`;
-                tocList.appendChild(li);
-            });
-
-            // Text rendern
-            let currentChapter = '';
-            paragraphs.forEach(para => {
-                // Kapitel-Überschrift einfügen, wenn nötig
-                const chapter = chapters.find(c => para.idx >= c.para_start && para.idx <= c.para_end);
-                if (chapter && chapter.id !== currentChapter) {
-                    const h2 = document.createElement('h2');
-                    h2.id = `chapter-${chapter.id}`;
-                    h2.className = 'chapter-title';
-                    h2.textContent = chapter.title;
-                    contentDiv.appendChild(h2);
-                    currentChapter = chapter.id;
-                }
-
-                const p = document.createElement('p');
-                p.className = 'paragraph';
-                p.innerHTML = `
-                    <span class="page-num">[GW ${para.gw}]</span>
-                    ${para.text}
-                `;
-                contentDiv.appendChild(p);
-            });
-
-            console.log('✅ text.html erfolgreich gerendert –', paragraphs.length, 'Absätze');
-        });
-    </script>
-</body>
-</html>
+        .paragraph {
+            margin-bottom: 1.4em;
+            text-align: justify;
+            hyphens: auto;
+        }
+        .page-num {
+            float: right;
+            font-size: 0.85em;
+            color: #555;
+            margin-left: 12px;
+            font-family: sans-serif;
+        }
+        em {
