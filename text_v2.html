@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text — Hegel Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .text-body p {
+      text-align: justify;
+      hyphens: auto;
+      margin-bottom: 0;
+      text-indent: 1.5em;
+      line-height: 1.62;
+    }
+    .chapter-heading + p { text-indent: 0; }
+    .chapter-heading { color: var(--accent); margin-top: 2.2em; margin-bottom: 1em; }
+    .heading-l1 { font-size: 2rem; font-weight: normal; text-align: center; }
+    .heading-l2 { font-size: 1.6rem; font-weight: normal; }
+    .heading-l3 { font-size: 1.3rem; font-weight: 600; }
+    .heading-l4 { font-size: 1.12rem; font-weight: 600; }
+    .heading-l5 { font-size: 1rem; font-style: italic; }
+    .toc-item-level-1 { font-weight: 600; margin-top: 15px; font-size: 0.95rem; }
+    .toc-item-level-2 { padding-left: 10px; font-size: 0.86rem; }
+    .toc-item-level-3 { padding-left: 20px; font-size: 0.82rem; }
+    .toc-item-level-4 { padding-left: 28px; font-size: 0.8rem; color: #666; }
+    .toc-item-level-5 { padding-left: 36px; font-size: 0.78rem; color: #777; }
+    .toc a.active {
+      color: var(--accent);
+      font-weight: bold;
+      border-left: 2px solid var(--accent);
+      padding-left: 5px;
+      margin-left: -7px;
+    }
+    .footnote-item {
+      font-size: 0.85rem;
+      margin-top: 18px;
+      border-top: 1px solid #d8d0c7;
+      padding-top: 10px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="site-title">
+    <span class="site-title-eyebrow">Digitale Edition</span>
+    <span class="site-title-main">Hegel · Werke</span>
+  </a>
+  <nav class="sitenav">
+    <ul>
+      <li><a href="index.html">Start</a></li>
+      <li><a href="text.html" class="current">Text lesen</a></li>
+      <li><a href="search.html">Suche</a></li>
+      <li><a href="network.html">Netzwerk</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <div class="reader-layout">
+    <aside class="toc">
+      <h3>Inhalt</h3>
+      <ul id="toc-list"></ul>
+    </aside>
+    <article class="text-body" id="text-render">
+      <p>Lade Hegel-Korpus...</p>
+    </article>
+  </div>
+</main>
+
+<script>
+async function loadHegel() {
+  const renderArea = document.getElementById('text-render');
+  const tocList = document.getElementById('toc-list');
+
+  try {
+    const response = await fetch('data/twa_band_5_v2.json?v=' + new Date().getTime());
+    const data = await response.json();
+    const pages = (data.pages || []).filter(p => !p.section_type || p.section_type === 'maintext');
+
+    renderArea.innerHTML = "";
+    tocList.innerHTML = "";
+    let tocHTML = "";
+
+    pages.forEach(page => {
+      const pageAnchor = `page-${page.page_book || page.id}`;
+
+      let pageHtml = `
+        <section class="page-unit" id="${pageAnchor}">
+          <div class="marginalie">${page.sigel || ''}</div>
+          <div class="content">`;
+
+      (page.blocks || []).forEach((block, index) => {
+        if (block.type === 'heading') {
+          const lvl = block.level || 2;
+          const id = `heading-${page.page_book || page.id}-${index}`;
+          const tag = lvl <= 2 ? 'h2' : 'h3';
+          pageHtml += `<${tag} class="chapter-heading heading-l${lvl}" id="${id}">${block.content}</${tag}>`;
+          tocHTML += `<li class="toc-item-level-${lvl}"><a href="#${id}">${block.plain || block.content}</a></li>`;
+        } else if (block.type === 'footnote') {
+          pageHtml += `<div class="footnote-item">${block.content}</div>`;
+        } else {
+          pageHtml += `<p>${block.content}</p>`;
+        }
+      });
+
+      pageHtml += `</div></section>`;
+      renderArea.insertAdjacentHTML('beforeend', pageHtml);
+    });
+
+    tocList.innerHTML = tocHTML;
+    initScrollSpy();
+  } catch (error) {
+    renderArea.innerHTML = `<p style="color:red">Fehler beim Laden: ${error.message}</p>`;
+  }
+}
+
+function initScrollSpy() {
+  const headings = document.querySelectorAll('.chapter-heading');
+  const navLinks = document.querySelectorAll('#toc-list a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach(link => link.classList.remove('active'));
+      const id = entry.target.getAttribute('id');
+      const activeLink = document.querySelector(`#toc-list a[href="#${id}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+        activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-18% 0px -78% 0px' });
+
+  headings.forEach(heading => observer.observe(heading));
+}
+
+loadHegel();
+</script>
+</body>
+</html>
