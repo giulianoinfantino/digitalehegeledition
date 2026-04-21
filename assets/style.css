@@ -29,3 +29,66 @@ main { padding: 50px 5%; max-width: 1200px; margin: 0 auto; min-height: 80vh; }
 .search-input:focus { outline: none; border-color: var(--accent); }
 .search-result { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
 mark { background: rgba(142, 32, 32, 0.15); color: var(--text-main); padding: 0 3px; }
+
+/* =========================================
+   PRO-FEATURES: THEMES & SCROLL-SPY
+   ========================================= */
+
+/* Sanftes Scrollen für das gesamte Dokument */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Theme: Sepia (Augenschonend) */
+body[data-theme="sepia"] {
+  --bg-color: #f4ecd8;
+  --text-main: #433422;
+  --text-muted: #7a6a58;
+  --border: #e0d5c1;
+  --accent: #8e2020;
+}
+
+/* Theme: Dark Mode (Nachtlese-Modus) */
+body[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --text-main: #e0e0e0;
+  --text-muted: #999;
+  --border: #333;
+  --accent: #d45d5d;
+}
+body[data-theme="dark"] .site-header {
+  background: rgba(26, 26, 26, 0.9);
+}
+
+/* Scroll-Spy: Aktive Seite im Inhaltsverzeichnis */
+.toc a.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-left: 2px solid var(--accent);
+  padding-left: 8px;
+  margin-left: -10px; /* Gleicht das Padding optisch aus */
+  transition: all 0.2s ease;
+}
+
+/* Theme-Switcher Buttons im Header */
+.theme-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: 20px;
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+}
+.theme-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.theme-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-main);
+}

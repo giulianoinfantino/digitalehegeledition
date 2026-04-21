@@ -2,21 +2,137 @@
 <html lang="de">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Text — Hegel Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="site-header">
-    <a href="index.html" class="site-title"><span class="site-title-eyebrow">Digitale Edition</span><span class="site-title-main">Hegel · Werke</span></a>
-    <nav class="sitenav"><ul><li><a href="index.html">Start</a></li><li><a href="text.html" class="current">Text lesen</a></li><li><a href="search.html">Suche</a></li></ul></nav>
+    <a href="index.html" class="site-title">
+        <span class="site-title-eyebrow">Digitale Edition</span>
+        <span class="site-title-main">Hegel · Werke</span>
+    </a>
+    <nav class="sitenav" style="display: flex; align-items: center;">
+        <ul>
+            <li><a href="index.html">Start</a></li>
+            <li><a href="text.html" class="current">Text lesen</a></li>
+            <li><a href="search.html">Suche</a></li>
+        </ul>
+        <div class="theme-controls">
+            <button class="theme-btn" onclick="setTheme('light')">Hell</button>
+            <button class="theme-btn" onclick="setTheme('sepia')">Sepia</button>
+            <button class="theme-btn" onclick="setTheme('dark')">Dunkel</button>
+        </div>
+    </nav>
 </header>
 <main>
     <div class="reader-layout">
-        <aside class="toc"><h3>Inhalt</h3><ul id="toc-list"></ul></aside>
-        <article class="text-body" id="text-render"><p>Lade Hegel-Korpus...</p></article>
+        <aside class="toc">
+            <h3>Inhalt</h3>
+            <ul id="toc-list"></ul>
+        </aside>
+        <article class="text-body" style="hyphens: auto;" id="text-render">
+            <p id="loading-status">Lade Hegel-Korpus...</p>
+        </article>
     </div>
 </main>
-<script src="assets/app.js"></script>
+
+<script>
+/* --- THEME LOGIK --- */
+function setTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('hegel-theme', theme); // Speichert die Wahl des Nutzers
+}
+// Beim Laden prüfen, ob der Nutzer schon ein Theme gewählt hatte
+const savedTheme = localStorage.getItem('hegel-theme') || 'light';
+setTheme(savedTheme);
+
+
+/* --- DATEN LADEN & RENDER LOGIK --- */
+async function loadHegel() {
+    const renderArea = document.getElementById('text-render');
+    const tocList = document.getElementById('toc-list');
+
+    try {
+        const response = await fetch('data/twa_band_5.json?nocache=' + new Date().getTime());
+        if (!response.ok) throw new Error("JSON-Datei konnte nicht geladen werden.");
+        
+        const data = await response.json();
+        renderArea.innerHTML = ""; 
+
+        const bandTitel = data.metadata.titel || "Wissenschaft der Logik I";
+        const bandNr = data.metadata.band || "5";
+        renderArea.innerHTML = `<h1>${bandTitel} (TWA ${bandNr})</h1>`;
+
+        data.pages.forEach(page => {
+            const pId = page.id || page.nr || "0";
+            const pSigel = page.sigel || `TWA ${bandNr}, ${pId}`;
+            const pBlocks = page.blocks || page.paragraphs || [];
+            const pageAnchor = `page-${pId}`;
+
+            // TOC Eintrag
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#${pageAnchor}" data-target="${pageAnchor}">Seite ${pId}</a>`;
+            tocList.appendChild(li);
+
+            // Text Eintrag
+            let pageHtml = `
+                <section class="page-unit" id="${pageAnchor}">
+                    <div class="marginalie">${pSigel}</div>
+                    <div class="content">`;
+            
+            if (pBlocks.length > 0) {
+                pBlocks.forEach(block => { pageHtml += `<p>${block}</p>`; });
+            } else {
+                pageHtml += `<p><em>[Kein Text]</em></p>`;
+            }
+            
+            pageHtml += `</div></section>`;
+            renderArea.insertAdjacentHTML('beforeend', pageHtml);
+        });
+
+        // NEU: Scroll-Spy initialisieren, NACHDEM der Text gerendert wurde
+        initScrollSpy();
+
+    } catch (error) {
+        renderArea.innerHTML = `<p style="color:red;">Fehler: ${error.message}</p>`;
+    }
+}
+
+/* --- SCROLL-SPY LOGIK --- */
+function initScrollSpy() {
+    const sections = document.querySelectorAll('.page-unit');
+    const navLinks = document.querySelectorAll('#toc-list a');
+
+    // Der Observer schaut, welches Element gerade oben im Bild ist
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // 1. Alle aktiven Markierungen entfernen
+                navLinks.forEach(link => link.classList.remove('active'));
+                
+                // 2. Die aktuelle Seite markieren
+                const id = entry.target.getAttribute('id');
+                const activeLink = document.querySelector(`#toc-list a[href="#${id}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    
+                    // Optional: Das Menü automatisch mitscrollen lassen
+                    activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+    }, { 
+        // Trigger-Bereich: Ein bisschen unterhalb des oberen Bildschirmrands
+        rootMargin: '-10% 0px -80% 0px' 
+    });
+
+    sections.forEach(sec => observer.observe(sec));
+}
+
+// Start
+loadHegel();
+</script>
 </body>
 </html>
