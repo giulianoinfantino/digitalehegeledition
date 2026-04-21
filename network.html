@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Start — Hegel Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .landing {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: start;
+      padding: 34px 0 18px;
+    }
+    .hero-copy {
+      padding-top: 12px;
+    }
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.7);
+    }
+    .hero h1 {
+      font-family: var(--font-text);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 0.96;
+      font-weight: 400;
+      margin: 0 0 20px;
+      letter-spacing: -0.03em;
+    }
+    .hero-lead {
+      max-width: 52rem;
+      font-size: 1.18rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin: 0 0 28px;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(142,32,32,0.4);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.82);
+      color: var(--text-main);
+    }
+    .hero-note {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 45rem;
+    }
+    .hero-panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.65));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 16px 34px rgba(0,0,0,0.04);
+    }
+    .panel-kicker {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .edition-title {
+      font-family: var(--font-text);
+      font-size: 2rem;
+      line-height: 1.08;
+      margin: 0 0 18px;
+      font-weight: 400;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 8px;
+    }
+    .meta-item {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(252,251,249,0.9);
+      border: 1px solid var(--border);
+    }
+    .meta-label {
+      display: block;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .meta-value {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.4;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 16px 0 42px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px 20px;
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .stat-number {
+      font-family: var(--font-text);
+      font-size: 2rem;
+      line-height: 1;
+      margin: 0 0 8px;
+    }
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+    .section {
+      margin: 42px 0;
+    }
+    .section-header {
+      margin-bottom: 20px;
+    }
+    .section-header h2 {
+      font-family: var(--font-text);
+      font-size: 2.1rem;
+      font-weight: 400;
+      margin: 0 0 8px;
+    }
+    .section-header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
+      max-width: 48rem;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.03);
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      margin: 0 0 10px;
+      font-weight: 700;
+    }
+    .feature-card p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.65;
+      font-size: 0.98rem;
+    }
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .workflow-card {
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+    }
+    .workflow-card ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      line-height: 1.75;
+    }
+    .workflow-card li + li {
+      margin-top: 4px;
+    }
+    .quote-box {
+      border-left: 3px solid var(--accent);
+      padding: 8px 0 8px 18px;
+      margin-top: 18px;
+      color: var(--text-muted);
+      font-family: var(--font-text);
+      font-size: 1.15rem;
+      line-height: 1.7;
+    }
+    .site-footer {
+      padding: 36px 0 10px;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+    @media (max-width: 980px) {
+      .hero,
+      .workflow-grid,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 700px) {
+      .meta-grid,
+      .stats-strip {
+        grid-template-columns: 1fr;
+      }
+      .site-header {
+        gap: 16px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .site-footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="site-title">
+    <span class="site-title-eyebrow">Digitale Edition</span>
+    <span class="site-title-main">Hegel · Werke</span>
+  </a>
+  <nav class="sitenav">
+    <ul>
+      <li><a href="index.html" class="current">Start</a></li>
+      <li><a href="text.html">Text lesen</a></li>
+      <li><a href="search.html">Suche</a></li>
+      <li><a href="network.html">Netzwerk</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="landing">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Arbeitsversion einer digitalen Hegel-Edition</div>
+      <h1>Wissenschaft<br>der Logik I</h1>
+      <p class="hero-lead">
+        Eine lesbare, durchsuchbare und strukturell gegliederte Webausgabe auf Basis der extrahierten Druckvorlage.
+        Die Startseite soll nicht bloß dekorativ sein, sondern den Leser direkt in den Text, in die Suche und in die
+        experimentellen Analysewerkzeuge führen.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="text.html">Edition betreten</a>
+        <a class="btn btn-secondary" href="search.html">Im Korpus suchen</a>
+        <a class="btn btn-secondary" href="network.html">Netzwerk ansehen</a>
+      </div>
+      <p class="hero-note">
+        Fokus dieser Fassung: sauberer Einstieg, bessere Informationsarchitektur und ein seriöserer Eindruck als bei einer reinen Placeholder-Startseite.
+      </p>
+    </div>
+
+    <aside class="hero-panel">
+      <div class="panel-kicker">Aktuelle Ausgabe</div>
+      <h2 class="edition-title">Georg Wilhelm Friedrich Hegel<br>Wissenschaft der Logik I</h2>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Band</span>
+          <span class="meta-value">TWA 5</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Teil</span>
+          <span class="meta-value">Die objektive Logik · Erstes Buch</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Zugriff</span>
+          <span class="meta-value">Lesetext · Suche · Netzwerk</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">fortlaufend überarbeitet</span>
+        </div>
+      </div>
+      <div class="quote-box">
+        Ziel ist nicht bloß, PDF-Seiten anzuzeigen, sondern eine wirkliche digitale Edition mit lesbarer Struktur,
+        durchsuchbarem Haupttext und ausbaufähiger semantischer Ordnung.
+      </div>
+    </aside>
+  </section>
+
+  <section class="stats-strip" aria-label="Korpusdaten">
+    <article class="stat-card">
+      <div class="stat-number" id="stat-pages">—</div>
+      <div class="stat-label">Haupttext-Seiten im aktuellen JSON</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-number" id="stat-headings">—</div>
+      <div class="stat-label">erkannte Überschriften im Haupttext</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-number" id="stat-blocks">—</div>
+      <div class="stat-label">durchsuchbare Textblöcke</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-number" id="stat-notes">—</div>
+      <div class="stat-label">abgetrennte Fußnotenblöcke</div>
+    </article>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Wie man diese Seite benutzen kann</h2>
+      <p>
+        Die Startseite soll drei Zugänge bündeln: lineares Lesen, gezielte Begriffssuche und experimentelle Strukturansicht.
+        So wird aus einer bloßen PDF-Ablage ein editorischer Arbeitsraum.
+      </p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card">
+        <h3>Text lesen</h3>
+        <p>
+          Der Reader zeigt nur den eigentlichen Haupttext, mit Gliederung und Seiten-Siglen. Frontmatter,
+          Verlagsseiten und Inhaltsverzeichnis können dadurch aus dem Lesefluss verschwinden.
+        </p>
+      </article>
+      <article class="feature-card">
+        <h3>Suche</h3>
+        <p>
+          Die Suche arbeitet blockweise auf dem normalisierten Haupttext. Sie ist damit für inhaltliche Orientierung
+          und philologische Schnellabfragen deutlich nützlicher als ein bloßes Browser-Finden innerhalb eines PDFs.
+        </p>
+      </article>
+      <article class="feature-card">
+        <h3>Netzwerk</h3>
+        <p>
+          Die Netzwerkansicht bleibt explorativ. Sie kann Beziehungen und Häufungen sichtbar machen, sollte aber nur
+          auf einem hinreichend bereinigten Korpus wissenschaftlich ernst genommen werden.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Editorische Leitidee</h2>
+      <p>
+        Die Seite soll modern wirken, ohne den Eindruck einer generischen Produkt-Landing-Page zu erzeugen.
+        Deshalb ist die Sprache bewusst sachlich, der Aufbau textzentriert und die Navigation knapp gehalten.
+      </p>
+    </div>
+    <div class="workflow-grid">
+      <article class="workflow-card">
+        <h3>Was hier schon besser funktioniert</h3>
+        <ol>
+          <li>klarer Einstieg statt bloßer Ein-Knopf-Startseite</li>
+          <li>sichtbare Orientierung über Band, Zugriff und Status</li>
+          <li>direkter Zugang zu den drei zentralen Arbeitsmodi</li>
+          <li>dynamische Kennzahlen aus dem JSON-Korpus</li>
+        </ol>
+      </article>
+      <article class="workflow-card">
+        <h3>Was als Nächstes folgen sollte</h3>
+        <ol>
+          <li>Feinarbeit an Sperrsatz, Kursivierung und Fußnoten</li>
+          <li>stabilere Überschriftenhierarchie in allen Bänden</li>
+          <li>bessere Kapitel-/Werknavigation über mehrere Bände hinweg</li>
+          <li>spätere TEI- oder semantische Exportspur</li>
+        </ol>
+      </article>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div>Digitale Hegel-Edition · Arbeitsstand für Webpräsentation und Korpuserprobung</div>
+    <div id="data-status">Lade Korpusdaten…</div>
+  </footer>
+</main>
+
+<script>
+  async function populateStats() {
+    const status = document.getElementById('data-status');
+    try {
+      const response = await fetch('data/twa_band_5_v2.json?v=' + Date.now());
+      const data = await response.json();
+      const pages = (data.pages || []).filter(page => !page.section_type || page.section_type === 'maintext');
+      let headings = 0;
+      let searchableBlocks = 0;
+      let notes = 0;
+
+      pages.forEach(page => {
+        (page.blocks || []).forEach(block => {
+          if (block.type === 'heading') headings += 1;
+          if (block.type === 'paragraph' || block.type === 'heading') searchableBlocks += 1;
+          if (block.type === 'footnote') notes += 1;
+        });
+      });
+
+      document.getElementById('stat-pages').textContent = pages.length.toLocaleString('de-DE');
+      document.getElementById('stat-headings').textContent = headings.toLocaleString('de-DE');
+      document.getElementById('stat-blocks').textContent = searchableBlocks.toLocaleString('de-DE');
+      document.getElementById('stat-notes').textContent = notes.toLocaleString('de-DE');
+      status.textContent = 'Korpusdaten erfolgreich geladen';
+    } catch (error) {
+      document.getElementById('stat-pages').textContent = '—';
+      document.getElementById('stat-headings').textContent = '—';
+      document.getElementById('stat-blocks').textContent = '—';
+      document.getElementById('stat-notes').textContent = '—';
+      status.textContent = 'Korpusdaten nicht geladen: ' + error.message;
+    }
+  }
+
+  populateStats();
+</script>
+</body>
+</html>
