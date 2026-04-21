@@ -6,40 +6,16 @@
     <title>Wissenschaft der Logik – Zweiter Band (GW 12)</title>
     <link rel="stylesheet" href="../assets/style.css">
     <style>
-        body {
-            font-family: Georgia, serif;
-            line-height: 1.78;
-            max-width: 720px;
-            margin: 40px auto;
-            padding: 20px;
-            color: #222;
-        }
+        body { font-family: Georgia, serif; line-height: 1.78; max-width: 720px; margin: 40px auto; padding: 20px; color: #222; }
         .container { display: flex; gap: 40px; }
         .toc { width: 280px; position: sticky; top: 30px; align-self: flex-start; }
         main { flex: 1; }
-
-        h1, h2.chapter-title {
-            text-align: center;
-            margin: 3em 0 1.8em 0;
-            font-weight: normal;
-            letter-spacing: 0.5px;
-        }
-        h1 { font-size: 2.1em; margin-top: 1em; }
+        h1, h2.chapter-title { text-align: center; margin: 3em 0 1.8em; font-weight: normal; }
+        h1 { font-size: 2.1em; }
         h2.chapter-title { font-size: 1.65em; border-bottom: 1px solid #ccc; padding-bottom: 12px; }
-
-        .paragraph {
-            margin-bottom: 1.45em;
-            text-align: justify;
-            hyphens: auto;
-        }
-        .page-num {
-            float: right;
-            font-size: 0.85em;
-            color: #555;
-            margin-left: 15px;
-            font-family: sans-serif;
-        }
-        em { font-style: italic; color: #111; }
+        .paragraph { margin-bottom: 1.45em; text-align: justify; }
+        .page-num { float: right; font-size: 0.85em; color: #555; margin-left: 15px; }
+        em { font-style: italic !important; color: #111; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -48,7 +24,6 @@
             <h2 style="text-align:center; margin-bottom:25px;">Inhaltsverzeichnis</h2>
             <ul id="toc-list"></ul>
         </nav>
-
         <main>
             <h1>Wissenschaft der Logik</h1>
             <h2>Zweiter Band – Die subjective Logik oder Lehre vom Begriff</h2>
@@ -57,6 +32,17 @@
     </div>
 
     <script>
+        function cleanEmphasis(text) {
+            // Sehr zurückhaltende Sperrschrift-Erkennung
+            return text
+                // 1. Entferne doppelte <em>-Tags aus dem Post-Processor
+                .replace(/<\/?em>/g, '')
+                // 2. Nur echte Sperrschrift-Muster (sehr konservativ)
+                .replace(/\b([A-ZÄÖÜ][A-ZÄÖÜa-zäöüß-]{6,})\b/g, '<em>$1</em>')           // lange Wörter mit Großbuchstaben
+                .replace(/\b([A-ZÄÖÜ]{2,})\b/g, '<em>$1</em>')                          // kurze reine Großbuchstaben-Wörter
+                .replace(/\b(B e g r i f f|B e g r i f f e|U r t h e i l|S c h l u ß|I d e e|O b j e c t i v i t ä t|S u b j e c t i v i t ä t)\b/g, '<em>$1</em>');
+        }
+
         Promise.all([
             fetch('data/paragraphs.json').then(r => r.json()),
             fetch('data/chapters.json').then(r => r.json())
@@ -64,7 +50,6 @@
             const contentDiv = document.getElementById('content');
             const tocList = document.getElementById('toc-list');
 
-            // Inhaltsverzeichnis
             chapters.forEach(ch => {
                 const li = document.createElement('li');
                 li.innerHTML = `<a href="#chapter-${ch.id}">${ch.title}</a>`;
@@ -87,15 +72,12 @@
                 p.className = 'paragraph';
                 p.innerHTML = `
                     <span class="page-num">[GW ${para.gw}]</span>
-                    ${para.text}
+                    ${cleanEmphasis(para.text)}
                 `;
                 contentDiv.appendChild(p);
             });
 
-            console.log('✅ text.html Version 4 erfolgreich geladen');
-        }).catch(err => {
-            console.error(err);
-            document.getElementById('content').innerHTML = `<p style="color:red;">Fehler beim Laden der JSON-Dateien. Bitte prüfe, ob data/paragraphs.json und data/chapters.json existieren.</p>`;
+            console.log('✅ Version 4.2 – Sperrschrift deutlich zurückhaltender');
         });
     </script>
 </body>
