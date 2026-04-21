@@ -13,17 +13,12 @@
         <span class="site-title-eyebrow">Digitale Edition</span>
         <span class="site-title-main">Hegel · Werke</span>
     </a>
-    <nav class="sitenav" style="display: flex; align-items: center;">
+    <nav class="sitenav">
         <ul>
             <li><a href="index.html">Start</a></li>
             <li><a href="text.html" class="current">Text lesen</a></li>
             <li><a href="search.html">Suche</a></li>
         </ul>
-        <div class="theme-controls">
-            <button class="theme-btn" onclick="setTheme('light')">Hell</button>
-            <button class="theme-btn" onclick="setTheme('sepia')">Sepia</button>
-            <button class="theme-btn" onclick="setTheme('dark')">Dunkel</button>
-        </div>
     </nav>
 </header>
 <main>
@@ -32,137 +27,76 @@
             <h3>Inhalt</h3>
             <ul id="toc-list"></ul>
         </aside>
-        <article class="text-body" style="hyphens: auto;" id="text-render">
-            <p id="loading-status">Lade Hegel-Korpus...</p>
+
+        <article class="text-body" id="text-render">
+            <p>Lade Hegel-Korpus...</p>
         </article>
     </div>
 </main>
 
 <script>
-/* --- THEME LOGIK --- */
-function setTheme(theme) {
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('hegel-theme', theme); // Speichert die Wahl des Nutzers
-}
-// Beim Laden prüfen, ob der Nutzer schon ein Theme gewählt hatte
-const savedTheme = localStorage.getItem('hegel-theme') || 'light';
-setTheme(savedTheme);
-
-
-/* --- DATEN LADEN & RENDER LOGIK --- */
 async function loadHegel() {
     const renderArea = document.getElementById('text-render');
     const tocList = document.getElementById('toc-list');
 
     try {
-        const response = await fetch('data/twa_band_5.json?nocache=' + new Date().getTime());
-        if (!response.ok) throw new Error("JSON-Datei konnte nicht geladen werden.");
-        
+        // 1. Daten laden
+        const response = await fetch('data/twa_band_5.json?v=' + new Date().getTime());
+        if (!response.ok) throw new Error("JSON konnte nicht geladen werden.");
         const data = await response.json();
-        renderArea.innerHTML = ""; 
 
-        const bandTitel = data.metadata.titel || "Wissenschaft der Logik I";
-        const bandNr = data.metadata.band || "5";
-        renderArea.innerHTML = `<h1>${bandTitel} (TWA ${bandNr})</h1>`;
+        // Anzeige leeren
+        renderArea.innerHTML = "";
+        tocList.innerHTML = "";
 
+        // 2. Navigation links bauen (aus metadata.toc)
+        // Das sorgt dafür, dass nur Kapitelüberschriften links erscheinen
+        if (data.metadata && data.metadata.toc) {
+            data.metadata.toc.forEach(item => {
+                const li = document.createElement('li');
+                // Wir fügen eine Klasse für die Einrückung hinzu (Level 1, 2, etc.)
+                li.className = 'toc-item-level-' + (item.level || 1);
+                li.innerHTML = `<a href="#page-${item.page}">${item.title}</a>`;
+                tocList.appendChild(li);
+            });
+        }
+
+        // 3. Den Text rechts rendern (aus data.pages)
+        // Hier gehen wir alle 456 Seiten durch
         data.pages.forEach(page => {
-            const pId = page.id || page.nr || "0";
-            const pSigel = page.sigel || `TWA ${bandNr}, ${pId}`;
-            const pBlocks = page.blocks || page.paragraphs || [];
+            const pId = page.id || page.nr;
             const pageAnchor = `page-${pId}`;
 
-            // TOC Eintrag
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="#${pageAnchor}" data-target="${pageAnchor}">Seite ${pId}</a>`;
-            tocList.appendChild(li);
-
-            // Text Eintrag
             let pageHtml = `
                 <section class="page-unit" id="${pageAnchor}">
-                    <div class="marginalie">${pSigel}</div>
+                    <div class="marginalie">${page.sigel}</div>
                     <div class="content">`;
-            
-if (pBlocks.length > 0) {
-                let mainContent = "";
-                let footnotes = "";
 
-                pBlocks.forEach(block => {
-                    // Abwärtskompatibilität, falls die alte JSON noch geladen wird
+            // Falls die Seite Text-Blöcke hat
+            if (page.blocks) {
+                page.blocks.forEach(block => {
                     if (typeof block === 'string') {
-                        mainContent += `<p>${block}</p>`;
-                        return;
-                    }
-
-                    // Das neue, smarte Rendering
-                    if (block.type === "heading") {
-                        mainContent += `<h2 class="chapter-heading">${block.content}</h2>`;
-                    } else if (block.type === "footnote") {
-                        footnotes += `<div class="footnote-item">${block.content}</div>`;
+                        pageHtml += `<p>${block}</p>`;
+                    } else if (block.type === 'heading') {
+                        pageHtml += `<h2 class="chapter-heading">${block.content}</h2>`;
+                    } else if (block.type === 'footnote') {
+                        pageHtml += `<div class="footnote-item">${block.content}</div>`;
                     } else {
-                        mainContent += `<p>${block.content}</p>`;
+                        pageHtml += `<p>${block.content}</p>`;
                     }
                 });
-
-                // Zuerst den Haupttext einfügen
-                pageHtml += mainContent;
-
-                // Wenn es Fußnoten auf dieser Seite gab, rendern wir einen edlen Trennstrich
-                if (footnotes !== "") {
-                    pageHtml += `
-                        <div class="footnote-container">
-                            <hr class="footnote-divider">
-                            ${footnotes}
-                        </div>`;
-                }
-
-            } else {
-                pageHtml += `<p><em>[Kein Text]</em></p>`;
             }
             
             pageHtml += `</div></section>`;
             renderArea.insertAdjacentHTML('beforeend', pageHtml);
         });
 
-        // NEU: Scroll-Spy initialisieren, NACHDEM der Text gerendert wurde
-        initScrollSpy();
-
     } catch (error) {
-        renderArea.innerHTML = `<p style="color:red;">Fehler: ${error.message}</p>`;
+        renderArea.innerHTML = `<p style="color:red">Fehler: ${error.message}</p>`;
     }
 }
 
-/* --- SCROLL-SPY LOGIK --- */
-function initScrollSpy() {
-    const sections = document.querySelectorAll('.page-unit');
-    const navLinks = document.querySelectorAll('#toc-list a');
-
-    // Der Observer schaut, welches Element gerade oben im Bild ist
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // 1. Alle aktiven Markierungen entfernen
-                navLinks.forEach(link => link.classList.remove('active'));
-                
-                // 2. Die aktuelle Seite markieren
-                const id = entry.target.getAttribute('id');
-                const activeLink = document.querySelector(`#toc-list a[href="#${id}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                    
-                    // Optional: Das Menü automatisch mitscrollen lassen
-                    activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
-        });
-    }, { 
-        // Trigger-Bereich: Ein bisschen unterhalb des oberen Bildschirmrands
-        rootMargin: '-10% 0px -80% 0px' 
-    });
-
-    sections.forEach(sec => observer.observe(sec));
-}
-
-// Start
+// Skript starten
 loadHegel();
 </script>
 </body>
