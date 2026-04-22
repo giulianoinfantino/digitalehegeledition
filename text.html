@@ -285,6 +285,16 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+    .toc-list li[data-level="2"] a {
+      padding-left: 16px;
+    }
+    .toc-list li[data-level="3"] a {
+      padding-left: 24px;
+    }
+    .toc-list li[data-level="4"] a,
+    .toc-list li[data-level="5"] a {
+      padding-left: 32px;
+    }
     .reader-view {
       min-width: 0;
     }
@@ -734,7 +744,7 @@
       </section>
 
       <section class="side-card">
-        <h2 class="side-title">Gedrucktes Inhaltsverzeichnis</h2>
+        <h2 class="side-title" id="toc-title">Werkgliederung</h2>
         <ul class="toc-list" id="toc-list">
           <li>Warte auf JSON…</li>
         </ul>
@@ -909,10 +919,12 @@ function normalizeCorpus(raw) {
   const metadata = raw.metadata || {};
   const band = inferBand(metadata, pages);
   const toc = Array.isArray(raw.toc_printed) ? raw.toc_printed : [];
+  const outline = buildDerivedOutline(pages);
+  const tocMode = metadata?.series === 'GW' ? 'derived' : 'printed';
 
   const counts = {
     pages: pages.length,
-    toc: toc.length,
+    toc: tocMode === 'derived' ? outline.length : toc.length,
     headings: 0,
     footnotes: 0,
   };
@@ -929,9 +941,55 @@ function normalizeCorpus(raw) {
     metadata,
     band,
     toc,
+    outline,
+    tocMode,
     counts,
     pages
   };
+}
+
+function isUsefulOutlineHeading(text) {
+  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!value) return false;
+  if (value.length < 4 || value.length > 140) return false;
+  if (/^(INHALTSVERZEICHNIS|ANHANG|ANMERKUNGEN)$/i.test(value)) return false;
+  if (/\d/.test(value)) return false;
+  if (/^[A-ZÄÖÜ]{1,4}$/.test(value)) return false;
+  if (/^[a-zäöüß]{1,4}$/.test(value)) return false;
+  return true;
+}
+
+function buildDerivedOutline(pages) {
+  const outline = [];
+  const seen = new Set();
+
+  pages.forEach(page => {
+    if (page.page_kind !== 'body') return;
+    if (!page.gw_page && !page.oa_page) return;
+
+    page.units.forEach(unit => {
+      if (unit.label !== 'heading') return;
+      const title = String(unit.text_normalized || unit.text || '').replace(/\s+/g, ' ').trim();
+      if (!isUsefulOutlineHeading(title)) return;
+      if ((unit.features?.top || 0) < 100) return;
+      if ((unit.level || 2) > 3) return;
+
+      const key = `${page.page_pdf}:${title}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+
+      outline.push({
+        title,
+        level: unit.level || 2,
+        page_pdf: page.page_pdf,
+        gw_page: page.gw_page || null,
+        oa_page: page.oa_page || null,
+        anchor: `page-${page.page_pdf}`,
+      });
+    });
+  });
+
+  return outline;
 }
 
 async function fetchFirstAvailable(sources) {
@@ -1044,8 +1102,7 @@ function renderWorkOptions() {
 function resolveSigel(page) {
   if (page.sigel) return page.sigel;
   const fallbackSiglum = state.selectedWork?.siglum || (state.corpus.band ? `Band ${state.corpus.band}` : 'Band');
-  if (page.page_book != null) return `${fallbackSiglum}, ${page.page_book}`;
-  return `${fallbackSiglum}, ohne Druckseite`;
+  return fallbackSiglum;
 }
 
 function resolvePageAnchorByBook(pageRef) {
@@ -1186,12 +1243,40 @@ function renderSummary() {
 }
 
 function renderToc() {
+  const tocTitle = document.getElementById('toc-title');
   const tocList = document.getElementById('toc-list');
   if (!state.corpus) {
+    tocTitle.textContent = 'Werkgliederung';
     tocList.innerHTML = '<li>Kein Korpus geladen.</li>';
     return;
   }
 
+  if (state.corpus.tocMode === 'derived') {
+    tocTitle.textContent = 'Werkgliederung';
+    if (!state.corpus.outline.length) {
+      tocList.innerHTML = '<li>Keine tragfähige Gliederung aus den Überschriften ableitbar.</li>';
+      return;
+    }
+
+    tocList.innerHTML = state.corpus.outline.slice(0, 120).map(entry => {
+      const locator = entry.gw_page
+        ? `GW ${escapeHtml(entry.gw_page)}${entry.oa_page ? ` · OA ${escapeHtml(entry.oa_page)}` : ''}`
+        : entry.oa_page
+          ? `OA ${escapeHtml(entry.oa_page)}`
+          : '';
+      return `
+        <li data-level="${escapeHtml(entry.level || 2)}">
+          <a href="#${escapeHtml(entry.anchor)}" data-page-anchor="${escapeHtml(entry.anchor)}">
+            ${escapeHtml(entry.title)}
+            ${locator ? `<span class="toc-page">${locator}</span>` : ''}
+          </a>
+        </li>
+      `;
+    }).join('');
+    return;
+  }
+
+  tocTitle.textContent = 'Gedrucktes Inhaltsverzeichnis';
   if (!state.corpus.toc.length) {
     tocList.innerHTML = '<li>Kein gedrucktes Inhaltsverzeichnis im JSON vorhanden.</li>';
     return;
@@ -1216,7 +1301,6 @@ function buildCitation(unit, page) {
   const locator = [];
   if (page.gw_page) locator.push(`GW ${page.gw_page}`);
   if (page.oa_page) locator.push(`OA ${page.oa_page}`);
-  if (page.page_book != null) locator.push(`Druckseite ${page.page_book}`);
   const unitType = unit.label === 'heading' ? 'Überschrift' : unit.label === 'footnote' ? 'Fußnote' : 'Textstelle';
   return `Hegel, ${siglum}, ${locator.join(', ')}, ${unitType}, Abschnitt ${unit.unit_id}`;
 }
@@ -1262,7 +1346,7 @@ function renderUnit(unit, page) {
         ${badge}
         <div class="toc-entry-meta">
           <span>TOC</span>
-          <span>Druckseite ${escapeHtml(pageRef)}</span>
+          <span>Referenz ${escapeHtml(pageRef)}</span>
         </div>
         <div class="toc-entry-title${rawClass}">${formatText(title, state.mode)}</div>
         ${actionBar}
@@ -1307,7 +1391,7 @@ function renderPage(page) {
   const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
   const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
 
-  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}` : ''}${gwPage && oaPage ? ', ' : ''}${oaPage ? `OA ${oaPage}` : ''}${page.page_book != null ? `${gwPage || oaPage ? ', ' : ''}Druckseite ${page.page_book}` : ''}`;
+  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}` : ''}${gwPage && oaPage ? ', ' : ''}${oaPage ? `OA ${oaPage}` : ''}`;
   return `
     <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
       <aside class="page-rail">
@@ -1315,7 +1399,6 @@ function renderPage(page) {
         <div class="page-meta">
           ${gwPage ? `GW ${escapeHtml(gwPage)}<br>` : ''}
           ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
-          ${page.page_book != null ? `Druckseite ${escapeHtml(page.page_book)}<br>` : ''}
           ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${page.units.length} Units
         </div>
