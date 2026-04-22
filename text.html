@@ -7,52 +7,67 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
+    :root {
+      --reader-paper: #f7f1e7;
+      --reader-ink: #241d17;
+      --reader-muted: #73685c;
+      --reader-rule: rgba(86, 62, 42, 0.18);
+      --reader-accent-soft: #6f1d1b;
+      --reader-panel: rgba(255, 252, 247, 0.84);
+    }
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(188, 151, 110, 0.1), transparent 28%),
+        linear-gradient(180deg, #fbf7ef 0%, #f4ede1 100%);
+      color: var(--reader-ink);
+    }
     .reader-main {
-      max-width: 1380px;
+      max-width: 1460px;
       margin: 0 auto;
     }
     .reader-intro {
-      margin-bottom: 26px;
+      margin-bottom: 34px;
+      padding: 8px 0 18px;
     }
     .reader-kicker {
       display: inline-block;
       margin-bottom: 14px;
-      padding: 7px 12px;
-      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border: 1px solid var(--reader-rule);
       border-radius: 999px;
-      color: var(--accent);
+      color: var(--reader-accent-soft);
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 1.4px;
       text-transform: uppercase;
-      background: rgba(255,255,255,0.74);
+      background: rgba(255, 250, 243, 0.86);
     }
     .reader-intro h1 {
       margin: 0 0 12px;
       font-family: var(--font-text);
-      font-size: clamp(2.4rem, 5vw, 4rem);
-      line-height: 0.98;
+      font-size: clamp(2.8rem, 5vw, 4.7rem);
+      line-height: 0.94;
       font-weight: 400;
       letter-spacing: -0.03em;
     }
     .reader-intro p {
       margin: 0;
-      max-width: 60rem;
-      color: var(--text-muted);
-      font-size: 1.03rem;
-      line-height: 1.7;
+      max-width: 52rem;
+      color: var(--reader-muted);
+      font-size: 1.08rem;
+      line-height: 1.78;
     }
     .reader-layout {
       display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
-      gap: 28px;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 34px;
       align-items: start;
     }
     .reader-sidebar {
       position: sticky;
       top: 96px;
       display: grid;
-      gap: 16px;
+      gap: 14px;
       max-height: calc(100vh - 120px);
       overflow-y: auto;
       padding-right: 4px;
@@ -61,13 +76,14 @@
     .reader-summary,
     .page-card,
     .empty-state {
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      background: rgba(255,255,255,0.76);
-      box-shadow: 0 16px 34px rgba(26,26,26,0.04);
+      border: 1px solid var(--reader-rule);
+      border-radius: 28px;
+      background: var(--reader-panel);
+      box-shadow: 0 18px 45px rgba(45, 29, 17, 0.05);
+      backdrop-filter: blur(7px);
     }
     .side-card {
-      padding: 18px;
+      padding: 20px 18px;
     }
     .side-title,
     .unit-badge {
@@ -79,24 +95,24 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--reader-muted);
     }
     .source-status {
       margin-top: 12px;
       padding: 12px 14px;
       border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(252,251,249,0.88);
+      border: 1px solid var(--reader-rule);
+      background: rgba(255, 250, 244, 0.92);
       font-size: 0.95rem;
       line-height: 1.55;
-      color: var(--text-muted);
+      color: var(--reader-muted);
     }
     .source-status strong {
-      color: var(--text-main);
+      color: var(--reader-ink);
     }
     .source-status.is-ready {
-      border-color: rgba(142,32,32,0.18);
-      color: var(--text-main);
+      border-color: rgba(111, 29, 27, 0.18);
+      color: var(--reader-ink);
     }
     .source-status.is-warning {
       border-color: rgba(196,141,35,0.26);
@@ -119,9 +135,9 @@
       min-height: 44px;
       padding: 0 16px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--text-main);
+      border: 1px solid var(--reader-rule);
+      background: rgba(255, 253, 250, 0.98);
+      color: var(--reader-ink);
       font-family: var(--font-ui);
       font-size: 0.94rem;
       font-weight: 600;
@@ -134,16 +150,16 @@
     .reader-btn:hover,
     .mode-btn:hover {
       transform: translateY(-1px);
-      border-color: rgba(142,32,32,0.38);
-      color: var(--accent);
+      border-color: rgba(111, 29, 27, 0.38);
+      color: var(--reader-accent-soft);
     }
     .file-picker input {
       display: none;
     }
     .reader-btn.primary {
-      background: var(--accent);
+      background: var(--reader-accent-soft);
       color: #fff;
-      border-color: var(--accent);
+      border-color: var(--reader-accent-soft);
     }
     .reader-btn.primary:hover {
       color: #fff;
@@ -156,9 +172,9 @@
       gap: 12px;
     }
     .mode-btn.is-active {
-      background: rgba(142,32,32,0.08);
-      border-color: rgba(142,32,32,0.38);
-      color: var(--accent);
+      background: rgba(111, 29, 27, 0.08);
+      border-color: rgba(111, 29, 27, 0.38);
+      color: var(--reader-accent-soft);
     }
     .checklist {
       display: grid;
@@ -170,7 +186,7 @@
       display: flex;
       align-items: center;
       gap: 9px;
-      color: var(--text-main);
+      color: var(--reader-ink);
       font-size: 0.94rem;
       line-height: 1.4;
     }
@@ -192,16 +208,16 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--reader-muted);
     }
     .range-field input,
     .range-field select {
       width: 100%;
       padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(252,251,249,0.88);
-      color: var(--text-main);
+      border-radius: 16px;
+      border: 1px solid var(--reader-rule);
+      background: rgba(255, 251, 246, 0.9);
+      color: var(--reader-ink);
       box-sizing: border-box;
       font-size: 1rem;
       font-family: var(--font-ui);
@@ -209,7 +225,7 @@
     .range-field input:focus,
     .range-field select:focus {
       outline: none;
-      border-color: rgba(142,32,32,0.4);
+      border-color: rgba(111, 29, 27, 0.4);
     }
     .stat-grid {
       display: grid;
@@ -217,9 +233,9 @@
       gap: 10px;
     }
     .stat-tile {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(252,251,249,0.86);
+      border: 1px solid var(--reader-rule);
+      border-radius: 18px;
+      background: rgba(255, 249, 242, 0.78);
       padding: 14px;
     }
     .stat-tile strong {
@@ -231,7 +247,7 @@
     }
     .stat-tile span {
       display: block;
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 0.82rem;
       line-height: 1.45;
     }
@@ -244,11 +260,11 @@
     }
     .toc-list a {
       display: block;
-      padding: 10px 12px;
-      border-radius: 14px;
+      padding: 11px 12px;
+      border-radius: 16px;
       text-decoration: none;
-      color: var(--text-main);
-      background: rgba(252,251,249,0.76);
+      color: var(--reader-ink);
+      background: rgba(255, 250, 244, 0.72);
       border: 1px solid transparent;
       transition: border-color 0.18s ease, transform 0.18s ease, color 0.18s ease;
       font-size: 0.92rem;
@@ -257,8 +273,8 @@
     .toc-list a:hover,
     .toc-list a.is-active {
       transform: translateX(2px);
-      border-color: rgba(142,32,32,0.25);
-      color: var(--accent);
+      border-color: rgba(111, 29, 27, 0.25);
+      color: var(--reader-accent-soft);
     }
     .toc-page {
       display: block;
@@ -273,8 +289,8 @@
       min-width: 0;
     }
     .reader-summary {
-      padding: 22px 24px;
-      margin-bottom: 18px;
+      padding: 28px 30px;
+      margin-bottom: 24px;
       display: grid;
       gap: 14px;
     }
@@ -295,7 +311,7 @@
     }
     .summary-subtitle {
       margin: 8px 0 0;
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 1rem;
       line-height: 1.6;
       max-width: 52rem;
@@ -311,26 +327,26 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(252,251,249,0.88);
-      border: 1px solid var(--border);
+      background: rgba(255, 249, 241, 0.9);
+      border: 1px solid var(--reader-rule);
       font-size: 0.84rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--reader-muted);
     }
     .jump-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
     .reader-pages {
       display: grid;
-      gap: 18px;
+      gap: 22px;
     }
     .page-card {
       display: grid;
-      grid-template-columns: 150px minmax(0, 1fr);
-      gap: 22px;
-      padding: 24px;
+      grid-template-columns: 138px minmax(0, 1fr);
+      gap: 28px;
+      padding: 28px 30px;
       scroll-margin-top: 92px;
     }
     .page-card:target,
@@ -339,28 +355,28 @@
       box-shadow: 0 18px 40px rgba(142,32,32,0.08);
     }
     .page-card.page-toc {
-      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(253,247,239,0.92));
+      background: linear-gradient(180deg, rgba(255,252,247,0.92), rgba(247,239,226,0.96));
     }
     .page-card.page-frontmatter {
-      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,248,246,0.92));
+      background: linear-gradient(180deg, rgba(255,252,247,0.92), rgba(244,239,232,0.96));
     }
     .page-rail {
       padding-right: 16px;
-      border-right: 1px solid var(--border);
+      border-right: 1px solid var(--reader-rule);
       display: grid;
       align-content: start;
-      gap: 8px;
+      gap: 10px;
     }
     .page-sigel {
       font-family: var(--font-text);
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       line-height: 1;
-      color: var(--accent);
+      color: var(--reader-accent-soft);
     }
     .page-meta {
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 0.86rem;
-      line-height: 1.5;
+      line-height: 1.7;
     }
     .page-actions,
     .unit-actions {
@@ -376,9 +392,9 @@
       min-height: 34px;
       padding: 0 12px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(252,251,249,0.92);
-      color: var(--text-main);
+      border: 1px solid var(--reader-rule);
+      background: rgba(255, 250, 244, 0.92);
+      color: var(--reader-ink);
       font-family: var(--font-ui);
       font-size: 0.78rem;
       font-weight: 700;
@@ -389,17 +405,17 @@
     .reader-btn.ghost:hover,
     .unit-action-btn:hover {
       transform: translateY(-1px);
-      border-color: rgba(142,32,32,0.38);
-      color: var(--accent);
+      border-color: rgba(111, 29, 27, 0.38);
+      color: var(--reader-accent-soft);
     }
     .page-kind-chip {
       display: inline-flex;
       width: fit-content;
       padding: 7px 10px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(252,251,249,0.92);
-      color: var(--text-main);
+      border: 1px solid var(--reader-rule);
+      background: rgba(255, 249, 241, 0.92);
+      color: var(--reader-ink);
       font-size: 0.76rem;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -437,10 +453,10 @@
     .toc-entry-title,
     .footnote-text {
       font-family: var(--font-text);
-      font-size: 1.26rem;
-      line-height: 1.72;
+      font-size: 1.34rem;
+      line-height: 1.82;
       margin: 0;
-      color: var(--text-main);
+      color: var(--reader-ink);
     }
     .unit p.is-raw,
     .frontmatter-text.is-raw,
@@ -460,24 +476,24 @@
     }
     .edition-heading {
       margin: 0;
-      color: var(--accent);
+      color: var(--reader-accent-soft);
       font-weight: 400;
-      font-family: var(--font-ui);
+      font-family: var(--font-text);
       line-height: 1.15;
     }
     .heading-l1 {
-      font-size: 1.95rem;
-      letter-spacing: 0.04em;
+      font-size: 2.1rem;
+      letter-spacing: 0.02em;
       padding-bottom: 0.35em;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--reader-rule);
       margin-top: 4px;
     }
     .heading-l2 {
-      font-size: 1.45rem;
+      font-size: 1.64rem;
       margin-top: 4px;
     }
     .heading-l3 {
-      font-size: 1.18rem;
+      font-size: 1.28rem;
       font-weight: 600;
       margin-top: 2px;
     }
@@ -491,19 +507,19 @@
     .heading-l5 {
       font-size: 0.98rem;
       font-style: italic;
-      color: var(--text-muted);
+      color: var(--reader-muted);
       margin-top: 2px;
     }
     .unit-frontmatter .frontmatter-text {
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 1.08rem;
       line-height: 1.65;
     }
     .unit-toc-entry {
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(142,32,32,0.12);
-      background: rgba(252,251,249,0.86);
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(111, 29, 27, 0.12);
+      background: rgba(255, 250, 244, 0.86);
       display: grid;
       gap: 6px;
     }
@@ -511,7 +527,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 0.8rem;
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -520,16 +536,16 @@
     .footnote-stack {
       margin-top: 22px;
       padding-top: 16px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--reader-rule);
       display: grid;
       gap: 12px;
     }
     .footnote-item {
       padding-left: 14px;
-      border-left: 2px solid rgba(142,32,32,0.25);
+      border-left: 2px solid rgba(111, 29, 27, 0.25);
     }
     .footnote-text {
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 1rem;
       line-height: 1.6;
     }
@@ -541,7 +557,7 @@
       max-width: min(420px, calc(100vw - 36px));
       padding: 12px 14px;
       border-radius: 16px;
-      border: 1px solid rgba(142,32,32,0.2);
+      border: 1px solid rgba(111, 29, 27, 0.2);
       background: rgba(255,251,247,0.98);
       box-shadow: 0 18px 38px rgba(26,26,26,0.12);
       color: var(--text-main);
@@ -558,12 +574,12 @@
     }
     .empty-state {
       padding: 34px 28px;
-      color: var(--text-muted);
+      color: var(--reader-muted);
       font-size: 1.05rem;
       line-height: 1.7;
     }
     .empty-state strong {
-      color: var(--text-main);
+      color: var(--reader-ink);
     }
     @media (max-width: 1080px) {
       .reader-layout {
@@ -586,7 +602,6 @@
         border-bottom: 1px solid var(--border);
       }
       .range-grid,
-      .jump-grid,
       .stat-grid,
       .mode-row {
         grid-template-columns: 1fr;
@@ -620,9 +635,9 @@
     <div class="reader-kicker">Direkt aus dem Extraktor</div>
     <h1>Lesetext der digitalen Edition</h1>
     <p>
-      Diese Textansicht lädt die einzelnen Werke direkt aus dem aktuellen Extraktor-Output. Du kannst im Reader
-      zwischen den vorhandenen Bänden wechseln und siehst sofort, wie gut die neue Strukturierung als digitale
-      Hegel-Ausgabe über mehrere Werke hinweg funktioniert.
+      Diese Lesefassung ist auf die <em>Gesammelten Werke</em> zugeschnitten: mit editorischer Seitenführung,
+      ruhigem Satzbild und direktem Zugriff auf die wissenschaftlich relevanten Stellenangaben in <strong>GW</strong>
+      und <strong>OA</strong>.
     </p>
   </section>
 
@@ -631,7 +646,7 @@
       <section class="side-card">
         <h2 class="side-title">Werk</h2>
         <div class="range-field">
-          <span>Editionsteil</span>
+          <span>Werk</span>
           <label>
             <select id="work-select">
               <option value="">Werkliste wird geladen…</option>
@@ -665,7 +680,7 @@
         </div>
         <div class="range-grid">
           <div class="range-field">
-            <span>Start PDF</span>
+            <span>Startansicht</span>
             <label><input type="number" id="start-page" min="1" value="1"></label>
           </div>
           <div class="range-field">
@@ -688,14 +703,10 @@
               <span>OA-Seite</span>
               <label><input type="text" id="jump-oa-page" placeholder="z. B. 226"></label>
             </div>
-            <div class="range-field">
-              <span>PDF-Seite</span>
-              <label><input type="number" id="jump-pdf-page" min="1" placeholder="z. B. 153"></label>
-            </div>
           </div>
           <button class="reader-btn ghost" id="jump-to-page" type="button">Zur Stelle springen</button>
           <div class="source-status" id="jump-status">
-            Navigiere direkt nach <strong>GW</strong>-, <strong>OA</strong>- oder <strong>PDF</strong>-Seite.
+            Navigiere direkt nach <strong>GW</strong>- oder <strong>OA</strong>-Seite.
           </div>
         </div>
       </section>
@@ -1034,7 +1045,7 @@ function resolveSigel(page) {
   if (page.sigel) return page.sigel;
   const fallbackSiglum = state.selectedWork?.siglum || (state.corpus.band ? `Band ${state.corpus.band}` : 'Band');
   if (page.page_book != null) return `${fallbackSiglum}, ${page.page_book}`;
-  return `PDF ${page.page_pdf}`;
+  return `${fallbackSiglum}, ohne Druckseite`;
 }
 
 function resolvePageAnchorByBook(pageRef) {
@@ -1064,9 +1075,6 @@ function resolvePageByReference(kind, value) {
   const token = normalizeNumericToken(value);
   if (token === null) return null;
 
-  if (kind === 'pdf') {
-    return state.corpus.pages.find(page => Number(page.page_pdf) === token) || null;
-  }
   if (kind === 'gw') {
     return state.corpus.pages.find(page => normalizeNumericToken(page.gw_page) === token) || null;
   }
@@ -1158,7 +1166,7 @@ function renderSummary() {
         <h2 class="summary-title">${escapeHtml(title)}</h2>
         <p class="summary-subtitle">
           Diese Lesefassung wird direkt aus <strong>${escapeHtml(state.sourceLabel)}</strong> gerendert.
-          Sichtbar ist aktuell der Ausschnitt von PDF-Seite ${start} bis ${end}.
+          Sichtbar ist aktuell der Ausschnitt ${start} bis ${end} innerhalb des geladenen Werkflusses.
         </p>
       </div>
       <div class="summary-strip">
@@ -1170,7 +1178,7 @@ function renderSummary() {
     </div>
     <div class="summary-strip">
       <span class="summary-chip">Sigle ${escapeHtml(state.selectedWork?.siglum || `${series} ${state.corpus.band}`.trim())}</span>
-      <span class="summary-chip">Quelle PDF: ${escapeHtml(sourcePdf)}</span>
+      <span class="summary-chip">Quelldatei ${escapeHtml(sourcePdf)}</span>
       <span class="summary-chip">Fußnoten ${state.showFootnotes ? 'sichtbar' : 'ausgeblendet'}</span>
       <span class="summary-chip">Struktur-Tags ${state.showTags ? 'sichtbar' : 'ausgeblendet'}</span>
     </div>
@@ -1208,7 +1216,6 @@ function buildCitation(unit, page) {
   const locator = [];
   if (page.gw_page) locator.push(`GW ${page.gw_page}`);
   if (page.oa_page) locator.push(`OA ${page.oa_page}`);
-  locator.push(`PDF ${page.page_pdf}`);
   if (page.page_book != null) locator.push(`Druckseite ${page.page_book}`);
   const unitType = unit.label === 'heading' ? 'Überschrift' : unit.label === 'footnote' ? 'Fußnote' : 'Textstelle';
   return `Hegel, ${siglum}, ${locator.join(', ')}, ${unitType}, Abschnitt ${unit.unit_id}`;
@@ -1300,16 +1307,15 @@ function renderPage(page) {
   const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
   const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
 
-  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}, ` : ''}${oaPage ? `OA ${oaPage}, ` : ''}PDF ${page.page_pdf}${page.page_book != null ? `, Druckseite ${page.page_book}` : ''}`;
+  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}` : ''}${gwPage && oaPage ? ', ' : ''}${oaPage ? `OA ${oaPage}` : ''}${page.page_book != null ? `${gwPage || oaPage ? ', ' : ''}Druckseite ${page.page_book}` : ''}`;
   return `
     <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
       <aside class="page-rail">
         <div class="page-sigel">${escapeHtml(resolveSigel(page))}</div>
         <div class="page-meta">
-          PDF ${escapeHtml(page.page_pdf)}<br>
-          ${page.page_book != null ? `Druckseite ${escapeHtml(page.page_book)}<br>` : ''}
           ${gwPage ? `GW ${escapeHtml(gwPage)}<br>` : ''}
           ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
+          ${page.page_book != null ? `Druckseite ${escapeHtml(page.page_book)}<br>` : ''}
           ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${page.units.length} Units
         </div>
@@ -1377,7 +1383,7 @@ function renderPages() {
     container.innerHTML = `
       <div class="empty-state">
         <strong>Keine Seiten im gewählten Bereich.</strong><br>
-        Der aktuelle Startwert liegt außerhalb des geladenen Werkes.
+        Die aktuelle Startansicht liegt außerhalb des geladenen Werkes.
       </div>
     `;
     return;
@@ -1432,7 +1438,7 @@ function jumpToResolvedPage(page, sourceLabel) {
   }
   renderAll();
   setJumpStatus(
-    `<strong>Gefunden:</strong> ${escapeHtml(sourceLabel)} → PDF ${escapeHtml(page.page_pdf)}${page.gw_page ? ` · GW ${escapeHtml(page.gw_page)}` : ''}${page.oa_page ? ` · OA ${escapeHtml(page.oa_page)}` : ''}`,
+    `<strong>Gefunden:</strong> ${escapeHtml(sourceLabel)}${page.gw_page ? ` → GW ${escapeHtml(page.gw_page)}` : ''}${page.oa_page ? ` · OA ${escapeHtml(page.oa_page)}` : ''}`,
     'is-ready'
   );
   window.location.hash = `page-${page.page_pdf}`;
@@ -1442,7 +1448,6 @@ function jumpToResolvedPage(page, sourceLabel) {
 function handleJumpToPage() {
   const gwValue = document.getElementById('jump-gw-page').value.trim();
   const oaValue = document.getElementById('jump-oa-page').value.trim();
-  const pdfValue = document.getElementById('jump-pdf-page').value.trim();
 
   if (gwValue) {
     jumpToResolvedPage(resolvePageByReference('gw', gwValue), `GW ${gwValue}`);
@@ -1452,11 +1457,7 @@ function handleJumpToPage() {
     jumpToResolvedPage(resolvePageByReference('oa', oaValue), `OA ${oaValue}`);
     return;
   }
-  if (pdfValue) {
-    jumpToResolvedPage(resolvePageByReference('pdf', pdfValue), `PDF ${pdfValue}`);
-    return;
-  }
-  setJumpStatus('<strong>Bitte eine Referenz eingeben.</strong><br>GW, OA oder PDF.', 'is-warning');
+  setJumpStatus('<strong>Bitte eine Referenz eingeben.</strong><br>GW oder OA.', 'is-warning');
 }
 
 function renderAll() {
