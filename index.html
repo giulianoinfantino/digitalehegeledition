@@ -436,6 +436,7 @@
   </footer>
 </main>
 
+<script src="assets/edition-data.js"></script>
 <script>
   const EDITION_SOURCES = [
     { label: 'Editionskatalog', path: '../out/edition.json' }
@@ -451,6 +452,9 @@
   }
 
   async function loadEdition() {
+    if (window.HEGEL_EDITION_DATA) {
+      return { edition: window.HEGEL_EDITION_DATA, source: { label: 'Eingebettete Editionsdaten' } };
+    }
     for (const source of EDITION_SOURCES) {
       try {
         const response = await fetch(`${source.path}?v=${Date.now()}`);

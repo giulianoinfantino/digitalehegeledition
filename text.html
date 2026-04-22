@@ -662,6 +662,7 @@
   </div>
 </main>
 
+<script src="assets/edition-data.js"></script>
 <script>
 const state = {
   edition: null,
@@ -833,6 +834,30 @@ async function fetchFirstAvailable(sources) {
     }
   }
   return null;
+}
+
+function ensureEmbeddedWorkScript(workId) {
+  return new Promise(resolve => {
+    window.HEGEL_WORK_DATA = window.HEGEL_WORK_DATA || {};
+    if (window.HEGEL_WORK_DATA[workId]) {
+      resolve(true);
+      return;
+    }
+
+    const existing = document.querySelector(`script[data-work-script="${workId}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve(Boolean(window.HEGEL_WORK_DATA[workId])), { once: true });
+      existing.addEventListener('error', () => resolve(false), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `assets/work-${workId}.js`;
+    script.dataset.workScript = workId;
+    script.onload = () => resolve(Boolean(window.HEGEL_WORK_DATA[workId]));
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 }
 
 function getRequestedWorkId() {
@@ -1170,6 +1195,14 @@ function setCorpus(raw, sourceLabel) {
 }
 
 async function loadSelectedWork() {
+  if (state.selectedWork?.work_id) {
+    const embeddedLoaded = await ensureEmbeddedWorkScript(state.selectedWork.work_id);
+    if (embeddedLoaded && window.HEGEL_WORK_DATA?.[state.selectedWork.work_id]) {
+      setCorpus(window.HEGEL_WORK_DATA[state.selectedWork.work_id], `${state.selectedWork.title} · eingebettet`);
+      return true;
+    }
+  }
+
   if (state.selectedWork?.paths?.master) {
     const payload = await fetchFirstAvailable([
       { label: state.selectedWork.title, path: `../out/${state.selectedWork.paths.master}` }
@@ -1189,13 +1222,21 @@ async function loadSelectedWork() {
 }
 
 async function initializeEdition() {
-  const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
-  if (!editionPayload) {
-    setEditionStatus('Kein Editionskatalog gefunden. Es wird auf den Standard-Export zurückgefallen.', 'is-warning');
-    return false;
+  if (window.HEGEL_EDITION_DATA) {
+    state.edition = window.HEGEL_EDITION_DATA;
+  } else {
+    const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
+    if (!editionPayload) {
+      setEditionStatus('Kein Editionskatalog gefunden. Es wird auf den Standard-Export zurückgefallen.', 'is-warning');
+      return false;
+    }
+    state.edition = editionPayload.data;
+    setEditionStatus(
+      `<strong>Geladen:</strong> ${escapeHtml(editionPayload.source.label)}<br>${escapeHtml(String((state.edition.works || []).length))} Werke in der Edition.`,
+      'is-ready'
+    );
   }
 
-  state.edition = editionPayload.data;
   state.works = state.edition.works || [];
   state.worksById = Object.fromEntries(state.works.map(work => [work.work_id, work]));
   state.selectedWorkId = getRequestedWorkId() || state.edition.metadata?.default_work_id || state.works[0]?.work_id || '';
@@ -1206,10 +1247,12 @@ async function initializeEdition() {
   }
 
   renderWorkOptions();
-  setEditionStatus(
-    `<strong>Geladen:</strong> ${escapeHtml(editionPayload.source.label)}<br>${escapeHtml(String(state.works.length))} Werke in der Edition.`,
-    'is-ready'
-  );
+  if (window.HEGEL_EDITION_DATA) {
+    setEditionStatus(
+      `<strong>Geladen:</strong> Eingebettete Editionsdaten<br>${escapeHtml(String(state.works.length))} Werke in der Edition.`,
+      'is-ready'
+    );
+  }
   return true;
 }
 
