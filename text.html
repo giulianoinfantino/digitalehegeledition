@@ -112,23 +112,66 @@
  * Normalisiert einen Rohtext aus dem JSON:
  *   • Trennstriche am Zeilenende: "Geschick-\nlichkeit" → "Geschicklichkeit"
  *   • Übrige Newlines und Mehrfachleerzeichen → ein Leerzeichen
+ *   • Inline-Sperrdruck: "M i t" → "Mit", "A n" → "An"
  *   • Trim
  */
 function normalizeText(raw) {
   if (!raw) return '';
   return raw
-    .replace(/-\s*\n\s*/g, '')   // Silbentrennung: "Wort-\nende" → "Wortende"
-    .replace(/\n/g, ' ')          // restliche Zeilenumbrüche → Leerzeichen
-    .replace(/\s{2,}/g, ' ')      // mehrere Leerzeichen → eines
+    .replace(/-\s*\n\s*/g, '')        // Silbentrennung: "Wort-\nende" → "Wortende"
+    .replace(/\n/g, ' ')              // restliche Zeilenumbrüche → Leerzeichen
+    .replace(/\s{2,}/g, ' ')          // mehrere Leerzeichen → eines
+    .replace(/\b([A-Za-zÄÖÜäöüß])(\s[A-Za-zÄÖÜäöüß]){2,}\b/g,
+             m => m.replace(/\s/g, '')) // "M i t" → "Mit" (Sperrdruck)
+    .trim();
+}
+
+/**
+ * De-spaciert einen komplett gesperrten Block:
+ *   "W I S S E N S C H A F T\nD E R L O G I K\nI" → "Wissenschaft Derlogik I"
+ * Jede visuelle Zeile (getrennt durch \n) wird separat verarbeitet.
+ */
+function despaceBlock(raw) {
+  if (!raw) return '';
+  return raw
+    .split(/\n/)
+    .map(line => {
+      line = line.trim();
+      if (!line) return '';
+      const tokens = line.split(' ');
+      if (tokens.length > 1 && tokens.every(t => /^[A-Za-zÄÖÜäöüß]$/.test(t))) {
+        // Alle Tokens sind Einzelzeichen → Sperrdruck → zusammenführen + Titelschreibung
+        const joined = tokens.join('');
+        return joined.charAt(0).toUpperCase() + joined.slice(1).toLowerCase();
+      }
+      return normalizeText(line);
+    })
+    .filter(Boolean)
+    .join(' · ')   // visueller Trenner zwischen den Zeilen eines Titel-Blocks
     .trim();
 }
 
 /**
  * Gibt den normalisierten Text eines Blocks zurück.
- * Unterstützt beide Schema-Varianten (text_normalized / content).
+ * Behandelt spaced_text-Blöcke ("W I S S E N S C H A F T") korrekt.
  */
 function blockText(block) {
-  return normalizeText(block.text_normalized || block.text_raw || block.content || '');
+  const raw = block.text_normalized || block.text_raw || block.content || '';
+  if (block.spaced_text) return despaceBlock(raw);
+  return normalizeText(raw);
+}
+
+/**
+ * Gibt true zurück, wenn ein als page_number klassifizierter Block
+ * eigentlich Fußnoten- oder Körpertext enthält (Fehlklassifizierung).
+ */
+function isMisclassifiedPageNumber(block) {
+  if (block.type !== 'page_number') return false;
+  const txt = (block.text_normalized || block.text_raw || '').trim();
+  // Echte Seitenzahl: nur Ziffern (ggf. mit * oder Sonderzeichen)
+  if (/^\*?\d+$/.test(txt)) return false;
+  // Alles andere (z.B. Fußnotentext) ist fehlklassifiziert
+  return true;
 }
 
 /**
@@ -179,7 +222,8 @@ async function loadHegel() {
     if (!data) throw new Error('Keine JSON-Datei gefunden (twa_band_5_v2.json / twa_band_5.json).');
 
     const band  = data.metadata?.band || '5';
-    const pages = (data.pages || []);
+    // Nur Seiten ab PDF-Seite 10 zeigen (Titelseite "Wissenschaft der Logik" aufwärts)
+    const pages = (data.pages || []).filter(p => (p.page_pdf || p.id || 0) >= 10);
 
     renderArea.innerHTML = '';
     tocList.innerHTML    = '';
@@ -226,7 +270,14 @@ async function loadHegel() {
 
         if (!txt) return;
 
-        // Seitenzahlen: ignorieren (nur für Sigel verwendet)
+        // Fehlklassifizierte page_number-Blöcke (enthalten eigentlich Fußnotentext)
+        if (isMisclassifiedPageNumber(block)) {
+          flushText();
+          footnotes.push(txt);
+          return;
+        }
+
+        // Echte Seitenzahlen: ignorieren
         if (btype === 'page_number') return;
 
         if (btype === 'heading') {
@@ -239,7 +290,6 @@ async function loadHegel() {
           tocHtml += `<li class="toc-item-level-${lvl}"><a href="#${id}">${escHtml(txt)}</a></li>`;
 
         } else if (btype === 'footnote') {
-          // Fußnoten sammeln, erst am Ende der Seite rendern
           flushText();
           footnotes.push(txt);
 
