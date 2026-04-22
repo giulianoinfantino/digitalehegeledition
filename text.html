@@ -579,10 +579,6 @@
       <section class="side-card">
         <h2 class="side-title">Quelle</h2>
         <div class="picker-row">
-          <label class="file-picker">
-            JSON-Datei öffnen
-            <input type="file" id="json-file" accept=".json,application/json">
-          </label>
           <button class="reader-btn" id="reload-source" type="button">Aktuelles Werk neu laden</button>
         </div>
         <div class="source-status" id="source-status">
@@ -649,8 +645,8 @@
           <div>
             <h2 class="summary-title">Noch kein Korpus geladen</h2>
             <p class="summary-subtitle">
-              Sobald Editionskatalog und Werkdatei geladen sind, erscheint hier der ausgewählte Band. Wenn das
-              automatische Laden fehlschlägt, kannst du weiterhin eine JSON-Datei manuell öffnen.
+              Sobald Editionskatalog und Werkdatei geladen sind, erscheint hier der ausgewählte Band direkt als
+              Lesefassung.
             </p>
           </div>
         </div>
@@ -1269,22 +1265,6 @@ function bindEvents() {
 
   document.getElementById('render-range').addEventListener('click', renderAll);
   document.getElementById('reload-source').addEventListener('click', handleAutoReload);
-
-  document.getElementById('json-file').addEventListener('change', async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      setCorpus(json, file.name);
-    } catch (error) {
-      setSourceStatus(
-        `<strong>JSON konnte nicht gelesen werden.</strong><br>${escapeHtml(error.message || 'Unbekannter Fehler')}`,
-        'is-warning'
-      );
-    }
-  });
 
   window.addEventListener('scroll', syncVisiblePage, { passive: true });
   window.addEventListener('hashchange', handleHashNavigation);

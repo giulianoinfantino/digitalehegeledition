@@ -200,6 +200,14 @@
       margin: 0 0 10px;
       font-weight: 700;
     }
+    .feature-card .work-title {
+      font-family: var(--font-text);
+      font-size: 1.55rem;
+      line-height: 1.12;
+      margin: 0 0 10px;
+      font-weight: 400;
+      color: var(--accent);
+    }
     .feature-card p {
       margin: 0;
       color: var(--text-muted);
@@ -320,9 +328,9 @@
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#works-section">Werke auswählen</a>
-        <a class="btn btn-secondary" href="text.html">Standardwerk lesen</a>
+        <a class="btn btn-secondary" href="text.html?work=twa-05">TWA 5 lesen</a>
+        <a class="btn btn-secondary" href="text.html?work=twa-06">TWA 6 lesen</a>
         <a class="btn btn-secondary" href="search.html">Edition durchsuchen</a>
-        <a class="btn btn-secondary" href="preview.html">JSON previewen</a>
       </div>
       <p class="hero-note">
         Fokus dieser Fassung: echter Editionskatalog statt bloßer Startkachel, klare Werkpfade und eine Informationsarchitektur,
@@ -381,8 +389,7 @@
     <div class="section-header">
       <h2>Werke der Edition</h2>
       <p>
-        Jedes Werk erhält einen eigenen Reader, eigene Pfade durch die Seiten sowie einen spezifischen Sucheinstieg.
-        Zugleich bleibt die Edition als Ganzes durchsuchbar.
+        Ein Klick auf ein Werk führt direkt in den Volltext des jeweiligen Bandes.
       </p>
     </div>
     <div class="feature-grid" id="works-grid">
@@ -472,9 +479,10 @@
 
     grid.innerHTML = works.map(work => `
       <article class="feature-card">
-        <h3>${escapeHtml(work.title)}</h3>
+        <h3>${escapeHtml(work.siglum || `TWA ${work.band || '—'}`)}</h3>
+        <div class="work-title">${escapeHtml(work.title)}</div>
         <p>
-          ${escapeHtml(work.siglum || `TWA ${work.band || '—'}`)} · ${escapeHtml(String(work.stats.pages_total || 0))} Seiten ·
+          ${escapeHtml(String(work.stats.pages_total || 0))} Seiten ·
           ${escapeHtml(String(work.stats.search_entries || 0))} suchbare Einheiten.
         </p>
         <div class="meta-list">
@@ -486,9 +494,8 @@
             : 'noch nicht erschlossen'}</div>
         </div>
         <div class="work-card-actions">
-          <a class="btn btn-primary" href="text.html?work=${encodeURIComponent(work.work_id)}">Lesen</a>
-          <a class="btn btn-secondary" href="search.html?work=${encodeURIComponent(work.work_id)}">Werk durchsuchen</a>
-          <a class="btn btn-secondary" href="network.html?work=${encodeURIComponent(work.work_id)}">Netzwerk</a>
+          <a class="btn btn-primary" href="text.html?work=${encodeURIComponent(work.work_id)}">Volltext öffnen</a>
+          <a class="btn btn-secondary" href="search.html?work=${encodeURIComponent(work.work_id)}">Suche</a>
         </div>
       </article>
     `).join('');
