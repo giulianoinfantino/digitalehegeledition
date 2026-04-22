@@ -475,7 +475,11 @@ const keyTerms = [
   "Objektivität", "Idee", "Natur", "Geist", "Identität", "Unterschied", "Notwendigkeit", "Freiheit"
 ];
 
-const corpusPath = 'data/twa_band_5_v2.json';
+const AUTO_SOURCES = [
+  { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
+  { label: 'Web-Export', path: '../out/web.json' },
+  { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' }
+];
 const thresholdInput = document.getElementById('threshold');
 const thresholdValue = document.getElementById('threshold-value');
 const statusLine = document.getElementById('status-line');
@@ -501,6 +505,47 @@ function escapeRegex(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function getUnitLabel(unit) {
+  const ann = unit?.annotations?.[0] || {};
+  return ann.label || unit.type || unit.label || 'paragraph';
+}
+
+function getUnitText(unit) {
+  return unit.text_normalized ?? unit.text ?? unit.plain ?? unit.text_raw ?? unit.content ?? '';
+}
+
+function normalizePage(page, index) {
+  return {
+    page_pdf: page.page_pdf ?? page.page ?? page.id ?? index + 1,
+    page_kind: page.page_kind || page.section_type || 'body',
+    units: Array.isArray(page.units)
+      ? page.units
+      : Array.isArray(page.blocks)
+        ? page.blocks
+        : []
+  };
+}
+
+function extractSearchBlocks(corpus) {
+  const pages = (corpus.pages || []).map(normalizePage).filter(page => {
+    if (!page.page_kind) return true;
+    return ['body', 'maintext'].includes(page.page_kind);
+  });
+
+  const blocks = [];
+  pages.forEach(page => {
+    page.units.forEach(unit => {
+      const label = getUnitLabel(unit);
+      if (label !== 'paragraph' && label !== 'heading') return;
+      const plain = String(getUnitText(unit)).trim();
+      if (!plain) return;
+      blocks.push(plain);
+    });
+  });
+
+  return blocks;
+}
+
 function nodeRadius(freq) {
   return Math.max(14, Math.min(36, 10 + Math.sqrt(freq) * 2.3));
 }
@@ -516,17 +561,7 @@ function buildStatsFromCorpus(corpus) {
     });
   });
 
-  const pages = (corpus.pages || []).filter(page => !page.section_type || page.section_type === 'maintext');
-  const blocks = [];
-
-  pages.forEach(page => {
-    (page.blocks || []).forEach(block => {
-      if (block.type !== 'paragraph' && block.type !== 'heading') return;
-      const plain = (block.plain || '').trim();
-      if (!plain) return;
-      blocks.push(plain);
-    });
-  });
+  const blocks = extractSearchBlocks(corpus);
 
   totalBlocks = blocks.length;
   metricBlocks.textContent = new Intl.NumberFormat('de-DE').format(totalBlocks);
@@ -781,14 +816,28 @@ function drawNetwork() {
   updateHighlighting();
 }
 
+async function loadCorpus() {
+  for (const source of AUTO_SOURCES) {
+    try {
+      const response = await fetch(`${source.path}?v=${Date.now()}`);
+      if (!response.ok) continue;
+      const corpus = await response.json();
+      return { corpus, source };
+    } catch (error) {
+      // Try next source silently.
+    }
+  }
+  throw new Error('Kein passender JSON-Pfad gefunden');
+}
+
 async function init() {
   try {
     statusLine.textContent = 'Lade Korpus…';
-    const response = await fetch(`${corpusPath}?v=${Date.now()}`);
-    const corpus = await response.json();
+    const { corpus, source } = await loadCorpus();
     buildStatsFromCorpus(corpus);
     renderTermList();
     drawNetwork();
+    statusLine.textContent = `${statusLine.textContent} · ${source.label}`;
   } catch (error) {
     console.error(error);
     statusLine.textContent = 'Fehler beim Laden';

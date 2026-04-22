@@ -4,55 +4,449 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Suche — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
-    .search-container { max-width: 920px; margin: 0 auto; }
-    .search-header { margin-bottom: 36px; }
-    .search-header h1 { font-family: var(--font-text); font-size: 3rem; font-weight: normal; margin-bottom: 12px; }
-    .search-header p { color: var(--text-muted); font-size: 1.08rem; line-height: 1.55; }
-    .search-box-wrapper {
-      position: sticky; top: 80px; background: rgba(252,251,249,0.94); backdrop-filter: blur(8px);
-      padding: 14px 0; z-index: 100; margin-bottom: 20px;
+    .search-main {
+      max-width: 1380px;
+      margin: 0 auto;
     }
-    .search-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
-    .search-input {
-      width: 100%; padding: 20px 24px; font-size: 1.35rem; font-family: var(--font-ui);
-      border: 2px solid var(--border); border-radius: 12px; box-sizing: border-box;
+    .search-intro {
+      margin-bottom: 28px;
     }
-    .search-input:focus { outline: none; border-color: var(--accent); }
-    .search-btn {
-      padding: 16px 18px; border-radius: 12px; border: 1px solid var(--border);
-      background: white; font-family: var(--font-ui); cursor: pointer;
+    .search-kicker {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.74);
     }
-    .search-options { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; font-family: var(--font-ui); font-size: .9rem; color: var(--text-muted); }
-    .search-options label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
-    .results-info {
-      font-family: var(--font-ui); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 1.5px; color: var(--accent); margin-bottom: 22px;
+    .search-intro h1 {
+      margin: 0 0 12px;
+      font-family: var(--font-text);
+      font-size: clamp(2.5rem, 5vw, 4.4rem);
+      line-height: 0.96;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+    .search-intro p {
+      margin: 0;
+      max-width: 62rem;
+      color: var(--text-muted);
+      font-size: 1.04rem;
+      line-height: 1.72;
+    }
+    .search-layout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+    .search-sidebar {
+      position: sticky;
+      top: 96px;
+      display: grid;
+      gap: 16px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .result-card,
+    .empty-state {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.78);
+      box-shadow: 0 16px 34px rgba(26,26,26,0.04);
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .empty-state {
+      padding: 20px;
+    }
+    .side-title,
+    .section-chip,
+    .result-chip,
+    .result-kind,
+    .suggestion-chip {
+      font-family: var(--font-ui);
+    }
+    .side-title {
+      margin: 0 0 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .source-status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.88);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+    .source-status strong {
+      color: var(--text-main);
+    }
+    .source-status.is-ready {
+      border-color: rgba(142,32,32,0.18);
+      color: var(--text-main);
+    }
+    .source-status.is-warning {
+      border-color: rgba(196,141,35,0.26);
+      background: rgba(255,248,232,0.92);
+    }
+    .picker-row,
+    .toggle-grid,
+    .range-grid,
+    .query-row,
+    .query-tools {
+      display: grid;
+      gap: 10px;
+    }
+    .file-picker,
+    .search-btn,
+    .suggestion-chip {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    .file-picker:hover,
+    .search-btn:hover,
+    .suggestion-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(142,32,32,0.38);
+      color: var(--accent);
+    }
+    .file-picker input {
+      display: none;
+    }
+    .search-btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .search-btn.primary:hover {
+      color: #fff;
+    }
+    .toggle-grid {
+      margin-top: 12px;
+    }
+    .toggle-grid label,
+    .range-field label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text-main);
+      font-size: 0.94rem;
+      line-height: 1.4;
+    }
+    .toggle-grid input,
+    .range-field input {
+      accent-color: var(--accent);
+    }
+    .range-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 12px;
+    }
+    .range-field {
+      display: grid;
+      gap: 8px;
+    }
+    .range-field span,
+    .sort-field span {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .range-field input,
+    .sort-field select,
+    .query-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.88);
+      color: var(--text-main);
+      box-sizing: border-box;
+      font-size: 1rem;
+      font-family: var(--font-ui);
+    }
+    .range-field input:focus,
+    .sort-field select:focus,
+    .query-input:focus {
+      outline: none;
+      border-color: rgba(142,32,32,0.4);
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat-tile {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(252,251,249,0.86);
+      padding: 14px;
+    }
+    .stat-tile strong {
+      display: block;
+      font-family: var(--font-text);
+      font-size: 1.75rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-tile span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .search-view {
+      min-width: 0;
+      display: grid;
+      gap: 18px;
+    }
+    .query-card {
+      background:
+        radial-gradient(circle at top right, rgba(142,32,32,0.08), transparent 36%),
+        linear-gradient(180deg, rgba(255,255,255,0.86), rgba(253,247,239,0.92));
+    }
+    .query-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+    .query-input {
+      min-height: 56px;
+      font-size: 1.08rem;
+    }
+    .query-tools {
+      grid-template-columns: minmax(0, 1fr) 190px;
+      align-items: end;
+      margin-top: 14px;
+    }
+    .query-note {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .results-summary {
+      display: grid;
+      gap: 14px;
+    }
+    .summary-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+    }
+    .summary-title {
+      margin: 0;
+      font-family: var(--font-text);
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      line-height: 1.04;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+    .summary-subtitle {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.65;
+      max-width: 54rem;
+    }
+    .chip-row,
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .section-chip,
+    .result-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(252,251,249,0.88);
+      border: 1px solid var(--border);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .suggestion-chip {
+      min-height: 38px;
+      padding: 0 14px;
+      background: rgba(252,251,249,0.88);
+    }
+    .results-list {
+      display: grid;
+      gap: 16px;
     }
     .result-card {
-      margin-bottom: 20px; padding: 22px; border-radius: 12px; background: white;
-      border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,.03);
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 22px;
+      padding: 24px;
+      scroll-margin-top: 92px;
     }
-    .result-meta {
-      font-family: var(--font-ui); font-size: 0.82rem; font-weight: 600; color: var(--accent);
-      margin-bottom: 8px; display: flex; gap: 10px; flex-wrap: wrap;
+    .result-rail {
+      padding-right: 16px;
+      border-right: 1px solid var(--border);
+      display: grid;
+      align-content: start;
+      gap: 10px;
     }
-    .result-title {
-      font-family: var(--font-ui); font-size: 1rem; font-weight: 600; margin-bottom: 10px;
-      color: var(--text);
+    .result-kind {
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(142,32,32,0.14);
+      background: rgba(142,32,32,0.08);
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .result-content {
-      font-family: var(--font-text); font-size: 1.18rem; line-height: 1.68; text-align: justify;
+    .result-sigel {
+      font-family: var(--font-text);
+      font-size: 1.25rem;
+      line-height: 1.1;
+      color: var(--accent);
     }
-    .result-link { font-family: var(--font-ui); font-size: .9rem; margin-top: 12px; display: inline-block; }
+    .result-rail-meta {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .result-body {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+    .result-context {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    .result-heading {
+      margin: 0;
+      font-family: var(--font-ui);
+      font-size: 1.22rem;
+      line-height: 1.3;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .result-heading a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .result-heading a:hover {
+      color: var(--accent);
+    }
+    .result-snippet {
+      margin: 0;
+      font-family: var(--font-text);
+      font-size: 1.22rem;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .result-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .result-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.94rem;
+    }
+    .result-link:hover {
+      text-decoration: underline;
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-size: 1.04rem;
+      line-height: 1.72;
+    }
+    .empty-state strong {
+      color: var(--text-main);
+    }
     mark {
-      background: rgba(142, 32, 32, 0.12); color: inherit;
-      border-bottom: 2px solid rgba(142, 32, 32, 0.3); padding: 0 2px;
+      background: rgba(142,32,32,0.14);
+      color: inherit;
+      padding: 0 3px;
+      border-radius: 4px;
     }
-    .no-results { text-align: center; padding: 60px; color: var(--text-muted); font-size: 1.25rem; font-style: italic; }
-    .muted { color: var(--text-muted); }
+    @media (max-width: 1080px) {
+      .search-layout {
+        grid-template-columns: 1fr;
+      }
+      .search-sidebar {
+        position: static;
+        max-height: none;
+        overflow: visible;
+      }
+    }
+    @media (max-width: 820px) {
+      .result-card,
+      .query-row,
+      .query-tools {
+        grid-template-columns: 1fr;
+      }
+      .result-rail {
+        padding-right: 0;
+        padding-bottom: 14px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .range-grid,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+      .site-header {
+        gap: 16px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -71,284 +465,838 @@
   </nav>
 </header>
 
-<main>
-  <div class="search-container">
-    <div class="search-header">
-      <h1>Korpus-Suche</h1>
-      <p>Durchsucht den Haupttext und die Überschriften. Titelei, Verlagsseiten und Inhaltsverzeichnis werden ausgeschlossen. Die Treffer springen zur passenden Seite in der Textansicht.</p>
-    </div>
+<main class="search-main">
+  <section class="search-intro">
+    <div class="search-kicker">Scholarly Search</div>
+    <h1>Synoptische Volltextsuche im Extraktor-Korpus</h1>
+    <p>
+      Diese Suchansicht indexiert den aktuellen Extraktor-Output direkt im Browser. Damit siehst du sofort,
+      wie gut die neue Strukturierung als wissenschaftliche Suchoberfläche funktioniert: mit Treffern aus
+      Fließtext, Überschriften, Paratext und Inhaltsverzeichnis, jeweils rückverlinkt in die Lesefassung.
+    </p>
+  </section>
 
-    <div class="search-box-wrapper">
-      <div class="search-row">
-        <input type="text" id="search-input" class="search-input" placeholder="Begriff oder Phrase suchen..." autofocus>
-        <button class="search-btn" id="search-btn">Suchen</button>
-      </div>
-      <div class="search-options">
-        <label><input type="checkbox" id="option-headings" checked> Überschriften einbeziehen</label>
-        <label><input type="checkbox" id="option-case"> Groß-/Kleinschreibung beachten</label>
-        <label><input type="checkbox" id="option-exact"> exakte Phrase</label>
-      </div>
-    </div>
+  <div class="search-layout">
+    <aside class="search-sidebar">
+      <section class="side-card">
+        <h2 class="side-title">Quelle</h2>
+        <div class="picker-row">
+          <label class="file-picker">
+            JSON-Datei öffnen
+            <input type="file" id="json-file" accept=".json,application/json">
+          </label>
+          <button class="search-btn" id="reload-source" type="button">Automatisch neu laden</button>
+        </div>
+        <div class="source-status" id="source-status">
+          Automatisches Laden wird versucht…
+        </div>
+      </section>
 
-    <div id="status-line" class="results-info">Initialisiere Index…</div>
-    <div id="results-area"></div>
+      <section class="side-card">
+        <h2 class="side-title">Filter</h2>
+        <div class="toggle-grid">
+          <label><input type="checkbox" id="include-headings" checked> Überschriften durchsuchen</label>
+          <label><input type="checkbox" id="include-frontmatter" checked> Paratexte durchsuchen</label>
+          <label><input type="checkbox" id="include-toc" checked> Inhaltsverzeichnis durchsuchen</label>
+          <label><input type="checkbox" id="include-footnotes"> Fußnoten durchsuchen</label>
+          <label><input type="checkbox" id="exact-match"> Exakte Phrase</label>
+          <label><input type="checkbox" id="case-sensitive"> Groß/Kleinschreibung beachten</label>
+        </div>
+        <div class="range-grid">
+          <div class="range-field">
+            <span>Start PDF</span>
+            <label><input type="number" id="start-page" min="1" value="1"></label>
+          </div>
+          <div class="range-field">
+            <span>Ende PDF</span>
+            <label><input type="number" id="end-page" min="1" value="160"></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h2 class="side-title">Edition auf einen Blick</h2>
+        <div class="stat-grid">
+          <div class="stat-tile">
+            <strong id="stat-pages">—</strong>
+            <span>Seiten</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="stat-entries">—</strong>
+            <span>Suchstellen</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="stat-headings">—</strong>
+            <span>Überschriften</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="stat-footnotes">—</strong>
+            <span>Fußnoten</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <section class="search-view">
+      <section class="query-card">
+        <div class="query-row">
+          <label>
+            <span class="side-title">Anfrage</span>
+            <input class="query-input" id="query-input" type="search" placeholder="z. B. Sein, Werden, Vorrede, Begriff der Logik">
+          </label>
+          <button class="search-btn primary" id="run-search" type="button">Suche starten</button>
+        </div>
+        <div class="query-tools">
+          <label class="sort-field">
+            <span>Sortierung</span>
+            <select id="sort-order">
+              <option value="relevance">Nach Relevanz</option>
+              <option value="page">Nach Seitenfolge</option>
+            </select>
+          </label>
+          <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
+        </div>
+        <p class="query-note">
+          Die Suche arbeitet direkt gegen die strukturierte JSON-Ausgabe. Treffer verlinken auf die passende
+          PDF-Seite in <code>text.html</code>.
+        </p>
+      </section>
+
+      <section class="results-summary" id="results-summary">
+        <div class="summary-head">
+          <div>
+            <h2 class="summary-title">Noch kein Korpus geladen</h2>
+            <p class="summary-subtitle">
+              Sobald der Extraktor-Export geladen ist, wird hier eine suchbare wissenschaftliche Ansicht erzeugt.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="results-list" id="results-list">
+        <div class="empty-state">
+          <strong>Warte auf Daten.</strong><br>
+          Danach kannst du direkt im aktuellen Hegel-Korpus suchen.
+        </div>
+      </section>
+    </section>
   </div>
 </main>
 
 <script>
-let blocks = [];
+const state = {
+  corpus: null,
+  sourceLabel: '',
+  entries: [],
+  suggestions: [],
+  query: '',
+  exact: false,
+  caseSensitive: false,
+  includeHeadings: true,
+  includeFrontmatter: true,
+  includeToc: true,
+  includeFootnotes: false,
+  sort: 'relevance'
+};
 
-function escapeHtml(str) {
-  return String(str)
+const AUTO_SOURCES = [
+  { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
+  { label: 'Web-Export', path: '../out/web.json' },
+  { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' },
+  { label: 'Site-Daten v1', path: 'data/twa_band_5_v1.json' }
+];
+
+function escapeHtml(value) {
+  return String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function normalizeText(raw) {
-  if (!raw) return '';
-  return raw
-    .replace(/-\s*\n\s*/g, '')
-    .replace(/\n/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\b([A-Za-zÄÖÜäöüß])(\s[A-Za-zÄÖÜäöüß]){2,}\b/g, m => m.replace(/\s/g, ''))
+function formatSearchText(value) {
+  return String(value || '')
+    .replace(/\u00ad/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
-function getBlockText(block) {
-  return normalizeText(block.text_normalized || block.text_raw || block.content || block.plain || '');
+function getUnitLabel(unit) {
+  const ann = unit?.annotations?.[0] || {};
+  return ann.label || unit.type || unit.label || 'paragraph';
 }
 
-function getAnchor(page) {
-  return `page-${page.page_pdf || page.page_book || page.id || 0}`;
+function getUnitLevel(unit) {
+  const ann = unit?.annotations?.[0] || {};
+  return ann.level || unit.level || null;
 }
 
-function sectionIsSearchable(page) {
-  const st = page.section_type || '';
-  return st === 'main_text' || st === 'maintext' || st === '' || st === null;
+function getUnitText(unit) {
+  return unit.text_normalized ?? unit.text ?? unit.text_raw ?? unit.content ?? '';
 }
 
-function typeIsSearchable(block, includeHeadings = true) {
-  if (!block || !block.type) return false;
-  if (block.type === 'main_text' || block.type === 'paragraph' || block.type === 'unknown') return true;
-  if (includeHeadings && block.type === 'heading') return true;
+function textLabel(unit) {
+  if (unit.level) return `${unit.label} · L${unit.level}`;
+  if (unit.marker) return `${unit.label} · ${unit.marker}`;
+  return unit.label;
+}
+
+function inferBand(metadata, pages) {
+  if (metadata?.band) return metadata.band;
+  const fromTitle = (metadata?.title || '').match(/\b(\d+)\b/);
+  if (fromTitle) return fromTitle[1];
+  const sigelPage = pages.find(page => page.sigel);
+  if (sigelPage?.sigel) {
+    const match = sigelPage.sigel.match(/TWA\s*([0-9]+)/i);
+    if (match) return match[1];
+  }
+  return '5';
+}
+
+function normalizeUnit(rawUnit, page, index) {
+  if (typeof rawUnit === 'string') {
+    return {
+      unit_id: `${page.page_id || page.page_pdf || 'p'}_u${String(index + 1).padStart(3, '0')}`,
+      label: 'paragraph',
+      level: null,
+      marker: null,
+      page_ref: null,
+      title: null,
+      text_raw: rawUnit,
+      text_normalized: rawUnit,
+      annotations: [{ label: 'paragraph' }]
+    };
+  }
+
+  const ann = rawUnit?.annotations?.[0] || {};
+  return {
+    ...rawUnit,
+    unit_id: rawUnit.unit_id || `${page.page_id || page.page_pdf || 'p'}_u${String(index + 1).padStart(3, '0')}`,
+    label: getUnitLabel(rawUnit),
+    level: getUnitLevel(rawUnit),
+    marker: ann.marker || rawUnit.marker || null,
+    page_ref: ann.page_ref ?? rawUnit.page_ref ?? null,
+    title: ann.title || rawUnit.title || null,
+    text_raw: rawUnit.text_raw ?? rawUnit.text ?? rawUnit.content ?? '',
+    text_normalized: rawUnit.text_normalized ?? rawUnit.text ?? rawUnit.content ?? rawUnit.text_raw ?? '',
+    annotations: rawUnit.annotations || [ann]
+  };
+}
+
+function normalizePage(rawPage, index) {
+  const pagePdf = rawPage.page_pdf ?? rawPage.page ?? rawPage.id ?? index + 1;
+  const unitsSource = Array.isArray(rawPage.units)
+    ? rawPage.units
+    : Array.isArray(rawPage.blocks)
+      ? rawPage.blocks
+      : [];
+  const units = unitsSource.map((unit, unitIndex) => normalizeUnit(unit, rawPage, unitIndex));
+
+  return {
+    ...rawPage,
+    page_id: rawPage.page_id || `p${String(pagePdf).padStart(4, '0')}`,
+    page_pdf: pagePdf,
+    page_book: rawPage.page_book ?? null,
+    page_kind: rawPage.page_kind || rawPage.section_type || 'body',
+    units
+  };
+}
+
+function normalizeCorpus(raw) {
+  const pages = (raw.pages || []).map(normalizePage);
+  const metadata = raw.metadata || {};
+  const band = inferBand(metadata, pages);
+  const toc = Array.isArray(raw.toc_printed) ? raw.toc_printed : [];
+
+  const counts = {
+    pages: pages.length,
+    headings: 0,
+    footnotes: 0
+  };
+
+  pages.forEach(page => {
+    page.units.forEach(unit => {
+      if (unit.label === 'heading') counts.headings += 1;
+      if (unit.label === 'footnote') counts.footnotes += 1;
+    });
+  });
+
+  return {
+    raw,
+    metadata,
+    band,
+    toc,
+    counts,
+    pages
+  };
+}
+
+function resolveSigel(corpus, page) {
+  if (page.sigel) return page.sigel;
+  if (page.page_book != null) return `TWA ${corpus.band}, ${page.page_book}`;
+  return `PDF ${page.page_pdf}`;
+}
+
+function buildSearchEntries(corpus) {
+  const entries = [];
+  let sectionTitle = '';
+  let sectionLevel = null;
+
+  corpus.pages.forEach(page => {
+    page.units.forEach((unit, index) => {
+      if (unit.label === 'page_number') return;
+
+      const displayText = formatSearchText(getUnitText(unit));
+      const rawText = formatSearchText(unit.text_raw || displayText);
+      const title = formatSearchText(unit.title || '');
+      const pageRef = unit.page_ref ?? unit.annotations?.[0]?.page_ref ?? null;
+
+      if (unit.label === 'heading' && displayText) {
+        sectionTitle = displayText;
+        sectionLevel = unit.level || null;
+      }
+
+      const searchableText = unit.label === 'toc_entry' && title ? title : displayText;
+      if (!searchableText) return;
+
+      entries.push({
+        id: unit.unit_id || `${page.page_id}_u${String(index + 1).padStart(3, '0')}`,
+        pagePdf: page.page_pdf,
+        pageBook: page.page_book,
+        pageKind: page.page_kind,
+        sigel: resolveSigel(corpus, page),
+        label: unit.label,
+        level: unit.level,
+        marker: unit.marker,
+        pageRef,
+        title: title || (unit.label === 'heading' ? searchableText : ''),
+        displayText: searchableText,
+        rawText,
+        sectionTitle: unit.label === 'heading' ? '' : sectionTitle,
+        sectionLevel: unit.label === 'heading' ? null : sectionLevel,
+        anchor: `page-${page.page_pdf}`
+      });
+    });
+  });
+
+  return entries;
+}
+
+function buildSuggestions(corpus) {
+  const seen = new Set();
+  const suggestions = [];
+  const candidates = [
+    ...corpus.toc.map(entry => entry.title),
+    ...corpus.pages.flatMap(page =>
+      page.units
+        .filter(unit => unit.label === 'heading')
+        .map(unit => getUnitText(unit))
+    )
+  ];
+
+  candidates.forEach(candidate => {
+    const value = formatSearchText(candidate);
+    if (!value || value.length < 4 || value.length > 46) return;
+    if (seen.has(value)) return;
+    seen.add(value);
+    suggestions.push(value);
+  });
+
+  return suggestions.slice(0, 8);
+}
+
+function humanLabel(label) {
+  const map = {
+    paragraph: 'Text',
+    heading: 'Überschrift',
+    footnote: 'Fußnote',
+    toc_entry: 'Inhaltsverzeichnis',
+    frontmatter: 'Paratext'
+  };
+  return map[label] || label;
+}
+
+function typeWeight(label) {
+  const map = {
+    heading: 24,
+    toc_entry: 16,
+    frontmatter: 12,
+    paragraph: 8,
+    footnote: 5
+  };
+  return map[label] || 6;
+}
+
+function countOccurrences(haystack, needle) {
+  if (!needle) return 0;
+  let count = 0;
+  let offset = 0;
+  while (offset < haystack.length) {
+    const index = haystack.indexOf(needle, offset);
+    if (index === -1) break;
+    count += 1;
+    offset = index + Math.max(needle.length, 1);
+  }
+  return count;
+}
+
+function getPatterns(query) {
+  if (state.exact) {
+    return query ? [query] : [];
+  }
+  return query.split(/\s+/).map(part => part.trim()).filter(Boolean);
+}
+
+function entryIsInScope(entry) {
+  if (entry.label === 'heading' && !state.includeHeadings) return false;
+  if (entry.label === 'frontmatter' && !state.includeFrontmatter) return false;
+  if (entry.label === 'toc_entry' && !state.includeToc) return false;
+  if (entry.label === 'footnote' && !state.includeFootnotes) return false;
+
+  const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
+  const end = Math.max(start, Number(document.getElementById('end-page').value) || start);
+  return entry.pagePdf >= start && entry.pagePdf <= end;
+}
+
+function scoreEntry(entry, query) {
+  const patterns = getPatterns(query);
+  if (!patterns.length) return null;
+
+  const haystack = state.caseSensitive ? entry.rawText : entry.displayText.toLowerCase();
+  const needles = state.caseSensitive ? patterns : patterns.map(pattern => pattern.toLowerCase());
+  const matchedIndexes = [];
+  let occurrences = 0;
+
+  if (state.exact) {
+    const exactNeedle = needles[0];
+    const exactIndex = haystack.indexOf(exactNeedle);
+    if (exactIndex === -1) return null;
+    matchedIndexes.push(exactIndex);
+    occurrences = countOccurrences(haystack, exactNeedle);
+  } else {
+    for (const needle of needles) {
+      const index = haystack.indexOf(needle);
+      if (index === -1) return null;
+      matchedIndexes.push(index);
+      occurrences += countOccurrences(haystack, needle);
+    }
+  }
+
+  let score = typeWeight(entry.label) + occurrences * 2;
+  if (matchedIndexes[0] === 0) score += 6;
+  if (entry.title && haystack.includes(state.caseSensitive ? entry.title : entry.title.toLowerCase())) score += 4;
+  if (entry.pageBook != null) score += 2;
+  if (entry.sectionTitle) {
+    const sectionHaystack = state.caseSensitive ? entry.sectionTitle : entry.sectionTitle.toLowerCase();
+    if (needles.some(needle => sectionHaystack.includes(needle))) score += 3;
+  }
+  if (state.exact) score += 18;
+
+  return {
+    entry,
+    score,
+    matchIndex: Math.min(...matchedIndexes),
+    occurrences
+  };
+}
+
+function excerptAround(text, index) {
+  const value = formatSearchText(text);
+  if (value.length <= 260) return value;
+  const start = Math.max(0, index - 90);
+  const end = Math.min(value.length, index + 170);
+  let excerpt = value.slice(start, end);
+  if (start > 0) excerpt = `…${excerpt}`;
+  if (end < value.length) excerpt = `${excerpt}…`;
+  return excerpt;
+}
+
+function highlightText(text, query) {
+  const patterns = getPatterns(query).sort((a, b) => b.length - a.length);
+  if (!patterns.length) return escapeHtml(text);
+
+  const regex = new RegExp(patterns.map(escapeRegExp).join('|'), state.caseSensitive ? 'g' : 'gi');
+  let html = '';
+  let lastIndex = 0;
+  let match = regex.exec(text);
+
+  while (match) {
+    html += escapeHtml(text.slice(lastIndex, match.index));
+    html += `<mark>${escapeHtml(match[0])}</mark>`;
+    lastIndex = match.index + match[0].length;
+    match = regex.exec(text);
+  }
+
+  html += escapeHtml(text.slice(lastIndex));
+  return html;
+}
+
+function renderSuggestionButtons() {
+  if (!state.suggestions.length) return '';
+  return `
+    <div>
+      <div class="side-title" style="margin-bottom:10px;">Anregungen</div>
+      <div class="suggestions">
+        ${state.suggestions.map(suggestion => `
+          <button class="suggestion-chip" type="button" data-suggestion="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function updateStats() {
+  document.getElementById('stat-pages').textContent = state.corpus ? state.corpus.counts.pages : '—';
+  document.getElementById('stat-entries').textContent = state.entries.length || '—';
+  document.getElementById('stat-headings').textContent = state.corpus ? state.corpus.counts.headings : '—';
+  document.getElementById('stat-footnotes').textContent = state.corpus ? state.corpus.counts.footnotes : '—';
+}
+
+function setSourceStatus(html, className = '') {
+  const el = document.getElementById('source-status');
+  el.className = `source-status ${className}`.trim();
+  el.innerHTML = html;
+}
+
+function syncUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (state.query) params.set('q', state.query);
+  else params.delete('q');
+  state.exact ? params.set('exact', '1') : params.delete('exact');
+  state.caseSensitive ? params.set('case', '1') : params.delete('case');
+  state.includeFootnotes ? params.set('footnotes', '1') : params.delete('footnotes');
+  params.set('sort', state.sort);
+  const queryString = params.toString();
+  history.replaceState(null, '', queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname);
+}
+
+function applyUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get('q') || '';
+  const exact = params.get('exact') === '1';
+  const caseSensitive = params.get('case') === '1';
+  const footnotes = params.get('footnotes') === '1';
+  const sort = params.get('sort') || 'relevance';
+
+  document.getElementById('query-input').value = query;
+  document.getElementById('exact-match').checked = exact;
+  document.getElementById('case-sensitive').checked = caseSensitive;
+  document.getElementById('include-footnotes').checked = footnotes;
+  if (sort === 'page') document.getElementById('sort-order').value = 'page';
+
+  state.query = query;
+  state.exact = exact;
+  state.caseSensitive = caseSensitive;
+  state.includeFootnotes = footnotes;
+  state.sort = sort === 'page' ? 'page' : 'relevance';
+}
+
+function getResults() {
+  if (!state.corpus || !state.query.trim()) return [];
+  const results = state.entries
+    .filter(entryIsInScope)
+    .map(entry => scoreEntry(entry, state.query.trim()))
+    .filter(Boolean);
+
+  results.sort((a, b) => {
+    if (state.sort === 'page') {
+      if (a.entry.pagePdf !== b.entry.pagePdf) return a.entry.pagePdf - b.entry.pagePdf;
+      return b.score - a.score;
+    }
+    if (b.score !== a.score) return b.score - a.score;
+    return a.entry.pagePdf - b.entry.pagePdf;
+  });
+
+  return results.slice(0, 250);
+}
+
+function renderSummary(results) {
+  const summary = document.getElementById('results-summary');
+
+  if (!state.corpus) {
+    summary.innerHTML = `
+      <div class="summary-head">
+        <div>
+          <h2 class="summary-title">Noch kein Korpus geladen</h2>
+          <p class="summary-subtitle">
+            Sobald der Extraktor-Export geladen ist, wird hier eine suchbare wissenschaftliche Ansicht erzeugt.
+          </p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (!state.query.trim()) {
+    summary.innerHTML = `
+      <div class="summary-head">
+        <div>
+          <h2 class="summary-title">Korpus bereit zur Recherche</h2>
+          <p class="summary-subtitle">
+            Geladen aus <strong>${escapeHtml(state.sourceLabel)}</strong>. Suche jetzt direkt in ${state.entries.length}
+            strukturierten Einheiten des Hegel-Korpus und springe von jedem Treffer in die aktuelle Lesefassung.
+          </p>
+        </div>
+        <div class="chip-row">
+          <span class="section-chip">Band ${escapeHtml(state.corpus.band)}</span>
+          <span class="section-chip">${state.corpus.counts.pages} Seiten</span>
+          <span class="section-chip">${state.entries.length} Suchstellen</span>
+        </div>
+      </div>
+      ${renderSuggestionButtons()}
+    `;
+    return;
+  }
+
+  const pageHits = new Set(results.map(result => result.entry.pagePdf)).size;
+  summary.innerHTML = `
+    <div class="summary-head">
+      <div>
+        <h2 class="summary-title">${results.length} Treffer zu „${escapeHtml(state.query.trim())}“</h2>
+        <p class="summary-subtitle">
+          ${pageHits} PDF-Seiten enthalten Treffer. Die Trefferliste wird direkt aus <strong>${escapeHtml(state.sourceLabel)}</strong>
+          berechnet und bleibt mit der Lesefassung synchron.
+        </p>
+      </div>
+      <div class="chip-row">
+        <span class="section-chip">${state.sort === 'page' ? 'Seitenfolge' : 'Relevanzsortierung'}</span>
+        <span class="section-chip">${state.exact ? 'Exakte Phrase' : 'Token-Suche'}</span>
+        <span class="section-chip">${state.caseSensitive ? 'Case sensitive' : 'Case insensitive'}</span>
+      </div>
+    </div>
+    <div class="chip-row">
+      <span class="section-chip">Überschriften ${state.includeHeadings ? 'ein' : 'aus'}</span>
+      <span class="section-chip">Paratexte ${state.includeFrontmatter ? 'ein' : 'aus'}</span>
+      <span class="section-chip">TOC ${state.includeToc ? 'ein' : 'aus'}</span>
+      <span class="section-chip">Fußnoten ${state.includeFootnotes ? 'ein' : 'aus'}</span>
+    </div>
+    ${renderSuggestionButtons()}
+  `;
+}
+
+function renderResults() {
+  const container = document.getElementById('results-list');
+
+  if (!state.corpus) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>Warte auf Daten.</strong><br>
+        Danach kannst du direkt im aktuellen Hegel-Korpus suchen.
+      </div>
+    `;
+    return;
+  }
+
+  syncUrl();
+
+  if (!state.query.trim()) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>Der Korpus ist geladen.</strong><br>
+        Gib oben einen Suchbegriff ein oder nutze eine der vorgeschlagenen Anfragen.
+      </div>
+    `;
+    renderSummary([]);
+    bindSuggestionButtons();
+    return;
+  }
+
+  const results = getResults();
+  renderSummary(results);
+
+  if (!results.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>Keine Treffer gefunden.</strong><br>
+        Versuche eine offenere Suche, erweitere den Seitenbereich oder aktiviere zusätzliche Textschichten.
+      </div>
+    `;
+    bindSuggestionButtons();
+    return;
+  }
+
+  container.innerHTML = results.map(result => {
+    const entry = result.entry;
+    const excerpt = excerptAround(entry.displayText, result.matchIndex);
+    const sectionContext = entry.sectionTitle
+      ? `Im Abschnitt <strong>${escapeHtml(entry.sectionTitle)}</strong>${entry.sectionLevel ? ` · Ebene ${escapeHtml(entry.sectionLevel)}` : ''}`
+      : 'Ohne Abschnittskontext';
+    const title = entry.label === 'heading'
+      ? highlightText(entry.displayText, state.query.trim())
+      : escapeHtml(humanLabel(entry.label));
+
+    return `
+      <article class="result-card">
+        <aside class="result-rail">
+          <div class="result-kind">${escapeHtml(humanLabel(entry.label))}</div>
+          <div class="result-sigel">${escapeHtml(entry.sigel)}</div>
+          <div class="result-rail-meta">
+            PDF ${escapeHtml(entry.pagePdf)}<br>
+            ${entry.pageBook != null ? `Druckseite ${escapeHtml(entry.pageBook)}<br>` : ''}
+            ${entry.pageRef != null ? `TOC-Ziel ${escapeHtml(entry.pageRef)}<br>` : ''}
+            ${escapeHtml(textLabel(entry))}
+          </div>
+        </aside>
+        <div class="result-body">
+          <div class="chip-row">
+            <span class="result-chip">${escapeHtml(entry.pageKind || 'body')}</span>
+            ${entry.level ? `<span class="result-chip">Ebene ${escapeHtml(entry.level)}</span>` : ''}
+            <span class="result-chip">Score ${escapeHtml(result.score)}</span>
+          </div>
+          <div class="result-context">${sectionContext}</div>
+          <h3 class="result-heading">
+            <a href="text.html#${escapeHtml(entry.anchor)}">${title}</a>
+          </h3>
+          <p class="result-snippet">${highlightText(excerpt, state.query.trim())}</p>
+          <div class="result-links">
+            <a class="result-link" href="text.html#${escapeHtml(entry.anchor)}">Im Lesetext öffnen</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  bindSuggestionButtons();
+}
+
+function setCorpus(raw, sourceLabel) {
+  state.corpus = normalizeCorpus(raw);
+  state.sourceLabel = sourceLabel;
+  state.entries = buildSearchEntries(state.corpus);
+  state.suggestions = buildSuggestions(state.corpus);
+  updateStats();
+
+  const endInput = document.getElementById('end-page');
+  if (!Number(endInput.value) || Number(endInput.value) < state.corpus.counts.pages) {
+    endInput.value = state.corpus.counts.pages;
+  }
+
+  renderResults();
+  setSourceStatus(
+    `<strong>Geladen:</strong> ${escapeHtml(sourceLabel)}<br>Band ${escapeHtml(state.corpus.band)} · ${state.corpus.counts.pages} Seiten · ${state.entries.length} Suchstellen.`,
+    'is-ready'
+  );
+}
+
+async function autoLoadCorpus() {
+  for (const source of AUTO_SOURCES) {
+    try {
+      const response = await fetch(`${source.path}?v=${Date.now()}`);
+      if (!response.ok) continue;
+      const json = await response.json();
+      setCorpus(json, source.label);
+      return true;
+    } catch (error) {
+      // Try next source silently.
+    }
+  }
   return false;
 }
 
-function pageLabel(page, band) {
-  if (page.sigel) return page.sigel;
-  const n = page.page_book || page.page_pdf || '';
-  return n ? `TWA ${band}, ${n}` : `TWA ${band}`;
-}
-
-function buildContext(text, query, exact, caseSensitive) {
-  if (!text) return '';
-  const hay = caseSensitive ? text : text.toLowerCase();
-  const needle = caseSensitive ? query : query.toLowerCase();
-
-  if (exact) {
-    const idx = hay.indexOf(needle);
-    if (idx === -1) return text.slice(0, 240);
-    const start = Math.max(0, idx - 90);
-    const end = Math.min(text.length, idx + query.length + 140);
-    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+async function handleAutoReload() {
+  setSourceStatus('Versuche, JSON automatisch zu laden…');
+  const loaded = await autoLoadCorpus();
+  if (!loaded) {
+    const hint = window.location.protocol === 'file:'
+      ? 'Direkt über <code>file://</code> geöffnet: bitte die Datei <code>out/master.json</code> manuell auswählen.'
+      : 'Kein passender JSON-Pfad gefunden. Bitte <code>out/master.json</code> manuell auswählen.';
+    setSourceStatus(`<strong>Automatisches Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
   }
-
-  const tokens = query.split(/\s+/).filter(Boolean);
-  let bestIdx = -1;
-  for (const tok of tokens) {
-    const pos = hay.indexOf(caseSensitive ? tok : tok.toLowerCase());
-    if (pos !== -1 && (bestIdx === -1 || pos < bestIdx)) bestIdx = pos;
-  }
-  if (bestIdx === -1) return text.slice(0, 240) + (text.length > 240 ? '…' : '');
-  const start = Math.max(0, bestIdx - 90);
-  const end = Math.min(text.length, bestIdx + 180);
-  return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
 }
 
-function highlight(text, query, exact, caseSensitive) {
-  if (!query) return escapeHtml(text);
-  const safe = escapeHtml(text);
-  if (exact) {
-    const flags = caseSensitive ? 'g' : 'gi';
-    const regex = new RegExp(`(${escapeRegex(query)})`, flags);
-    return safe.replace(regex, '<mark>$1</mark>');
-  }
-
-  const tokens = query.split(/\s+/).filter(Boolean).sort((a,b) => b.length - a.length);
-  if (!tokens.length) return safe;
-  const flags = caseSensitive ? 'g' : 'gi';
-  const regex = new RegExp(`(${tokens.map(escapeRegex).join('|')})`, flags);
-  return safe.replace(regex, '<mark>$1</mark>');
+function bindSuggestionButtons() {
+  document.querySelectorAll('[data-suggestion]').forEach(button => {
+    button.addEventListener('click', () => {
+      const suggestion = button.dataset.suggestion || '';
+      document.getElementById('query-input').value = suggestion;
+      state.query = suggestion;
+      renderResults();
+    });
+  });
 }
 
-function scoreHit(entry, query, exact, caseSensitive) {
-  const text = entry.text;
-  const hay = caseSensitive ? text : text.toLowerCase();
-  const needle = caseSensitive ? query : query.toLowerCase();
-  let score = 0;
-
-  if (exact && hay.includes(needle)) score += 100;
-
-  const tokens = exact ? [query] : query.split(/\s+/).filter(Boolean);
-  for (const token of tokens) {
-    const t = caseSensitive ? token : token.toLowerCase();
-    if (!t) continue;
-    const matches = hay.split(t).length - 1;
-    score += matches * 10;
-  }
-
-  if (entry.type === 'heading') score += 8;
-  if (entry.text.length < 140) score += 2;
-  return score;
+function readControls() {
+  state.query = document.getElementById('query-input').value.trim();
+  state.exact = document.getElementById('exact-match').checked;
+  state.caseSensitive = document.getElementById('case-sensitive').checked;
+  state.includeHeadings = document.getElementById('include-headings').checked;
+  state.includeFrontmatter = document.getElementById('include-frontmatter').checked;
+  state.includeToc = document.getElementById('include-toc').checked;
+  state.includeFootnotes = document.getElementById('include-footnotes').checked;
+  state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
 }
 
-function matches(entry, query, exact, caseSensitive) {
-  const hay = caseSensitive ? entry.text : entry.text.toLowerCase();
-  const needle = caseSensitive ? query : query.toLowerCase();
+function bindEvents() {
+  document.getElementById('run-search').addEventListener('click', () => {
+    readControls();
+    renderResults();
+  });
 
-  if (exact) return hay.includes(needle);
+  document.getElementById('clear-search').addEventListener('click', () => {
+    document.getElementById('query-input').value = '';
+    document.getElementById('exact-match').checked = false;
+    document.getElementById('case-sensitive').checked = false;
+    document.getElementById('include-headings').checked = true;
+    document.getElementById('include-frontmatter').checked = true;
+    document.getElementById('include-toc').checked = true;
+    document.getElementById('include-footnotes').checked = false;
+    document.getElementById('sort-order').value = 'relevance';
+    readControls();
+    renderResults();
+  });
 
-  const tokens = query.split(/\s+/).filter(Boolean);
-  return tokens.every(tok => hay.includes(caseSensitive ? tok : tok.toLowerCase()));
-}
-
-async function init() {
-  const status = document.getElementById('status-line');
-  const results = document.getElementById('results-area');
-
-  try {
-    let corpus = null;
-    const candidates = [
-      'data/twa_band_5_v2_corrected.json',
-      'data/twa_band_5_v2.json',
-      'data/twa_band_5.json'
-    ];
-
-    for (const path of candidates) {
-      const res = await fetch(path + '?v=' + Date.now());
-      if (res.ok) {
-        corpus = await res.json();
-        break;
-      }
+  document.getElementById('query-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      readControls();
+      renderResults();
     }
+  });
 
-    if (!corpus) throw new Error('Keine JSON-Datei gefunden.');
+  [
+    'exact-match',
+    'case-sensitive',
+    'include-headings',
+    'include-frontmatter',
+    'include-toc',
+    'include-footnotes',
+    'sort-order',
+    'start-page',
+    'end-page'
+  ].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      readControls();
+      renderResults();
+    });
+  });
 
-    const band = corpus.metadata?.band || '5';
-    blocks = [];
+  document.getElementById('reload-source').addEventListener('click', handleAutoReload);
 
-    (corpus.pages || [])
-      .filter(sectionIsSearchable)
-      .forEach(page => {
-        (page.blocks || []).forEach((block, idx) => {
-          const text = getBlockText(block);
-          if (!text) return;
-          if (!typeIsSearchable(block, true)) return;
+  document.getElementById('json-file').addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-          blocks.push({
-            pagePdf: page.page_pdf || null,
-            pageBook: page.page_book || page.id || null,
-            sigel: pageLabel(page, band),
-            type: block.type,
-            level: block.level || null,
-            text,
-            anchor: getAnchor(page),
-            blockId: block.id || `${getAnchor(page)}-b${idx}`
-          });
-        });
-      });
-
-    status.textContent = `Index bereit: ${blocks.length} Textblöcke`;
-    results.innerHTML = '<div class="muted">Gib mindestens zwei Zeichen ein.</div>';
-    wireSearch();
-  } catch (err) {
-    status.textContent = `Fehler: ${err.message}`;
-    results.innerHTML = '';
-    console.error(err);
-  }
-}
-
-function runSearch() {
-  const input = document.getElementById('search-input');
-  const includeHeadings = document.getElementById('option-headings').checked;
-  const caseSensitive = document.getElementById('option-case').checked;
-  const exact = document.getElementById('option-exact').checked;
-  const status = document.getElementById('status-line');
-  const results = document.getElementById('results-area');
-
-  const query = input.value.trim();
-  results.innerHTML = '';
-
-  if (query.length < 2) {
-    status.textContent = `Index bereit: ${blocks.length} Textblöcke`;
-    results.innerHTML = '<div class="muted">Gib mindestens zwei Zeichen ein.</div>';
-    return;
-  }
-
-  const base = includeHeadings ? blocks : blocks.filter(b => b.type !== 'heading');
-  const hits = base
-    .filter(entry => matches(entry, query, exact, caseSensitive))
-    .map(entry => ({ ...entry, score: scoreHit(entry, query, exact, caseSensitive) }))
-    .sort((a, b) => b.score - a.score || (a.pageBook || 0) - (b.pageBook || 0))
-    .slice(0, 200);
-
-  status.textContent = `${hits.length} Treffer für „${query}“`;
-
-  if (!hits.length) {
-    results.innerHTML = '<div class="no-results">Keine Treffer gefunden.</div>';
-    return;
-  }
-
-  hits.forEach(hit => {
-    const context = buildContext(hit.text, query, exact, caseSensitive);
-    const content = highlight(context, query, exact, caseSensitive);
-    const label = hit.type === 'heading' ? 'Überschrift' : 'Absatz';
-
-    results.insertAdjacentHTML('beforeend', `
-      <article class="result-card">
-        <div class="result-meta">
-          <span>${escapeHtml(hit.sigel)}</span>
-          <span>${label}</span>
-          ${hit.level ? `<span>Level ${hit.level}</span>` : ''}
-        </div>
-        <div class="result-title">${highlight(hit.text.slice(0, 140) + (hit.text.length > 140 ? '…' : ''), query, exact, caseSensitive)}</div>
-        <div class="result-content">${content}</div>
-        <a class="result-link" href="text.html#${encodeURIComponent(hit.anchor)}">zur Stelle</a>
-      </article>
-    `);
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      setCorpus(json, file.name);
+    } catch (error) {
+      setSourceStatus(
+        `<strong>JSON konnte nicht gelesen werden.</strong><br>${escapeHtml(error.message || 'Unbekannter Fehler')}`,
+        'is-warning'
+      );
+    }
   });
 }
 
-function wireSearch() {
-  const input = document.getElementById('search-input');
-  const button = document.getElementById('search-btn');
-  const optionHeadings = document.getElementById('option-headings');
-  const optionCase = document.getElementById('option-case');
-  const optionExact = document.getElementById('option-exact');
-
-  let timer = null;
-  const delayed = () => {
-    clearTimeout(timer);
-    timer = setTimeout(runSearch, 120);
-  };
-
-  input.addEventListener('input', delayed);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') runSearch();
-  });
-  button.addEventListener('click', runSearch);
-  optionHeadings.addEventListener('change', runSearch);
-  optionCase.addEventListener('change', runSearch);
-  optionExact.addEventListener('change', runSearch);
-}
-
-init();
+applyUrlState();
+bindEvents();
+handleAutoReload();
 </script>
 </body>
 </html>

@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Text — Hegel Edition</title>
+  <title>JSON Preview — Hegel Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
-    .reader-main {
+    .preview-main {
       max-width: 1380px;
       margin: 0 auto;
     }
-    .reader-intro {
-      margin-bottom: 26px;
+    .preview-intro {
+      margin-bottom: 28px;
     }
-    .reader-kicker {
+    .preview-kicker {
       display: inline-block;
       margin-bottom: 14px;
       padding: 7px 12px;
@@ -27,28 +27,28 @@
       text-transform: uppercase;
       background: rgba(255,255,255,0.74);
     }
-    .reader-intro h1 {
+    .preview-intro h1 {
       margin: 0 0 12px;
       font-family: var(--font-text);
-      font-size: clamp(2.4rem, 5vw, 4rem);
-      line-height: 0.98;
+      font-size: clamp(2.5rem, 5vw, 4.4rem);
+      line-height: 0.96;
       font-weight: 400;
       letter-spacing: -0.03em;
     }
-    .reader-intro p {
+    .preview-intro p {
       margin: 0;
-      max-width: 60rem;
+      max-width: 58rem;
       color: var(--text-muted);
-      font-size: 1.03rem;
+      font-size: 1.05rem;
       line-height: 1.7;
     }
-    .reader-layout {
+    .preview-layout {
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
       gap: 28px;
       align-items: start;
     }
-    .reader-sidebar {
+    .preview-sidebar {
       position: sticky;
       top: 96px;
       display: grid;
@@ -58,7 +58,7 @@
       padding-right: 4px;
     }
     .side-card,
-    .reader-summary,
+    .viewer-summary,
     .page-card,
     .empty-state {
       border: 1px solid var(--border);
@@ -70,6 +70,8 @@
       padding: 18px;
     }
     .side-title,
+    .panel-label,
+    .page-label,
     .unit-badge {
       font-family: var(--font-ui);
     }
@@ -109,7 +111,7 @@
       gap: 10px;
     }
     .file-picker,
-    .reader-btn,
+    .preview-btn,
     .mode-btn {
       appearance: none;
       display: inline-flex;
@@ -131,7 +133,7 @@
       box-sizing: border-box;
     }
     .file-picker:hover,
-    .reader-btn:hover,
+    .preview-btn:hover,
     .mode-btn:hover {
       transform: translateY(-1px);
       border-color: rgba(142,32,32,0.38);
@@ -140,12 +142,12 @@
     .file-picker input {
       display: none;
     }
-    .reader-btn.primary {
+    .preview-btn.primary {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
-    .reader-btn.primary:hover {
+    .preview-btn.primary:hover {
       color: #fff;
     }
     .mode-row {
@@ -248,8 +250,7 @@
       font-size: 0.92rem;
       line-height: 1.45;
     }
-    .toc-list a:hover,
-    .toc-list a.is-active {
+    .toc-list a:hover {
       transform: translateX(2px);
       border-color: rgba(142,32,32,0.25);
       color: var(--accent);
@@ -263,23 +264,23 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
-    .reader-view {
+    .viewer {
       min-width: 0;
     }
-    .reader-summary {
+    .viewer-summary {
       padding: 22px 24px;
       margin-bottom: 18px;
       display: grid;
       gap: 14px;
     }
-    .summary-head {
+    .viewer-head {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       gap: 14px;
       align-items: start;
     }
-    .summary-title {
+    .viewer-title {
       margin: 0;
       font-family: var(--font-text);
       font-size: clamp(1.9rem, 4vw, 3rem);
@@ -287,19 +288,19 @@
       font-weight: 400;
       letter-spacing: -0.02em;
     }
-    .summary-subtitle {
+    .viewer-subtitle {
       margin: 8px 0 0;
       color: var(--text-muted);
       font-size: 1rem;
       line-height: 1.6;
       max-width: 52rem;
     }
-    .summary-strip {
+    .viewer-strip {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
-    .summary-chip {
+    .viewer-chip {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -311,7 +312,7 @@
       font-weight: 600;
       color: var(--text-muted);
     }
-    .reader-pages {
+    .viewer-pages {
       display: grid;
       gap: 18px;
     }
@@ -321,11 +322,6 @@
       gap: 22px;
       padding: 24px;
       scroll-margin-top: 92px;
-    }
-    .page-card:target,
-    .page-card.is-target {
-      border-color: rgba(142,32,32,0.32);
-      box-shadow: 0 18px 40px rgba(142,32,32,0.08);
     }
     .page-card.page-toc {
       background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(253,247,239,0.92));
@@ -498,10 +494,10 @@
       color: var(--text-main);
     }
     @media (max-width: 1080px) {
-      .reader-layout {
+      .preview-layout {
         grid-template-columns: 1fr;
       }
-      .reader-sidebar {
+      .preview-sidebar {
         position: static;
         max-height: none;
         overflow: visible;
@@ -539,26 +535,27 @@
   <nav class="sitenav">
     <ul>
       <li><a href="index.html">Start</a></li>
-      <li><a href="text.html" class="current">Text lesen</a></li>
+      <li><a href="text.html">Text lesen</a></li>
       <li><a href="search.html">Suche</a></li>
       <li><a href="network.html">Netzwerk</a></li>
+      <li><a href="preview.html" class="current">JSON Preview</a></li>
     </ul>
   </nav>
 </header>
 
-<main class="reader-main">
-  <section class="reader-intro">
-    <div class="reader-kicker">Direkt aus dem Extraktor</div>
-    <h1>Lesetext aus dem aktuellen JSON</h1>
+<main class="preview-main">
+  <section class="preview-intro">
+    <div class="preview-kicker">Arbeitsansicht für den Extraktor</div>
+    <h1>JSON als digitale Edition lesen</h1>
     <p>
-      Diese Textansicht liest den aktuellen Extraktor-Output direkt ein, statt auf die ältere, site-spezifische
-      JSON-Struktur angewiesen zu sein. So kannst du sofort sehen, wie gut die neue Strukturierung als digitale
-      Hegel-Ausgabe funktioniert.
+      Diese Seite ist absichtlich kein fertiger Endzustand, sondern ein editorischer Vorschau-Raum. Sie rendert das aktuelle
+      Extraktor-JSON direkt als lesbare Webansicht, damit wir schnell beurteilen können, wie gut Gliederung, Seitensiglen,
+      Fußnoten und Normalisierung bereits funktionieren.
     </p>
   </section>
 
-  <div class="reader-layout">
-    <aside class="reader-sidebar">
+  <div class="preview-layout">
+    <aside class="preview-sidebar">
       <section class="side-card">
         <h2 class="side-title">Quelle</h2>
         <div class="picker-row">
@@ -566,7 +563,7 @@
             JSON-Datei öffnen
             <input type="file" id="json-file" accept=".json,application/json">
           </label>
-          <button class="reader-btn" id="reload-source" type="button">Automatisch neu laden</button>
+          <button class="preview-btn" id="reload-source" type="button">Automatisch neu laden</button>
         </div>
         <div class="source-status" id="source-status">
           Automatisches Laden wird versucht…
@@ -574,7 +571,7 @@
       </section>
 
       <section class="side-card">
-        <h2 class="side-title">Lesemodus</h2>
+        <h2 class="side-title">Ansicht</h2>
         <div class="mode-row">
           <button class="mode-btn is-active" id="mode-normalized" type="button">Normalisiert</button>
           <button class="mode-btn" id="mode-raw" type="button">Rohtext</button>
@@ -590,10 +587,10 @@
           </div>
           <div class="range-field">
             <span>Anzahl Seiten</span>
-            <label><input type="number" id="page-count" min="1" max="160" value="24"></label>
+            <label><input type="number" id="page-count" min="1" max="120" value="20"></label>
           </div>
         </div>
-        <button class="reader-btn primary" id="render-range" type="button" style="margin-top:14px;">Ausschnitt rendern</button>
+        <button class="preview-btn primary" id="render-range" type="button" style="margin-top:14px;">Ausschnitt rendern</button>
       </section>
 
       <section class="side-card">
@@ -626,12 +623,12 @@
       </section>
     </aside>
 
-    <section class="reader-view">
-      <div class="reader-summary" id="reader-summary">
-        <div class="summary-head">
+    <section class="viewer">
+      <div class="viewer-summary" id="viewer-summary">
+        <div class="viewer-head">
           <div>
-            <h2 class="summary-title">Noch kein Korpus geladen</h2>
-            <p class="summary-subtitle">
+            <h2 class="viewer-title">Noch kein Korpus geladen</h2>
+            <p class="viewer-subtitle">
               Wenn das automatische Laden fehlschlägt, kannst du hier einfach die aktuelle Datei
               <code>out/master.json</code> manuell auswählen.
             </p>
@@ -639,10 +636,10 @@
         </div>
       </div>
 
-      <div class="reader-pages" id="reader-pages">
+      <div class="viewer-pages" id="preview-pages">
         <div class="empty-state">
           <strong>Warte auf Daten.</strong><br>
-          Sobald das Korpus geladen ist, wird hier der Extraktor-Output direkt als digitale Lesefassung gerendert.
+          Diese Vorschau ist für das aktuelle Extraktor-JSON gedacht und rendert danach einen Seitenausschnitt als digitale Edition.
         </div>
       </div>
     </section>
@@ -830,48 +827,6 @@ function setSourceStatus(html, className = '') {
   el.innerHTML = html;
 }
 
-function getHashPageTarget() {
-  const match = window.location.hash.match(/^#page-(\d+)$/);
-  return match ? Number(match[1]) : null;
-}
-
-function ensureHashPageIsVisible() {
-  if (!state.corpus) return false;
-  const hashPage = getHashPageTarget();
-  if (!hashPage) return false;
-
-  const startInput = document.getElementById('start-page');
-  const countInput = document.getElementById('page-count');
-  const count = Math.max(1, Number(countInput.value) || 24);
-  const start = Math.max(1, Number(startInput.value) || 1);
-  const end = start + count - 1;
-
-  if (hashPage >= start && hashPage <= end) return false;
-  startInput.value = Math.max(1, hashPage - Math.min(2, count - 1));
-  return true;
-}
-
-function focusHashTarget() {
-  const targetId = window.location.hash.replace(/^#/, '');
-  if (!targetId) return;
-
-  const target = document.getElementById(targetId);
-  if (!target) return;
-
-  document.querySelectorAll('.page-card.is-target').forEach(card => card.classList.remove('is-target'));
-  target.classList.add('is-target');
-  requestAnimationFrame(() => {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-}
-
-function handleHashNavigation() {
-  if (!state.corpus) return;
-  const changedRange = ensureHashPageIsVisible();
-  if (changedRange) renderAll();
-  focusHashTarget();
-}
-
 function updateStats() {
   if (!state.corpus) return;
   document.getElementById('stat-pages').textContent = state.corpus.counts.pages;
@@ -880,35 +835,35 @@ function updateStats() {
   document.getElementById('stat-footnotes').textContent = state.corpus.counts.footnotes;
 }
 
-function renderSummary() {
+function renderViewerSummary() {
   if (!state.corpus) return;
   const title = state.corpus.metadata.title || 'Unbenanntes Korpus';
   const sourcePdf = state.corpus.metadata.source_pdf || 'keine Quelle notiert';
-  const summary = document.getElementById('reader-summary');
+  const summary = document.getElementById('viewer-summary');
   const start = Number(document.getElementById('start-page').value) || 1;
-  const count = Number(document.getElementById('page-count').value) || 24;
+  const count = Number(document.getElementById('page-count').value) || 20;
   const end = start + count - 1;
 
   summary.innerHTML = `
-    <div class="summary-head">
+    <div class="viewer-head">
       <div>
-        <h2 class="summary-title">${escapeHtml(title)}</h2>
-        <p class="summary-subtitle">
-          Diese Lesefassung wird direkt aus <strong>${escapeHtml(state.sourceLabel)}</strong> gerendert.
-          Sichtbar ist aktuell der Ausschnitt von PDF-Seite ${start} bis ${end}.
+        <h2 class="viewer-title">${escapeHtml(title)}</h2>
+        <p class="viewer-subtitle">
+          Vorschau auf den aktuellen JSON-Stand. Quelle: <strong>${escapeHtml(state.sourceLabel)}</strong>.
+          Die Seite zeigt einen editierbaren Ausschnitt von PDF-Seite ${start} bis ${end}.
         </p>
       </div>
-      <div class="summary-strip">
-        <span class="summary-chip">Band ${escapeHtml(state.corpus.band)}</span>
-        <span class="summary-chip">${state.corpus.counts.pages} Seiten</span>
-        <span class="summary-chip">${state.corpus.counts.headings} Überschriften</span>
-        <span class="summary-chip">${state.mode === 'raw' ? 'Rohtext' : 'Normalisiert'}</span>
+      <div class="viewer-strip">
+        <span class="viewer-chip">Band ${escapeHtml(state.corpus.band)}</span>
+        <span class="viewer-chip">${state.corpus.counts.pages} Seiten</span>
+        <span class="viewer-chip">${state.corpus.counts.headings} Überschriften</span>
+        <span class="viewer-chip">${state.mode === 'raw' ? 'Rohtext' : 'Normalisiert'}</span>
       </div>
     </div>
-    <div class="summary-strip">
-      <span class="summary-chip">Quelle PDF: ${escapeHtml(sourcePdf)}</span>
-      <span class="summary-chip">Fußnoten ${state.showFootnotes ? 'sichtbar' : 'ausgeblendet'}</span>
-      <span class="summary-chip">Struktur-Tags ${state.showTags ? 'sichtbar' : 'ausgeblendet'}</span>
+    <div class="viewer-strip">
+      <span class="viewer-chip">Quelle PDF: ${escapeHtml(sourcePdf)}</span>
+      <span class="viewer-chip">Fußnoten ${state.showFootnotes ? 'sichtbar' : 'ausgeblendet'}</span>
+      <span class="viewer-chip">Struktur-Tags ${state.showTags ? 'sichtbar' : 'ausgeblendet'}</span>
     </div>
   `;
 }
@@ -930,7 +885,7 @@ function renderToc() {
     const href = anchor ? `#${anchor}` : '#';
     return `
       <li>
-        <a href="${href}" data-page-anchor="${escapeHtml(anchor)}">
+        <a href="${href}">
           ${escapeHtml(entry.title)}
           <span class="toc-page">Seite ${escapeHtml(entry.page)}</span>
         </a>
@@ -1032,25 +987,8 @@ function renderPage(page) {
   `;
 }
 
-function syncVisiblePage() {
-  const anchors = document.querySelectorAll('.toc-list a[data-page-anchor]');
-  const pages = [...document.querySelectorAll('.page-card[id]')];
-  if (!pages.length || !anchors.length) return;
-
-  let current = pages[0];
-  for (const page of pages) {
-    const rect = page.getBoundingClientRect();
-    if (rect.top <= 150) current = page;
-    else break;
-  }
-
-  anchors.forEach(anchor => {
-    anchor.classList.toggle('is-active', anchor.dataset.pageAnchor === current.id);
-  });
-}
-
 function renderPages() {
-  const container = document.getElementById('reader-pages');
+  const container = document.getElementById('preview-pages');
   if (!state.corpus) {
     container.innerHTML = `
       <div class="empty-state">
@@ -1062,7 +1000,7 @@ function renderPages() {
   }
 
   const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
-  const count = Math.max(1, Number(document.getElementById('page-count').value) || 24);
+  const count = Math.max(1, Number(document.getElementById('page-count').value) || 20);
   const pages = state.corpus.pages
     .filter(page => page.page_pdf >= start)
     .slice(0, count);
@@ -1078,12 +1016,11 @@ function renderPages() {
   }
 
   container.innerHTML = pages.map(renderPage).join('');
-  syncVisiblePage();
 }
 
 function renderAll() {
   updateStats();
-  renderSummary();
+  renderViewerSummary();
   renderToc();
   renderPages();
 }
@@ -1096,7 +1033,6 @@ function setCorpus(raw, sourceLabel) {
     `<strong>Geladen:</strong> ${escapeHtml(sourceLabel)}<br>Band ${escapeHtml(state.corpus.band)} · ${state.corpus.counts.pages} Seiten · ${state.corpus.counts.headings} Überschriften.`,
     'is-ready'
   );
-  handleHashNavigation();
 }
 
 async function autoLoadCorpus() {
@@ -1120,7 +1056,7 @@ async function handleAutoReload() {
 
   if (!loaded) {
     const hint = window.location.protocol === 'file:'
-      ? 'Direkt über <code>file://</code> geöffnet: bitte die Datei <code>out/master.json</code> manuell auswählen.'
+      ? 'Direkt über <code>file://</code> geöffnet: bitte unten die Datei <code>out/master.json</code> manuell auswählen.'
       : 'Kein passender JSON-Pfad gefunden. Bitte <code>out/master.json</code> manuell auswählen.';
     setSourceStatus(`<strong>Automatisches Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
   }
@@ -1169,9 +1105,6 @@ function bindEvents() {
       );
     }
   });
-
-  window.addEventListener('scroll', syncVisiblePage, { passive: true });
-  window.addEventListener('hashchange', handleHashNavigation);
 }
 
 bindEvents();

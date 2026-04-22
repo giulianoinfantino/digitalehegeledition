@@ -298,6 +298,7 @@
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="text.html">Edition betreten</a>
+        <a class="btn btn-secondary" href="preview.html">JSON previewen</a>
         <a class="btn btn-secondary" href="search.html">Im Korpus suchen</a>
         <a class="btn btn-secondary" href="network.html">Netzwerk ansehen</a>
       </div>
@@ -423,29 +424,88 @@
 </main>
 
 <script>
+  const AUTO_SOURCES = [
+    { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
+    { label: 'Web-Export', path: '../out/web.json' },
+    { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' }
+  ];
+
+  function getUnitLabel(unit) {
+    const ann = unit?.annotations?.[0] || {};
+    return ann.label || unit.type || unit.label || 'paragraph';
+  }
+
+  function getUnitText(unit) {
+    return unit.text_normalized ?? unit.text ?? unit.plain ?? unit.text_raw ?? unit.content ?? '';
+  }
+
+  function extractPages(corpus) {
+    return (corpus.pages || []).map((page, index) => ({
+      page_pdf: page.page_pdf ?? page.page ?? page.id ?? index + 1,
+      page_kind: page.page_kind || page.section_type || 'body',
+      units: Array.isArray(page.units)
+        ? page.units
+        : Array.isArray(page.blocks)
+          ? page.blocks
+          : []
+    }));
+  }
+
+  function computeStats(corpus) {
+    const pages = extractPages(corpus).filter(page => {
+      if (!page.page_kind) return true;
+      return ['body', 'maintext'].includes(page.page_kind);
+    });
+
+    let headings = 0;
+    let searchableBlocks = 0;
+    let notes = 0;
+
+    pages.forEach(page => {
+      page.units.forEach(unit => {
+        const label = getUnitLabel(unit);
+        const text = String(getUnitText(unit)).trim();
+        if (!text) return;
+
+        if (label === 'heading') headings += 1;
+        if (label === 'paragraph' || label === 'heading') searchableBlocks += 1;
+        if (label === 'footnote') notes += 1;
+      });
+    });
+
+    return {
+      pages: pages.length,
+      headings,
+      searchableBlocks,
+      notes
+    };
+  }
+
+  async function loadCorpus() {
+    for (const source of AUTO_SOURCES) {
+      try {
+        const response = await fetch(`${source.path}?v=${Date.now()}`);
+        if (!response.ok) continue;
+        const corpus = await response.json();
+        return { corpus, source };
+      } catch (error) {
+        // Try next source silently.
+      }
+    }
+    throw new Error('Kein passender JSON-Pfad gefunden');
+  }
+
   async function populateStats() {
     const status = document.getElementById('data-status');
     try {
-      const response = await fetch('data/twa_band_5_v2.json?v=' + Date.now());
-      const data = await response.json();
-      const pages = (data.pages || []).filter(page => !page.section_type || page.section_type === 'maintext');
-      let headings = 0;
-      let searchableBlocks = 0;
-      let notes = 0;
+      const { corpus, source } = await loadCorpus();
+      const stats = computeStats(corpus);
 
-      pages.forEach(page => {
-        (page.blocks || []).forEach(block => {
-          if (block.type === 'heading') headings += 1;
-          if (block.type === 'paragraph' || block.type === 'heading') searchableBlocks += 1;
-          if (block.type === 'footnote') notes += 1;
-        });
-      });
-
-      document.getElementById('stat-pages').textContent = pages.length.toLocaleString('de-DE');
-      document.getElementById('stat-headings').textContent = headings.toLocaleString('de-DE');
-      document.getElementById('stat-blocks').textContent = searchableBlocks.toLocaleString('de-DE');
-      document.getElementById('stat-notes').textContent = notes.toLocaleString('de-DE');
-      status.textContent = 'Korpusdaten erfolgreich geladen';
+      document.getElementById('stat-pages').textContent = stats.pages.toLocaleString('de-DE');
+      document.getElementById('stat-headings').textContent = stats.headings.toLocaleString('de-DE');
+      document.getElementById('stat-blocks').textContent = stats.searchableBlocks.toLocaleString('de-DE');
+      document.getElementById('stat-notes').textContent = stats.notes.toLocaleString('de-DE');
+      status.textContent = `Korpusdaten erfolgreich geladen · ${source.label}`;
     } catch (error) {
       document.getElementById('stat-pages').textContent = '—';
       document.getElementById('stat-headings').textContent = '—';
