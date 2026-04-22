@@ -986,6 +986,7 @@ function renderSummary() {
   if (!state.corpus) return;
   const title = state.selectedWork?.title || state.corpus.metadata.title || 'Unbenanntes Korpus';
   const sourcePdf = state.selectedWork?.pdf_filename || state.corpus.metadata.pdf_filename || state.corpus.metadata.source_pdf || 'keine Quelle notiert';
+  const series = state.selectedWork?.series || state.corpus.metadata?.series || '';
   const summary = document.getElementById('reader-summary');
   const start = Number(document.getElementById('start-page').value) || 1;
   const count = Number(document.getElementById('page-count').value) || 24;
@@ -1001,7 +1002,7 @@ function renderSummary() {
         </p>
       </div>
       <div class="summary-strip">
-        <span class="summary-chip">Band ${escapeHtml(state.corpus.band)}</span>
+        <span class="summary-chip">${escapeHtml(series || 'Edition')} ${escapeHtml(state.corpus.band)}</span>
         <span class="summary-chip">${state.corpus.counts.pages} Seiten</span>
         <span class="summary-chip">${state.corpus.counts.headings} Überschriften</span>
         <span class="summary-chip">${state.mode === 'raw' ? 'Rohtext' : 'Normalisiert'}</span>
@@ -1113,6 +1114,8 @@ function renderPage(page) {
   const footnotes = page.units.filter(unit => unit.label === 'footnote');
   const pageNumberUnit = page.units.find(unit => unit.label === 'page_number');
   const pageNumberLabel = pageNumberUnit?.annotations?.[0]?.page_number_display || pageNumberUnit?.text_normalized || null;
+  const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
+  const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
 
   return `
     <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
@@ -1121,6 +1124,8 @@ function renderPage(page) {
         <div class="page-meta">
           PDF ${escapeHtml(page.page_pdf)}<br>
           ${page.page_book != null ? `Druckseite ${escapeHtml(page.page_book)}<br>` : ''}
+          ${gwPage ? `GW ${escapeHtml(gwPage)}<br>` : ''}
+          ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
           ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${page.units.length} Units
         </div>
@@ -1165,8 +1170,10 @@ function renderPages() {
 
   const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
   const count = Math.max(1, Number(document.getElementById('page-count').value) || 24);
+  const selectedSeries = state.selectedWork?.series || state.corpus.metadata?.series || '';
   const pages = state.corpus.pages
     .filter(page => page.page_pdf >= start)
+    .filter(page => !(selectedSeries === 'GW' && page.page_kind === 'frontmatter' && page.page_pdf <= 9))
     .slice(0, count);
 
   if (!pages.length) {
