@@ -761,6 +761,35 @@ const state = {
   copyFeedbackTimer: null,
 };
 
+const CURATED_OUTLINES = {
+  'gw-12': [
+    { title: 'Vorb­ericht', gw_page: 5, level: 1 },
+    { title: 'Inhaltsanzeige', gw_page: 7, level: 1 },
+    { title: 'Vom Begriff im allgemeinen', gw_page: 11, level: 1 },
+    { title: 'Eintheilung', gw_page: 29, level: 1 },
+    { title: 'Erster Abschnitt', gw_page: 31, level: 1 },
+    { title: 'Die Subjectivität', gw_page: 31, level: 2 },
+    { title: 'Erstes Kapitel', gw_page: 32, level: 1 },
+    { title: 'Der Begriff', gw_page: 32, level: 2 },
+    { title: 'A) Der allgemeine Begriff', gw_page: 33, level: 3 },
+    { title: 'B) Der besondere Begriff', gw_page: 37, level: 3 },
+    { title: 'Anmerkung', gw_page: 43, level: 4 },
+    { title: 'C) Das Einzelne', gw_page: 49, level: 3 },
+    { title: 'Zweites Kapitel', gw_page: 53, level: 1 },
+    { title: 'Das Urtheil', gw_page: 53, level: 2 },
+    { title: 'A. Das Urtheil des Daseyns', gw_page: 59, level: 3 },
+    { title: 'a. Das positive Urtheil', gw_page: 60, level: 4 },
+    { title: 'b. Negatives Urtheil', gw_page: 64, level: 4 },
+    { title: 'c. Unendliches Urtheil', gw_page: 69, level: 4 },
+    { title: 'B. Das Urtheil der Reflexion', gw_page: 71, level: 3 },
+    { title: 'a. Das singuläre Urtheil', gw_page: 72, level: 4 },
+    { title: 'b. Das particuläre Urtheil', gw_page: 73, level: 4 },
+    { title: 'c. Das universelle Urtheil', gw_page: 74, level: 4 },
+    { title: 'C. Das Urtheil der Nothwendigkeit', gw_page: 77, level: 3 },
+    { title: 'a. Das kategorische Urtheil', gw_page: 77, level: 4 },
+  ],
+};
+
 const EDITION_SOURCES = [
   { label: 'Editionskatalog', path: '../out/edition.json' }
 ];
@@ -888,8 +917,9 @@ function normalizeCorpus(raw) {
   const metadata = raw.metadata || {};
   const band = inferBand(metadata, pages);
   const toc = Array.isArray(raw.toc_printed) ? raw.toc_printed : [];
-  const outline = buildDerivedOutline(pages);
-  const tocMode = metadata?.series === 'GW' ? 'derived' : 'printed';
+  const curatedOutline = buildCuratedOutline(metadata, pages);
+  const outline = curatedOutline.length ? curatedOutline : buildDerivedOutline(pages);
+  const tocMode = curatedOutline.length ? 'curated' : metadata?.series === 'GW' ? 'derived' : 'printed';
 
   const counts = {
     pages: pages.length,
@@ -959,6 +989,30 @@ function buildDerivedOutline(pages) {
   });
 
   return outline;
+}
+
+function resolvePageAnchorByGw(pageRef) {
+  if (!state.corpus || pageRef === null || pageRef === undefined) return '';
+  const token = normalizeNumericToken(pageRef);
+  if (token === null) return '';
+  const direct = state.corpus.pages.find(page => normalizeNumericToken(page.gw_page) === token);
+  return direct ? `page-${direct.page_pdf}` : '';
+}
+
+function buildCuratedOutline(metadata, pages) {
+  const workId = metadata?.work_id;
+  const entries = CURATED_OUTLINES[workId] || [];
+  if (!entries.length) return [];
+
+  return entries.map(entry => {
+    const targetPage = pages.find(page => normalizeNumericToken(page.gw_page) === normalizeNumericToken(entry.gw_page));
+    return {
+      ...entry,
+      anchor: targetPage ? `page-${targetPage.page_pdf}` : '',
+      oa_page: targetPage?.oa_page || null,
+      page_pdf: targetPage?.page_pdf || null,
+    };
+  });
 }
 
 async function fetchFirstAvailable(sources) {
@@ -1217,6 +1271,36 @@ function renderToc() {
   if (!state.corpus) {
     tocTitle.textContent = 'Werkgliederung';
     tocList.innerHTML = '<li>Kein Korpus geladen.</li>';
+    return;
+  }
+
+  if (state.corpus.tocMode === 'curated') {
+    tocTitle.textContent = 'Werkgliederung';
+    tocList.innerHTML = state.corpus.outline.map(entry => {
+      const locator = entry.gw_page
+        ? `GW ${escapeHtml(entry.gw_page)}${entry.oa_page ? ` · OA ${escapeHtml(entry.oa_page)}` : ''}`
+        : entry.oa_page
+          ? `OA ${escapeHtml(entry.oa_page)}`
+          : '';
+      const body = entry.anchor
+        ? `
+          <a href="#${escapeHtml(entry.anchor)}" data-page-anchor="${escapeHtml(entry.anchor)}">
+            ${escapeHtml(entry.title)}
+            ${locator ? `<span class="toc-page">${locator}</span>` : ''}
+          </a>
+        `
+        : `
+          <span>
+            ${escapeHtml(entry.title)}
+            ${locator ? `<span class="toc-page">${locator}</span>` : ''}
+          </span>
+        `;
+      return `
+        <li data-level="${escapeHtml(entry.level || 2)}">
+          ${body}
+        </li>
+      `;
+    }).join('');
     return;
   }
 
