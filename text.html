@@ -23,15 +23,46 @@
     .chapter-heading {
       font-family: var(--font-ui);
       color: var(--accent);
-      margin-top: 2.5em;
-      margin-bottom: 1em;
       font-weight: 400;
     }
-    .heading-l1 { font-size: 1.9rem; text-align: center; letter-spacing: .02em; }
-    .heading-l2 { font-size: 1.5rem; }
-    .heading-l3 { font-size: 1.25rem; font-weight: 600; }
-    .heading-l4 { font-size: 1.1rem; font-weight: 600; font-style: italic; }
-    .heading-l5 { font-size: 1rem; font-style: italic; }
+    /* Level 1: Abschnitt / Vorrede / Einleitung */
+    .heading-l1 {
+      font-size: 1.75rem;
+      margin-top: 3em;
+      margin-bottom: 1.2em;
+      letter-spacing: .03em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .4em;
+    }
+    /* Level 2: Kapitel */
+    .heading-l2 {
+      font-size: 1.4rem;
+      margin-top: 2.5em;
+      margin-bottom: 1em;
+    }
+    /* Level 3: A. / B. / C. */
+    .heading-l3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 2em;
+      margin-bottom: .8em;
+    }
+    /* Level 4: a. / b. / c. */
+    .heading-l4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-style: italic;
+      margin-top: 1.5em;
+      margin-bottom: .5em;
+    }
+    /* Level 5: Anmerkung */
+    .heading-l5 {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-top: 1.2em;
+      margin-bottom: .4em;
+    }
 
     /* ── Fußnoten ─────────────────────────────────────────────── */
     .footnote-container {
@@ -55,10 +86,11 @@
     }
 
     /* ── Inhaltsverzeichnis ───────────────────────────────────── */
-    .toc-item-level-1 { font-weight: 600; margin-top: 12px; font-size: 0.9rem; }
-    .toc-item-level-2 { padding-left: 10px; font-size: 0.84rem; }
+    .toc-item-level-1 { font-weight: 600; margin-top: 14px; font-size: 0.88rem; }
+    .toc-item-level-2 { padding-left: 10px; font-size: 0.83rem; margin-top: 4px; }
     .toc-item-level-3 { padding-left: 20px; font-size: 0.80rem; }
     .toc-item-level-4 { padding-left: 28px; font-size: 0.78rem; color: #777; }
+    .toc-item-level-5 { padding-left: 36px; font-size: 0.74rem; color: #999; font-style: italic; }
     .toc a.active {
       color: var(--accent);
       font-weight: 600;
@@ -283,11 +315,14 @@ async function loadHegel() {
         if (btype === 'heading') {
           flushText();
           const lvl = block.level || 2;
-          const tag = lvl <= 2 ? 'h2' : lvl === 3 ? 'h3' : 'h4';
+          // HTML-Tag nach Level: h2 für Abschnitte, h3 für Kapitel, h4 für A/B/C, p für tiefere
+          const tag = lvl <= 1 ? 'h2' : lvl === 2 ? 'h3' : lvl === 3 ? 'h4' : 'p';
           const id  = `heading-${page.page_pdf || page.id || pageIdx}-${block.id || ''}`;
           renderedHtml += `<${tag} class="chapter-heading heading-l${lvl}" id="${id}">${escHtml(txt)}</${tag}>`;
-          // TOC-Eintrag
-          tocHtml += `<li class="toc-item-level-${lvl}"><a href="#${id}">${escHtml(txt)}</a></li>`;
+          // TOC-Eintrag (Level 5 = Anmerkungen: nur wenn sie Titel-Text haben)
+          if (lvl <= 5) {
+            tocHtml += `<li class="toc-item-level-${lvl}"><a href="#${id}">${escHtml(txt)}</a></li>`;
+          }
 
         } else if (btype === 'footnote') {
           flushText();
