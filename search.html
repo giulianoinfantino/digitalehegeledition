@@ -7,6 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
+    body[data-theme="dark"] {
+      --bg-color: #17120f;
+      --text-main: #f0e6d7;
+      --text-muted: #b8ab9b;
+      --border: rgba(222, 205, 182, 0.16);
+      --accent: #d09a82;
+    }
     .search-main {
       max-width: 1380px;
       margin: 0 auto;
@@ -97,6 +104,33 @@
       font-size: 0.95rem;
       line-height: 1.55;
       color: var(--text-muted);
+    }
+    body[data-theme="dark"] {
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(23, 18, 15, 0.88);
+    }
+    body[data-theme="dark"] .search-kicker,
+    body[data-theme="dark"] .side-card,
+    body[data-theme="dark"] .query-card,
+    body[data-theme="dark"] .results-summary,
+    body[data-theme="dark"] .result-card,
+    body[data-theme="dark"] .empty-state,
+    body[data-theme="dark"] .source-status {
+      background: rgba(240, 230, 215, 0.03);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] input,
+    body[data-theme="dark"] select {
+      background: rgba(240, 230, 215, 0.03);
+      color: var(--text-main);
+    }
+    body[data-theme="dark"] mark {
+      background: rgba(208, 154, 130, 0.18);
+      color: var(--text-main);
     }
     .source-status strong {
       color: var(--text-main);
@@ -862,6 +896,7 @@
 
 <script src="assets/edition-data.js"></script>
 <script src="assets/search-data.js"></script>
+<script src="assets/theme.js"></script>
 <script>
 const state = {
   edition: null,

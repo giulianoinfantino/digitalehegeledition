@@ -7,6 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
+    body[data-theme="dark"] {
+      --bg-color: #17120f;
+      --text-main: #f0e6d7;
+      --text-muted: #b8ab9b;
+      --border: rgba(222, 205, 182, 0.16);
+      --accent: #d09a82;
+    }
     .landing {
       max-width: 1180px;
       margin: 0 auto;
@@ -93,6 +100,25 @@
       border-radius: 24px;
       padding: 26px;
       box-shadow: 0 16px 34px rgba(0,0,0,0.04);
+    }
+    body[data-theme="dark"] {
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(23, 18, 15, 0.88);
+    }
+    body[data-theme="dark"] .eyebrow,
+    body[data-theme="dark"] .btn-secondary,
+    body[data-theme="dark"] .hero-panel,
+    body[data-theme="dark"] .meta-item,
+    body[data-theme="dark"] .feature-card,
+    body[data-theme="dark"] .edition-card,
+    body[data-theme="dark"] .work-card,
+    body[data-theme="dark"] .stat-card {
+      background: rgba(240, 230, 215, 0.03);
+      box-shadow: none;
     }
     .panel-kicker {
       font-size: 0.8rem;
@@ -567,6 +593,7 @@
 </main>
 
 <script src="assets/edition-data.js"></script>
+<script src="assets/theme.js"></script>
 <script>
   const EDITION_SOURCES = [
     { label: 'Editionskatalog', path: '../out/edition.json' }

@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="assets/style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
+    body[data-theme="dark"] {
+      --bg-color: #17120f;
+      --text-main: #f0e6d7;
+      --text-muted: #b8ab9b;
+      --border: rgba(222, 205, 182, 0.16);
+      --accent: #d09a82;
+    }
     .network-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 330px;
@@ -52,6 +59,31 @@
       background: rgba(255,255,255,0.72);
       box-shadow: 0 18px 40px rgba(26,26,26,0.05);
       overflow: hidden;
+    }
+    body[data-theme="dark"] {
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(23, 18, 15, 0.88);
+    }
+    body[data-theme="dark"] .eyebrow,
+    body[data-theme="dark"] .workspace,
+    body[data-theme="dark"] .toolbar,
+    body[data-theme="dark"] .side-panel,
+    body[data-theme="dark"] .stat-card,
+    body[data-theme="dark"] .detail-card {
+      background: rgba(240, 230, 215, 0.03);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] .toolbar button,
+    body[data-theme="dark"] .panel-button {
+      background: rgba(240, 230, 215, 0.03);
+      color: var(--text-main);
+    }
+    body[data-theme="dark"] canvas {
+      filter: saturate(0.9) brightness(0.88);
     }
     .toolbar {
       display: flex;
@@ -667,6 +699,7 @@
 </main>
 
 <script src="assets/edition-data.js"></script>
+<script src="assets/theme.js"></script>
 <script>
 const keyTerms = [
   "Sein", "Nichts", "Werden", "Dasein", "Etwas", "Grenze", "Endlichkeit", "Unendlichkeit",
