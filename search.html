@@ -543,6 +543,185 @@
         flex-direction: column;
       }
     }
+    :root {
+      --reader-paper: #f6f0e5;
+      --reader-ink: #221d18;
+      --reader-muted: #6d6358;
+      --reader-rule: rgba(69, 54, 40, 0.16);
+      --reader-accent-soft: #6a201d;
+    }
+    html { background: #f6f0e5; }
+    body {
+      background:
+        linear-gradient(90deg, rgba(168, 139, 96, 0.05) 0%, transparent 20%, transparent 80%, rgba(168, 139, 96, 0.04) 100%),
+        linear-gradient(180deg, #faf6ef 0%, #f3ecdf 100%);
+      color: var(--reader-ink);
+    }
+    .site-header {
+      border-bottom: 1px solid var(--reader-rule);
+      background: rgba(246, 240, 229, 0.9);
+      backdrop-filter: blur(8px);
+    }
+    .site-title-eyebrow,
+    .search-kicker,
+    .side-title,
+    .section-chip,
+    .result-chip,
+    .result-kind,
+    .suggestion-chip,
+    .summary-chip {
+      color: var(--reader-muted);
+      letter-spacing: 0.16em;
+    }
+    .site-title-main,
+    .search-intro h1,
+    .result-title,
+    .summary-count {
+      font-family: var(--font-text);
+      color: var(--reader-ink);
+      font-weight: 400;
+    }
+    .site-title-main { font-size: 1.45rem; }
+    .sitenav a {
+      color: var(--reader-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.88rem;
+    }
+    .sitenav a:hover,
+    .sitenav a.current,
+    .search-btn:hover,
+    .search-btn.primary,
+    .suggestion-chip:hover {
+      color: var(--reader-accent-soft);
+    }
+    .search-main { max-width: 1520px; }
+    .search-intro {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .search-kicker {
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+    .search-intro h1 {
+      max-width: 12ch;
+      font-size: clamp(3rem, 5vw, 5.2rem);
+      line-height: 0.92;
+    }
+    .search-intro p,
+    .source-status,
+    .results-summary p,
+    .result-context,
+    .result-meta {
+      color: var(--reader-muted);
+      font-family: var(--font-text);
+    }
+    .search-layout {
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 54px;
+    }
+    .search-sidebar {
+      gap: 26px;
+      top: 88px;
+      padding-right: 12px;
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .result-card,
+    .empty-state {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .empty-state {
+      padding: 0 0 22px;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .source-status {
+      padding: 0;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+    }
+    .search-btn,
+    .suggestion-chip {
+      min-height: 34px;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: var(--reader-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .search-btn:hover,
+    .search-btn.primary,
+    .suggestion-chip:hover {
+      border: none;
+      background: transparent;
+      transform: none;
+      box-shadow: none;
+    }
+    .range-field span,
+    .sort-field span {
+      color: var(--reader-muted);
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
+    }
+    .range-field input,
+    .range-field select,
+    .sort-field select,
+    .query-input {
+      padding: 10px 0 8px;
+      border: none;
+      border-bottom: 1px solid var(--reader-rule);
+      border-radius: 0;
+      background: transparent;
+      color: var(--reader-ink);
+      font-family: var(--font-text);
+      font-size: 1.08rem;
+    }
+    .range-field input:focus,
+    .range-field select:focus,
+    .sort-field select:focus,
+    .query-input:focus {
+      border-bottom-color: var(--reader-accent-soft);
+    }
+    .stat-tile,
+    .results-summary .summary-chip {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+    }
+    .search-view { gap: 30px; }
+    .query-card,
+    .results-summary {
+      background: transparent;
+    }
+    .query-tools,
+    .query-row {
+      gap: 18px;
+    }
+    .result-card {
+      padding: 0 0 26px;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .result-card:last-child { border-bottom: none; }
+    .result-title {
+      font-size: 1.8rem;
+      line-height: 1.08;
+    }
   </style>
 </head>
 <body>
