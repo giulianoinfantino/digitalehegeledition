@@ -591,10 +591,11 @@
 
 <script>
 const state = {
-  corpus: null,
-  sourceLabel: '',
+  edition: null,
+  works: [],
+  worksById: {},
   entries: [],
-  suggestions: [],
+  sourceLabel: '',
   query: '',
   exact: false,
   caseSensitive: false,
@@ -602,14 +603,16 @@ const state = {
   includeFrontmatter: true,
   includeToc: true,
   includeFootnotes: false,
-  sort: 'relevance'
+  sort: 'relevance',
+  workFilter: 'all'
 };
 
-const AUTO_SOURCES = [
-  { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
-  { label: 'Web-Export', path: '../out/web.json' },
-  { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' },
-  { label: 'Site-Daten v1', path: 'data/twa_band_5_v1.json' }
+const EDITION_SOURCES = [
+  { label: 'Editionskatalog', path: '../out/edition.json' }
+];
+
+const SEARCH_SOURCES = [
+  { label: 'Editionsindex', path: '../out/search.json' }
 ];
 
 function escapeHtml(value) {
@@ -632,188 +635,22 @@ function formatSearchText(value) {
     .trim();
 }
 
-function getUnitLabel(unit) {
-  const ann = unit?.annotations?.[0] || {};
-  return ann.label || unit.type || unit.label || 'paragraph';
-}
-
-function getUnitLevel(unit) {
-  const ann = unit?.annotations?.[0] || {};
-  return ann.level || unit.level || null;
-}
-
-function getUnitText(unit) {
-  return unit.text_normalized ?? unit.text ?? unit.text_raw ?? unit.content ?? '';
-}
-
-function textLabel(unit) {
-  if (unit.level) return `${unit.label} · L${unit.level}`;
-  if (unit.marker) return `${unit.label} · ${unit.marker}`;
-  return unit.label;
-}
-
-function inferBand(metadata, pages) {
-  if (metadata?.band) return metadata.band;
-  const fromTitle = (metadata?.title || '').match(/\b(\d+)\b/);
-  if (fromTitle) return fromTitle[1];
-  const sigelPage = pages.find(page => page.sigel);
-  if (sigelPage?.sigel) {
-    const match = sigelPage.sigel.match(/TWA\s*([0-9]+)/i);
-    if (match) return match[1];
-  }
-  return '5';
-}
-
-function normalizeUnit(rawUnit, page, index) {
-  if (typeof rawUnit === 'string') {
-    return {
-      unit_id: `${page.page_id || page.page_pdf || 'p'}_u${String(index + 1).padStart(3, '0')}`,
-      label: 'paragraph',
-      level: null,
-      marker: null,
-      page_ref: null,
-      title: null,
-      text_raw: rawUnit,
-      text_normalized: rawUnit,
-      annotations: [{ label: 'paragraph' }]
-    };
-  }
-
-  const ann = rawUnit?.annotations?.[0] || {};
+function normalizeEntry(raw) {
   return {
-    ...rawUnit,
-    unit_id: rawUnit.unit_id || `${page.page_id || page.page_pdf || 'p'}_u${String(index + 1).padStart(3, '0')}`,
-    label: getUnitLabel(rawUnit),
-    level: getUnitLevel(rawUnit),
-    marker: ann.marker || rawUnit.marker || null,
-    page_ref: ann.page_ref ?? rawUnit.page_ref ?? null,
-    title: ann.title || rawUnit.title || null,
-    text_raw: rawUnit.text_raw ?? rawUnit.text ?? rawUnit.content ?? '',
-    text_normalized: rawUnit.text_normalized ?? rawUnit.text ?? rawUnit.content ?? rawUnit.text_raw ?? '',
-    annotations: rawUnit.annotations || [ann]
+    ...raw,
+    work_id: raw.work_id || 'default',
+    work_title: raw.work_title || 'Unbekanntes Werk',
+    work_short_title: raw.work_short_title || raw.work_title || 'Unbekanntes Werk',
+    text: formatSearchText(raw.text),
+    title: formatSearchText(raw.title || ''),
+    sigel: raw.sigel || (raw.band ? `TWA ${raw.band}` : `PDF ${raw.page_pdf}`),
+    page_pdf: Number(raw.page_pdf) || 1,
+    page_book: raw.page_book ?? null,
+    level: raw.level ?? null,
+    page_ref: raw.page_ref ?? null,
+    page_kind: raw.page_kind || 'body',
+    label: raw.label || 'paragraph'
   };
-}
-
-function normalizePage(rawPage, index) {
-  const pagePdf = rawPage.page_pdf ?? rawPage.page ?? rawPage.id ?? index + 1;
-  const unitsSource = Array.isArray(rawPage.units)
-    ? rawPage.units
-    : Array.isArray(rawPage.blocks)
-      ? rawPage.blocks
-      : [];
-  const units = unitsSource.map((unit, unitIndex) => normalizeUnit(unit, rawPage, unitIndex));
-
-  return {
-    ...rawPage,
-    page_id: rawPage.page_id || `p${String(pagePdf).padStart(4, '0')}`,
-    page_pdf: pagePdf,
-    page_book: rawPage.page_book ?? null,
-    page_kind: rawPage.page_kind || rawPage.section_type || 'body',
-    units
-  };
-}
-
-function normalizeCorpus(raw) {
-  const pages = (raw.pages || []).map(normalizePage);
-  const metadata = raw.metadata || {};
-  const band = inferBand(metadata, pages);
-  const toc = Array.isArray(raw.toc_printed) ? raw.toc_printed : [];
-
-  const counts = {
-    pages: pages.length,
-    headings: 0,
-    footnotes: 0
-  };
-
-  pages.forEach(page => {
-    page.units.forEach(unit => {
-      if (unit.label === 'heading') counts.headings += 1;
-      if (unit.label === 'footnote') counts.footnotes += 1;
-    });
-  });
-
-  return {
-    raw,
-    metadata,
-    band,
-    toc,
-    counts,
-    pages
-  };
-}
-
-function resolveSigel(corpus, page) {
-  if (page.sigel) return page.sigel;
-  if (page.page_book != null) return `TWA ${corpus.band}, ${page.page_book}`;
-  return `PDF ${page.page_pdf}`;
-}
-
-function buildSearchEntries(corpus) {
-  const entries = [];
-  let sectionTitle = '';
-  let sectionLevel = null;
-
-  corpus.pages.forEach(page => {
-    page.units.forEach((unit, index) => {
-      if (unit.label === 'page_number') return;
-
-      const displayText = formatSearchText(getUnitText(unit));
-      const rawText = formatSearchText(unit.text_raw || displayText);
-      const title = formatSearchText(unit.title || '');
-      const pageRef = unit.page_ref ?? unit.annotations?.[0]?.page_ref ?? null;
-
-      if (unit.label === 'heading' && displayText) {
-        sectionTitle = displayText;
-        sectionLevel = unit.level || null;
-      }
-
-      const searchableText = unit.label === 'toc_entry' && title ? title : displayText;
-      if (!searchableText) return;
-
-      entries.push({
-        id: unit.unit_id || `${page.page_id}_u${String(index + 1).padStart(3, '0')}`,
-        pagePdf: page.page_pdf,
-        pageBook: page.page_book,
-        pageKind: page.page_kind,
-        sigel: resolveSigel(corpus, page),
-        label: unit.label,
-        level: unit.level,
-        marker: unit.marker,
-        pageRef,
-        title: title || (unit.label === 'heading' ? searchableText : ''),
-        displayText: searchableText,
-        rawText,
-        sectionTitle: unit.label === 'heading' ? '' : sectionTitle,
-        sectionLevel: unit.label === 'heading' ? null : sectionLevel,
-        anchor: `page-${page.page_pdf}`
-      });
-    });
-  });
-
-  return entries;
-}
-
-function buildSuggestions(corpus) {
-  const seen = new Set();
-  const suggestions = [];
-  const candidates = [
-    ...corpus.toc.map(entry => entry.title),
-    ...corpus.pages.flatMap(page =>
-      page.units
-        .filter(unit => unit.label === 'heading')
-        .map(unit => getUnitText(unit))
-    )
-  ];
-
-  candidates.forEach(candidate => {
-    const value = formatSearchText(candidate);
-    if (!value || value.length < 4 || value.length > 46) return;
-    if (seen.has(value)) return;
-    seen.add(value);
-    suggestions.push(value);
-  });
-
-  return suggestions.slice(0, 8);
 }
 
 function humanLabel(label) {
@@ -830,12 +667,149 @@ function humanLabel(label) {
 function typeWeight(label) {
   const map = {
     heading: 24,
-    toc_entry: 16,
+    toc_entry: 18,
     frontmatter: 12,
     paragraph: 8,
     footnote: 5
   };
   return map[label] || 6;
+}
+
+function currentWork() {
+  return state.workFilter === 'all' ? null : state.worksById[state.workFilter] || null;
+}
+
+function setSourceStatus(html, className = '') {
+  const el = document.getElementById('source-status');
+  el.className = `source-status ${className}`.trim();
+  el.innerHTML = html;
+}
+
+async function fetchFirstAvailable(sources) {
+  for (const source of sources) {
+    try {
+      const response = await fetch(`${source.path}?v=${Date.now()}`);
+      if (!response.ok) continue;
+      return { data: await response.json(), source };
+    } catch (error) {
+      // Try next source silently.
+    }
+  }
+  return null;
+}
+
+function applyUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get('q') || '';
+  const exact = params.get('exact') === '1';
+  const caseSensitive = params.get('case') === '1';
+  const footnotes = params.get('footnotes') === '1';
+  const sort = params.get('sort') || 'relevance';
+  const work = params.get('work') || 'all';
+
+  document.getElementById('query-input').value = query;
+  document.getElementById('exact-match').checked = exact;
+  document.getElementById('case-sensitive').checked = caseSensitive;
+  document.getElementById('include-footnotes').checked = footnotes;
+  if (sort === 'page') document.getElementById('sort-order').value = 'page';
+
+  state.query = query;
+  state.exact = exact;
+  state.caseSensitive = caseSensitive;
+  state.includeFootnotes = footnotes;
+  state.sort = sort === 'page' ? 'page' : 'relevance';
+  state.workFilter = work;
+}
+
+function syncUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (state.query) params.set('q', state.query);
+  else params.delete('q');
+  state.exact ? params.set('exact', '1') : params.delete('exact');
+  state.caseSensitive ? params.set('case', '1') : params.delete('case');
+  state.includeFootnotes ? params.set('footnotes', '1') : params.delete('footnotes');
+  state.workFilter !== 'all' ? params.set('work', state.workFilter) : params.delete('work');
+  params.set('sort', state.sort);
+  const queryString = params.toString();
+  history.replaceState(null, '', queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname);
+}
+
+function renderWorkOptions() {
+  const select = document.getElementById('work-filter');
+  const options = [
+    `<option value="all">Gesamte Edition</option>`,
+    ...state.works.map(work => `<option value="${escapeHtml(work.work_id)}">${escapeHtml(work.title)}</option>`)
+  ];
+  select.innerHTML = options.join('');
+  if (state.workFilter !== 'all' && state.worksById[state.workFilter]) {
+    select.value = state.workFilter;
+  } else {
+    state.workFilter = 'all';
+    select.value = 'all';
+  }
+}
+
+function updatePageRangeState() {
+  const work = currentWork();
+  const startInput = document.getElementById('start-page');
+  const endInput = document.getElementById('end-page');
+  const disabled = !work;
+
+  startInput.disabled = disabled;
+  endInput.disabled = disabled;
+
+  if (work) {
+    if (!Number(startInput.value) || Number(startInput.value) < 1) startInput.value = 1;
+    if (!Number(endInput.value) || Number(endInput.value) > work.stats.pages_total) {
+      endInput.value = work.stats.pages_total;
+    }
+  }
+}
+
+function readControls() {
+  state.query = document.getElementById('query-input').value.trim();
+  state.exact = document.getElementById('exact-match').checked;
+  state.caseSensitive = document.getElementById('case-sensitive').checked;
+  state.includeHeadings = document.getElementById('include-headings').checked;
+  state.includeFrontmatter = document.getElementById('include-frontmatter').checked;
+  state.includeToc = document.getElementById('include-toc').checked;
+  state.includeFootnotes = document.getElementById('include-footnotes').checked;
+  state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
+  state.workFilter = document.getElementById('work-filter').value || 'all';
+  updatePageRangeState();
+}
+
+function buildSuggestions() {
+  const seen = new Set();
+  const scope = state.entries
+    .filter(entry => state.workFilter === 'all' || entry.work_id === state.workFilter)
+    .filter(entry => ['heading', 'toc_entry', 'frontmatter'].includes(entry.label));
+
+  const suggestions = [];
+  for (const entry of scope) {
+    const candidate = formatSearchText(entry.title || entry.text);
+    if (!candidate || candidate.length < 4 || candidate.length > 52) continue;
+    if (seen.has(candidate)) continue;
+    seen.add(candidate);
+    suggestions.push(candidate);
+    if (suggestions.length >= 8) break;
+  }
+  return suggestions;
+}
+
+function updateStats() {
+  const editionStats = state.edition?.metadata?.stats || {};
+  const work = currentWork();
+
+  document.getElementById('stat-works').textContent = (work ? 1 : (state.edition?.metadata?.works_count || state.works.length || 0)).toLocaleString('de-DE');
+  document.getElementById('stat-pages').textContent = ((work ? work.stats.pages_total : editionStats.pages_total) || 0).toLocaleString('de-DE');
+  document.getElementById('stat-entries').textContent = ((work ? work.stats.search_entries : state.entries.length) || 0).toLocaleString('de-DE');
+  document.getElementById('stat-footnotes').textContent = ((work ? work.stats.footnotes : editionStats.footnotes) || 0).toLocaleString('de-DE');
+}
+
+function getPatterns(query) {
+  if (state.exact) return query ? [query] : [];
+  return query.split(/\s+/).map(part => part.trim()).filter(Boolean);
 }
 
 function countOccurrences(haystack, needle) {
@@ -851,63 +825,55 @@ function countOccurrences(haystack, needle) {
   return count;
 }
 
-function getPatterns(query) {
-  if (state.exact) {
-    return query ? [query] : [];
-  }
-  return query.split(/\s+/).map(part => part.trim()).filter(Boolean);
-}
-
 function entryIsInScope(entry) {
   if (entry.label === 'heading' && !state.includeHeadings) return false;
   if (entry.label === 'frontmatter' && !state.includeFrontmatter) return false;
   if (entry.label === 'toc_entry' && !state.includeToc) return false;
   if (entry.label === 'footnote' && !state.includeFootnotes) return false;
 
+  if (state.workFilter !== 'all' && entry.work_id !== state.workFilter) return false;
+
+  const work = currentWork();
+  if (!work) return true;
+
   const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
   const end = Math.max(start, Number(document.getElementById('end-page').value) || start);
-  return entry.pagePdf >= start && entry.pagePdf <= end;
+  return entry.page_pdf >= start && entry.page_pdf <= end;
 }
 
 function scoreEntry(entry, query) {
   const patterns = getPatterns(query);
   if (!patterns.length) return null;
 
-  const haystack = state.caseSensitive ? entry.rawText : entry.displayText.toLowerCase();
+  const sourceText = state.caseSensitive ? entry.text : entry.text.toLowerCase();
   const needles = state.caseSensitive ? patterns : patterns.map(pattern => pattern.toLowerCase());
   const matchedIndexes = [];
   let occurrences = 0;
 
   if (state.exact) {
     const exactNeedle = needles[0];
-    const exactIndex = haystack.indexOf(exactNeedle);
+    const exactIndex = sourceText.indexOf(exactNeedle);
     if (exactIndex === -1) return null;
     matchedIndexes.push(exactIndex);
-    occurrences = countOccurrences(haystack, exactNeedle);
+    occurrences = countOccurrences(sourceText, exactNeedle);
   } else {
     for (const needle of needles) {
-      const index = haystack.indexOf(needle);
+      const index = sourceText.indexOf(needle);
       if (index === -1) return null;
       matchedIndexes.push(index);
-      occurrences += countOccurrences(haystack, needle);
+      occurrences += countOccurrences(sourceText, needle);
     }
   }
 
   let score = typeWeight(entry.label) + occurrences * 2;
   if (matchedIndexes[0] === 0) score += 6;
-  if (entry.title && haystack.includes(state.caseSensitive ? entry.title : entry.title.toLowerCase())) score += 4;
-  if (entry.pageBook != null) score += 2;
-  if (entry.sectionTitle) {
-    const sectionHaystack = state.caseSensitive ? entry.sectionTitle : entry.sectionTitle.toLowerCase();
-    if (needles.some(needle => sectionHaystack.includes(needle))) score += 3;
-  }
+  if (entry.page_book != null) score += 2;
   if (state.exact) score += 18;
 
   return {
     entry,
     score,
-    matchIndex: Math.min(...matchedIndexes),
-    occurrences
+    matchIndex: Math.min(...matchedIndexes)
   };
 }
 
@@ -942,13 +908,13 @@ function highlightText(text, query) {
   return html;
 }
 
-function renderSuggestionButtons() {
-  if (!state.suggestions.length) return '';
+function renderSuggestionButtons(suggestions) {
+  if (!suggestions.length) return '';
   return `
     <div>
       <div class="side-title" style="margin-bottom:10px;">Anregungen</div>
       <div class="suggestions">
-        ${state.suggestions.map(suggestion => `
+        ${suggestions.map(suggestion => `
           <button class="suggestion-chip" type="button" data-suggestion="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>
         `).join('')}
       </div>
@@ -956,54 +922,8 @@ function renderSuggestionButtons() {
   `;
 }
 
-function updateStats() {
-  document.getElementById('stat-pages').textContent = state.corpus ? state.corpus.counts.pages : '—';
-  document.getElementById('stat-entries').textContent = state.entries.length || '—';
-  document.getElementById('stat-headings').textContent = state.corpus ? state.corpus.counts.headings : '—';
-  document.getElementById('stat-footnotes').textContent = state.corpus ? state.corpus.counts.footnotes : '—';
-}
-
-function setSourceStatus(html, className = '') {
-  const el = document.getElementById('source-status');
-  el.className = `source-status ${className}`.trim();
-  el.innerHTML = html;
-}
-
-function syncUrl() {
-  const params = new URLSearchParams(window.location.search);
-  if (state.query) params.set('q', state.query);
-  else params.delete('q');
-  state.exact ? params.set('exact', '1') : params.delete('exact');
-  state.caseSensitive ? params.set('case', '1') : params.delete('case');
-  state.includeFootnotes ? params.set('footnotes', '1') : params.delete('footnotes');
-  params.set('sort', state.sort);
-  const queryString = params.toString();
-  history.replaceState(null, '', queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname);
-}
-
-function applyUrlState() {
-  const params = new URLSearchParams(window.location.search);
-  const query = params.get('q') || '';
-  const exact = params.get('exact') === '1';
-  const caseSensitive = params.get('case') === '1';
-  const footnotes = params.get('footnotes') === '1';
-  const sort = params.get('sort') || 'relevance';
-
-  document.getElementById('query-input').value = query;
-  document.getElementById('exact-match').checked = exact;
-  document.getElementById('case-sensitive').checked = caseSensitive;
-  document.getElementById('include-footnotes').checked = footnotes;
-  if (sort === 'page') document.getElementById('sort-order').value = 'page';
-
-  state.query = query;
-  state.exact = exact;
-  state.caseSensitive = caseSensitive;
-  state.includeFootnotes = footnotes;
-  state.sort = sort === 'page' ? 'page' : 'relevance';
-}
-
 function getResults() {
-  if (!state.corpus || !state.query.trim()) return [];
+  if (!state.query.trim()) return [];
   const results = state.entries
     .filter(entryIsInScope)
     .map(entry => scoreEntry(entry, state.query.trim()))
@@ -1011,11 +931,13 @@ function getResults() {
 
   results.sort((a, b) => {
     if (state.sort === 'page') {
-      if (a.entry.pagePdf !== b.entry.pagePdf) return a.entry.pagePdf - b.entry.pagePdf;
+      if (a.entry.work_id !== b.entry.work_id) return a.entry.work_id.localeCompare(b.entry.work_id, 'de');
+      if (a.entry.page_pdf !== b.entry.page_pdf) return a.entry.page_pdf - b.entry.page_pdf;
       return b.score - a.score;
     }
     if (b.score !== a.score) return b.score - a.score;
-    return a.entry.pagePdf - b.entry.pagePdf;
+    if (a.entry.work_id !== b.entry.work_id) return a.entry.work_id.localeCompare(b.entry.work_id, 'de');
+    return a.entry.page_pdf - b.entry.page_pdf;
   });
 
   return results.slice(0, 250);
@@ -1023,14 +945,16 @@ function getResults() {
 
 function renderSummary(results) {
   const summary = document.getElementById('results-summary');
+  const work = currentWork();
+  const suggestions = buildSuggestions();
 
-  if (!state.corpus) {
+  if (!state.edition) {
     summary.innerHTML = `
       <div class="summary-head">
         <div>
-          <h2 class="summary-title">Noch kein Korpus geladen</h2>
+          <h2 class="summary-title">Noch keine Edition geladen</h2>
           <p class="summary-subtitle">
-            Sobald der Extraktor-Export geladen ist, wird hier eine suchbare wissenschaftliche Ansicht erzeugt.
+            Sobald Editionskatalog und Suchindex geladen sind, wird hier die Mehrwerk-Suche bereitgestellt.
           </p>
         </div>
       </div>
@@ -1042,31 +966,31 @@ function renderSummary(results) {
     summary.innerHTML = `
       <div class="summary-head">
         <div>
-          <h2 class="summary-title">Korpus bereit zur Recherche</h2>
+          <h2 class="summary-title">${work ? escapeHtml(work.title) : 'Gesamte Edition'} bereit zur Recherche</h2>
           <p class="summary-subtitle">
-            Geladen aus <strong>${escapeHtml(state.sourceLabel)}</strong>. Suche jetzt direkt in ${state.entries.length}
-            strukturierten Einheiten des Hegel-Korpus und springe von jedem Treffer in die aktuelle Lesefassung.
+            Die Suche arbeitet aktuell auf <strong>${work ? escapeHtml(work.title) : 'allen geladenen Werken'}</strong>
+            und nutzt den aggregierten Editionsindex aus <strong>${escapeHtml(state.sourceLabel)}</strong>.
           </p>
         </div>
         <div class="chip-row">
-          <span class="section-chip">Band ${escapeHtml(state.corpus.band)}</span>
-          <span class="section-chip">${state.corpus.counts.pages} Seiten</span>
-          <span class="section-chip">${state.entries.length} Suchstellen</span>
+          <span class="section-chip">${work ? escapeHtml(work.siglum || `TWA ${work.band}`) : `${state.works.length} Werke`}</span>
+          <span class="section-chip">${work ? work.stats.pages_total : state.edition.metadata?.stats?.pages_total || 0} Seiten</span>
+          <span class="section-chip">${work ? work.stats.search_entries : state.entries.length} Suchstellen</span>
         </div>
       </div>
-      ${renderSuggestionButtons()}
+      ${renderSuggestionButtons(suggestions)}
     `;
     return;
   }
 
-  const pageHits = new Set(results.map(result => result.entry.pagePdf)).size;
+  const workHits = new Set(results.map(result => result.entry.work_id)).size;
   summary.innerHTML = `
     <div class="summary-head">
       <div>
         <h2 class="summary-title">${results.length} Treffer zu „${escapeHtml(state.query.trim())}“</h2>
         <p class="summary-subtitle">
-          ${pageHits} PDF-Seiten enthalten Treffer. Die Trefferliste wird direkt aus <strong>${escapeHtml(state.sourceLabel)}</strong>
-          berechnet und bleibt mit der Lesefassung synchron.
+          ${work ? `Gefiltert auf ${escapeHtml(work.title)}.` : `Treffer in ${workHits} Werk(en).`}
+          Die Liste bleibt über <strong>${escapeHtml(state.sourceLabel)}</strong> mit den jeweiligen Reader-Seiten verknüpft.
         </p>
       </div>
       <div class="chip-row">
@@ -1081,29 +1005,41 @@ function renderSummary(results) {
       <span class="section-chip">TOC ${state.includeToc ? 'ein' : 'aus'}</span>
       <span class="section-chip">Fußnoten ${state.includeFootnotes ? 'ein' : 'aus'}</span>
     </div>
-    ${renderSuggestionButtons()}
+    ${renderSuggestionButtons(suggestions)}
   `;
+}
+
+function bindSuggestionButtons() {
+  document.querySelectorAll('[data-suggestion]').forEach(button => {
+    button.addEventListener('click', () => {
+      const suggestion = button.dataset.suggestion || '';
+      document.getElementById('query-input').value = suggestion;
+      state.query = suggestion;
+      renderResults();
+    });
+  });
 }
 
 function renderResults() {
   const container = document.getElementById('results-list');
 
-  if (!state.corpus) {
+  if (!state.edition) {
     container.innerHTML = `
       <div class="empty-state">
         <strong>Warte auf Daten.</strong><br>
-        Danach kannst du direkt im aktuellen Hegel-Korpus suchen.
+        Danach kannst du die gesamte Edition oder ein einzelnes Werk durchsuchen.
       </div>
     `;
     return;
   }
 
+  updateStats();
   syncUrl();
 
   if (!state.query.trim()) {
     container.innerHTML = `
       <div class="empty-state">
-        <strong>Der Korpus ist geladen.</strong><br>
+        <strong>Die Edition ist geladen.</strong><br>
         Gib oben einen Suchbegriff ein oder nutze eine der vorgeschlagenen Anfragen.
       </div>
     `;
@@ -1119,7 +1055,7 @@ function renderResults() {
     container.innerHTML = `
       <div class="empty-state">
         <strong>Keine Treffer gefunden.</strong><br>
-        Versuche eine offenere Suche, erweitere den Seitenbereich oder aktiviere zusätzliche Textschichten.
+        Versuche eine offenere Suche, wechsle den Werkfilter oder aktiviere zusätzliche Textschichten.
       </div>
     `;
     bindSuggestionButtons();
@@ -1128,12 +1064,10 @@ function renderResults() {
 
   container.innerHTML = results.map(result => {
     const entry = result.entry;
-    const excerpt = excerptAround(entry.displayText, result.matchIndex);
-    const sectionContext = entry.sectionTitle
-      ? `Im Abschnitt <strong>${escapeHtml(entry.sectionTitle)}</strong>${entry.sectionLevel ? ` · Ebene ${escapeHtml(entry.sectionLevel)}` : ''}`
-      : 'Ohne Abschnittskontext';
-    const title = entry.label === 'heading'
-      ? highlightText(entry.displayText, state.query.trim())
+    const targetHref = `text.html?work=${encodeURIComponent(entry.work_id)}#page-${entry.page_pdf}`;
+    const excerpt = excerptAround(entry.text, result.matchIndex);
+    const title = entry.label === 'heading' || entry.label === 'toc_entry'
+      ? highlightText(entry.title || entry.text, state.query.trim())
       : escapeHtml(humanLabel(entry.label));
 
     return `
@@ -1142,25 +1076,29 @@ function renderResults() {
           <div class="result-kind">${escapeHtml(humanLabel(entry.label))}</div>
           <div class="result-sigel">${escapeHtml(entry.sigel)}</div>
           <div class="result-rail-meta">
-            PDF ${escapeHtml(entry.pagePdf)}<br>
-            ${entry.pageBook != null ? `Druckseite ${escapeHtml(entry.pageBook)}<br>` : ''}
-            ${entry.pageRef != null ? `TOC-Ziel ${escapeHtml(entry.pageRef)}<br>` : ''}
-            ${escapeHtml(textLabel(entry))}
+            ${escapeHtml(entry.work_title)}<br>
+            PDF ${escapeHtml(entry.page_pdf)}<br>
+            ${entry.page_book != null ? `Druckseite ${escapeHtml(entry.page_book)}<br>` : ''}
+            ${entry.page_ref != null ? `TOC-Ziel ${escapeHtml(entry.page_ref)}<br>` : ''}
+            ${entry.level ? `Ebene ${escapeHtml(entry.level)}<br>` : ''}
+            ${escapeHtml(entry.page_kind || 'body')}
           </div>
         </aside>
         <div class="result-body">
           <div class="chip-row">
-            <span class="result-chip">${escapeHtml(entry.pageKind || 'body')}</span>
-            ${entry.level ? `<span class="result-chip">Ebene ${escapeHtml(entry.level)}</span>` : ''}
+            <span class="result-chip">${escapeHtml(entry.work_short_title || entry.work_title)}</span>
+            <span class="result-chip">${escapeHtml(entry.page_kind || 'body')}</span>
             <span class="result-chip">Score ${escapeHtml(result.score)}</span>
           </div>
-          <div class="result-context">${sectionContext}</div>
+          <div class="result-context">
+            ${entry.title && entry.label !== 'toc_entry' ? `Titelkontext: <strong>${escapeHtml(entry.title)}</strong>` : `Werk: <strong>${escapeHtml(entry.work_title)}</strong>`}
+          </div>
           <h3 class="result-heading">
-            <a href="text.html#${escapeHtml(entry.anchor)}">${title}</a>
+            <a href="${targetHref}">${title}</a>
           </h3>
           <p class="result-snippet">${highlightText(excerpt, state.query.trim())}</p>
           <div class="result-links">
-            <a class="result-link" href="text.html#${escapeHtml(entry.anchor)}">Im Lesetext öffnen</a>
+            <a class="result-link" href="${targetHref}">Im Lesetext öffnen</a>
           </div>
         </div>
       </article>
@@ -1170,71 +1108,43 @@ function renderResults() {
   bindSuggestionButtons();
 }
 
-function setCorpus(raw, sourceLabel) {
-  state.corpus = normalizeCorpus(raw);
+function setEditionData(edition, entries, sourceLabel) {
+  state.edition = edition;
+  state.works = edition.works || [];
+  state.worksById = Object.fromEntries(state.works.map(work => [work.work_id, work]));
+  state.entries = (entries || []).map(normalizeEntry);
   state.sourceLabel = sourceLabel;
-  state.entries = buildSearchEntries(state.corpus);
-  state.suggestions = buildSuggestions(state.corpus);
+
+  renderWorkOptions();
+  updatePageRangeState();
   updateStats();
-
-  const endInput = document.getElementById('end-page');
-  if (!Number(endInput.value) || Number(endInput.value) < state.corpus.counts.pages) {
-    endInput.value = state.corpus.counts.pages;
-  }
-
   renderResults();
+
   setSourceStatus(
-    `<strong>Geladen:</strong> ${escapeHtml(sourceLabel)}<br>Band ${escapeHtml(state.corpus.band)} · ${state.corpus.counts.pages} Seiten · ${state.entries.length} Suchstellen.`,
+    `<strong>Geladen:</strong> ${escapeHtml(sourceLabel)}<br>${escapeHtml(String(state.works.length))} Werke · ${escapeHtml(String(state.entries.length))} Suchstellen.`,
     'is-ready'
   );
 }
 
-async function autoLoadCorpus() {
-  for (const source of AUTO_SOURCES) {
-    try {
-      const response = await fetch(`${source.path}?v=${Date.now()}`);
-      if (!response.ok) continue;
-      const json = await response.json();
-      setCorpus(json, source.label);
-      return true;
-    } catch (error) {
-      // Try next source silently.
-    }
-  }
-  return false;
-}
-
 async function handleAutoReload() {
-  setSourceStatus('Versuche, JSON automatisch zu laden…');
-  const loaded = await autoLoadCorpus();
-  if (!loaded) {
+  setSourceStatus('Lade Editionskatalog und Suchindex…');
+
+  const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
+  const searchPayload = await fetchFirstAvailable(SEARCH_SOURCES);
+
+  if (!editionPayload || !searchPayload) {
     const hint = window.location.protocol === 'file:'
-      ? 'Direkt über <code>file://</code> geöffnet: bitte die Datei <code>out/master.json</code> manuell auswählen.'
-      : 'Kein passender JSON-Pfad gefunden. Bitte <code>out/master.json</code> manuell auswählen.';
-    setSourceStatus(`<strong>Automatisches Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
+      ? 'Direkt über <code>file://</code> geöffnet: bitte die Site über einen lokalen Server laden, damit mehrere JSON-Dateien gelesen werden können.'
+      : 'Editionskatalog oder Suchindex konnten nicht geladen werden.';
+    setSourceStatus(`<strong>Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
+    return;
   }
-}
 
-function bindSuggestionButtons() {
-  document.querySelectorAll('[data-suggestion]').forEach(button => {
-    button.addEventListener('click', () => {
-      const suggestion = button.dataset.suggestion || '';
-      document.getElementById('query-input').value = suggestion;
-      state.query = suggestion;
-      renderResults();
-    });
-  });
-}
-
-function readControls() {
-  state.query = document.getElementById('query-input').value.trim();
-  state.exact = document.getElementById('exact-match').checked;
-  state.caseSensitive = document.getElementById('case-sensitive').checked;
-  state.includeHeadings = document.getElementById('include-headings').checked;
-  state.includeFrontmatter = document.getElementById('include-frontmatter').checked;
-  state.includeToc = document.getElementById('include-toc').checked;
-  state.includeFootnotes = document.getElementById('include-footnotes').checked;
-  state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
+  setEditionData(
+    editionPayload.data,
+    searchPayload.data,
+    `${editionPayload.source.label} + ${searchPayload.source.label}`
+  );
 }
 
 function bindEvents() {
@@ -1273,7 +1183,8 @@ function bindEvents() {
     'include-footnotes',
     'sort-order',
     'start-page',
-    'end-page'
+    'end-page',
+    'work-filter'
   ].forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
       readControls();
@@ -1282,22 +1193,6 @@ function bindEvents() {
   });
 
   document.getElementById('reload-source').addEventListener('click', handleAutoReload);
-
-  document.getElementById('json-file').addEventListener('change', async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      setCorpus(json, file.name);
-    } catch (error) {
-      setSourceStatus(
-        `<strong>JSON konnte nicht gelesen werden.</strong><br>${escapeHtml(error.message || 'Unbekannter Fehler')}`,
-        'is-warning'
-      );
-    }
-  });
 }
 
 applyUrlState();
