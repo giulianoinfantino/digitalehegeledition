@@ -491,6 +491,7 @@
   </section>
 </main>
 
+<script src="assets/edition-data.js"></script>
 <script>
 const keyTerms = [
   "Sein", "Nichts", "Werden", "Dasein", "Etwas", "Grenze", "Endlichkeit", "Unendlichkeit",
@@ -558,6 +559,30 @@ async function fetchFirstAvailable(sources) {
     }
   }
   return null;
+}
+
+function ensureEmbeddedWorkScript(workId) {
+  return new Promise(resolve => {
+    window.HEGEL_WORK_DATA = window.HEGEL_WORK_DATA || {};
+    if (window.HEGEL_WORK_DATA[workId]) {
+      resolve(true);
+      return;
+    }
+
+    const existing = document.querySelector(`script[data-work-script="${workId}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve(Boolean(window.HEGEL_WORK_DATA[workId])), { once: true });
+      existing.addEventListener('error', () => resolve(false), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `assets/work-${workId}.js`;
+    script.dataset.workScript = workId;
+    script.onload = () => resolve(Boolean(window.HEGEL_WORK_DATA[workId]));
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 }
 
 function getUnitLabel(unit) {
@@ -872,7 +897,9 @@ function drawNetwork() {
 }
 
 async function loadCorpus() {
-  const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
+  const editionPayload = window.HEGEL_EDITION_DATA
+    ? { data: window.HEGEL_EDITION_DATA, source: { label: 'Eingebettete Editionsdaten' } }
+    : await fetchFirstAvailable(EDITION_SOURCES);
   if (editionPayload) {
     editionWorks = editionPayload.data.works || [];
     worksById = Object.fromEntries(editionWorks.map(work => [work.work_id, work]));
@@ -885,6 +912,12 @@ async function loadCorpus() {
     if (selectedWorkId && worksById[selectedWorkId]) {
       workSelect.value = selectedWorkId;
       workStatus.textContent = `${worksById[selectedWorkId].title} geladen aus ${editionPayload.source.label}.`;
+      const embeddedLoaded = await ensureEmbeddedWorkScript(selectedWorkId);
+      if (embeddedLoaded && window.HEGEL_WORK_DATA?.[selectedWorkId]) {
+        updateWorkUrl(selectedWorkId);
+        return { corpus: window.HEGEL_WORK_DATA[selectedWorkId], source: { label: `${worksById[selectedWorkId].title} · eingebettet` }, work: worksById[selectedWorkId] };
+      }
+
       const workResponse = await fetch(`../out/${worksById[selectedWorkId].paths.master}?v=${Date.now()}`);
       if (workResponse.ok) {
         updateWorkUrl(selectedWorkId);
