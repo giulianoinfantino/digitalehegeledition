@@ -1156,6 +1156,15 @@ function syncVisiblePage() {
   });
 }
 
+function shouldRenderReaderPage(page, selectedSeries) {
+  if (selectedSeries !== 'GW') return true;
+  if (page.page_kind === 'toc') return false;
+  if (page.page_kind === 'frontmatter' && !page.gw_page) return false;
+
+  const visibleUnits = (page.units || []).filter(unit => !['footnote', 'page_number'].includes(unit.label));
+  return visibleUnits.length > 0;
+}
+
 function renderPages() {
   const container = document.getElementById('reader-pages');
   if (!state.corpus) {
@@ -1173,7 +1182,7 @@ function renderPages() {
   const selectedSeries = state.selectedWork?.series || state.corpus.metadata?.series || '';
   const pages = state.corpus.pages
     .filter(page => page.page_pdf >= start)
-    .filter(page => !(selectedSeries === 'GW' && page.page_kind === 'frontmatter' && page.page_pdf <= 9))
+    .filter(page => shouldRenderReaderPage(page, selectedSeries))
     .slice(0, count);
 
   if (!pages.length) {
