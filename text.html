@@ -15,8 +15,19 @@
       --reader-accent-soft: #6a201d;
       --reader-accent-faint: rgba(106, 32, 29, 0.08);
     }
+    body[data-theme="dark"] {
+      --reader-paper: #17120f;
+      --reader-ink: #f0e6d7;
+      --reader-muted: #b8ab9b;
+      --reader-rule: rgba(222, 205, 182, 0.16);
+      --reader-accent-soft: #d09a82;
+      --reader-accent-faint: rgba(208, 154, 130, 0.12);
+    }
     html {
       background: #f6f0e5;
+    }
+    html:has(body[data-theme="dark"]) {
+      background: #17120f;
     }
     body {
       background:
@@ -24,11 +35,19 @@
         linear-gradient(180deg, #faf6ef 0%, #f3ecdf 100%);
       color: var(--reader-ink);
     }
+    body[data-theme="dark"] {
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+    }
     .site-header {
       border-bottom: 1px solid var(--reader-rule);
       padding: 16px 5%;
       background: rgba(246, 240, 229, 0.9);
       backdrop-filter: blur(8px);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(23, 18, 15, 0.88);
     }
     .site-title-eyebrow {
       font-size: 0.64rem;
@@ -234,6 +253,11 @@
     .range-field select:focus {
       outline: none;
       border-bottom-color: var(--reader-accent-soft);
+    }
+    body[data-theme="dark"] .range-field input,
+    body[data-theme="dark"] .range-field select {
+      background: transparent;
+      color: var(--reader-ink);
     }
     .stat-grid {
       display: grid;
@@ -701,6 +725,7 @@
   </div>
 </main>
 
+<script src="assets/theme.js"></script>
 <script src="assets/edition-data.js"></script>
 <script>
 const state = {
@@ -742,6 +767,54 @@ const CURATED_OUTLINES = {
     { title: 'c. Das universelle Urtheil', gw_page: 74, level: 4 },
     { title: 'C. Das Urtheil der Nothwendigkeit', gw_page: 77, level: 3 },
     { title: 'a. Das kategorische Urtheil', gw_page: 77, level: 4 },
+    { title: 'b. Das hypothetische Urtheil', gw_page: 78, level: 4 },
+    { title: 'c. Das disjunctive Urtheil', gw_page: 80, level: 4 },
+    { title: 'D. Das Urtheil des Begriffs', gw_page: 84, level: 3 },
+    { title: 'a. Das assertorische Urtheil', gw_page: 84, level: 4 },
+    { title: 'b. Das problematische Urtheil', gw_page: 86, level: 4 },
+    { title: 'c. Das apodiktische Urtheil', gw_page: 87, level: 4 },
+    { title: 'Drittes Kapitel', gw_page: 90, level: 1 },
+    { title: 'Der Schluß', gw_page: 90, level: 2 },
+    { title: 'A. Der Schluß des Daseyns', gw_page: 92, level: 3 },
+    { title: 'a. Erste Figur des Schlusses', gw_page: 93, level: 4 },
+    { title: 'Anmerkung', gw_page: 106, level: 4 },
+    { title: 'B. Der Schluß der Reflexion', gw_page: 110, level: 3 },
+    { title: 'b. Schluß der Induction', gw_page: 113, level: 4 },
+    { title: 'c. Der Schluß der Analogie', gw_page: 115, level: 4 },
+    { title: 'C. Der Schluß der Nothwendigkeit', gw_page: 118, level: 3 },
+    { title: 'a. Der kategorische Schluß', gw_page: 119, level: 4 },
+    { title: 'b. Der hypothetische Schluß', gw_page: 121, level: 4 },
+    { title: 'c. Der disjunctive Schluß', gw_page: 123, level: 4 },
+    { title: 'Zweyter Abschnitt', gw_page: 127, level: 1 },
+    { title: 'Die Objectivität', gw_page: 127, level: 2 },
+    { title: 'Erstes Kapitel', gw_page: 133, level: 1 },
+    { title: 'Der Mechanismus', gw_page: 133, level: 2 },
+    { title: 'A. Das mechanische Object', gw_page: 133, level: 3 },
+    { title: 'B. Der mechanische Process', gw_page: 136, level: 3 },
+    { title: 'C. Der absolute Mechanismus', gw_page: 143, level: 3 },
+    { title: 'Zweytes Kapitel', gw_page: 148, level: 1 },
+    { title: 'Der Chemismus', gw_page: 148, level: 2 },
+    { title: 'A. Das chemische Object', gw_page: 148, level: 3 },
+    { title: 'B. Der Process', gw_page: 149, level: 3 },
+    { title: 'C. Uebergang des Chemismus', gw_page: 152, level: 3 },
+    { title: 'Drittes Kapitel', gw_page: 154, level: 1 },
+    { title: 'Teleologie', gw_page: 154, level: 2 },
+    { title: 'A. Der subjective Zweck', gw_page: 160, level: 3 },
+    { title: 'B. Das Mittel', gw_page: 162, level: 3 },
+    { title: 'C. Der ausgeführte Zweck', gw_page: 165, level: 3 },
+    { title: 'Dritter Abschnitt', gw_page: 173, level: 1 },
+    { title: 'Die Idee', gw_page: 173, level: 2 },
+    { title: 'Erstes Kapitel', gw_page: 179, level: 1 },
+    { title: 'Das Leben', gw_page: 179, level: 2 },
+    { title: 'A. Das lebendige Individuum', gw_page: 182, level: 3 },
+    { title: 'B. Der Lebens-Process', gw_page: 187, level: 3 },
+    { title: 'C. Die Gattung', gw_page: 189, level: 3 },
+    { title: 'Zweytes Kapitel', gw_page: 192, level: 1 },
+    { title: 'Die Idee des Erkennens', gw_page: 192, level: 2 },
+    { title: 'A. Die Idee des Wahren', gw_page: 199, level: 3 },
+    { title: 'B. Die Idee des Guten', gw_page: 231, level: 3 },
+    { title: 'Drittes Kapitel', gw_page: 236, level: 1 },
+    { title: 'Die absolute Idee', gw_page: 236, level: 2 },
   ],
 };
 
