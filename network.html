@@ -71,7 +71,7 @@
     body[data-theme="dark"] .eyebrow,
     body[data-theme="dark"] .workspace,
     body[data-theme="dark"] .toolbar,
-    body[data-theme="dark"] .side-panel,
+    body[data-theme="dark"] .sidepanel,
     body[data-theme="dark"] .stat-card,
     body[data-theme="dark"] .detail-card {
       background: rgba(240, 230, 215, 0.03);
@@ -81,6 +81,37 @@
     body[data-theme="dark"] .panel-button {
       background: rgba(240, 230, 215, 0.03);
       color: var(--text-main);
+    }
+    body[data-theme="dark"] .site-title-main,
+    body[data-theme="dark"] .intro h1,
+    body[data-theme="dark"] .panel-lead,
+    body[data-theme="dark"] .term-name,
+    body[data-theme="dark"] .stat-value,
+    body[data-theme="dark"] .connection-pair {
+      color: var(--text-main);
+    }
+    body[data-theme="dark"] .panel-select,
+    body[data-theme="dark"] .term-list button,
+    body[data-theme="dark"] .connection-item,
+    body[data-theme="dark"] .status-line,
+    body[data-theme="dark"] .metrics {
+      background: rgba(240, 230, 215, 0.03);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] .viz-stage {
+      background:
+        radial-gradient(circle at top left, rgba(208,154,130,0.10), transparent 34%),
+        linear-gradient(180deg, rgba(240,230,215,0.04), rgba(240,230,215,0.02));
+    }
+    body[data-theme="dark"] .intro p,
+    body[data-theme="dark"] .panel-subtle,
+    body[data-theme="dark"] .term-detail,
+    body[data-theme="dark"] .connection-meta,
+    body[data-theme="dark"] .small-note,
+    body[data-theme="dark"] .legend-item,
+    body[data-theme="dark"] .toolbar label,
+    body[data-theme="dark"] .status-line {
+      color: #cdbdac;
     }
     body[data-theme="dark"] canvas {
       filter: saturate(0.9) brightness(0.88);

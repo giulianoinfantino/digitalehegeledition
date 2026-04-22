@@ -123,10 +123,54 @@
       background: rgba(240, 230, 215, 0.03);
       box-shadow: none;
     }
+    body[data-theme="dark"] .site-title-main,
+    body[data-theme="dark"] .search-intro h1,
+    body[data-theme="dark"] .summary-title,
+    body[data-theme="dark"] .result-heading,
+    body[data-theme="dark"] .result-title,
+    body[data-theme="dark"] .result-sigel,
+    body[data-theme="dark"] .stat-tile strong,
+    body[data-theme="dark"] .facet-card strong {
+      color: var(--text-main);
+    }
     body[data-theme="dark"] input,
     body[data-theme="dark"] select {
       background: rgba(240, 230, 215, 0.03);
       color: var(--text-main);
+    }
+    body[data-theme="dark"] .file-picker,
+    body[data-theme="dark"] .search-btn,
+    body[data-theme="dark"] .suggestion-chip,
+    body[data-theme="dark"] .section-chip,
+    body[data-theme="dark"] .result-chip,
+    body[data-theme="dark"] .stat-tile,
+    body[data-theme="dark"] .facet-card,
+    body[data-theme="dark"] .work-breakdown-row,
+    body[data-theme="dark"] .result-meta-card {
+      background: rgba(240, 230, 215, 0.03);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] .result-kind {
+      background: rgba(208, 154, 130, 0.12);
+      border-color: rgba(208, 154, 130, 0.24);
+      color: var(--accent);
+    }
+    body[data-theme="dark"] .query-card {
+      background:
+        radial-gradient(circle at top right, rgba(208,154,130,0.10), transparent 36%),
+        linear-gradient(180deg, rgba(240,230,215,0.05), rgba(240,230,215,0.03));
+    }
+    body[data-theme="dark"] .query-note,
+    body[data-theme="dark"] .summary-subtitle,
+    body[data-theme="dark"] .result-context,
+    body[data-theme="dark"] .result-rail-meta,
+    body[data-theme="dark"] .result-meta-card,
+    body[data-theme="dark"] .empty-state,
+    body[data-theme="dark"] .stat-tile span,
+    body[data-theme="dark"] .facet-card span,
+    body[data-theme="dark"] .work-breakdown-value,
+    body[data-theme="dark"] .work-breakdown-label {
+      color: #cdbdac;
     }
     body[data-theme="dark"] mark {
       background: rgba(208, 154, 130, 0.18);
