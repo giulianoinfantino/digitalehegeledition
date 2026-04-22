@@ -190,7 +190,8 @@
       text-transform: uppercase;
       color: var(--text-muted);
     }
-    .range-field input {
+    .range-field input,
+    .range-field select {
       width: 100%;
       padding: 10px 12px;
       border-radius: 14px;
@@ -201,7 +202,8 @@
       font-size: 1rem;
       font-family: var(--font-ui);
     }
-    .range-field input:focus {
+    .range-field input:focus,
+    .range-field select:focus {
       outline: none;
       border-color: rgba(142,32,32,0.4);
     }
@@ -549,16 +551,31 @@
 <main class="reader-main">
   <section class="reader-intro">
     <div class="reader-kicker">Direkt aus dem Extraktor</div>
-    <h1>Lesetext aus dem aktuellen JSON</h1>
+    <h1>Lesetext der digitalen Edition</h1>
     <p>
-      Diese Textansicht liest den aktuellen Extraktor-Output direkt ein, statt auf die ältere, site-spezifische
-      JSON-Struktur angewiesen zu sein. So kannst du sofort sehen, wie gut die neue Strukturierung als digitale
-      Hegel-Ausgabe funktioniert.
+      Diese Textansicht lädt die einzelnen Werke direkt aus dem aktuellen Extraktor-Output. Du kannst im Reader
+      zwischen den vorhandenen Bänden wechseln und siehst sofort, wie gut die neue Strukturierung als digitale
+      Hegel-Ausgabe über mehrere Werke hinweg funktioniert.
     </p>
   </section>
 
   <div class="reader-layout">
     <aside class="reader-sidebar">
+      <section class="side-card">
+        <h2 class="side-title">Werk</h2>
+        <div class="range-field">
+          <span>Editionsteil</span>
+          <label>
+            <select id="work-select">
+              <option value="">Werkliste wird geladen…</option>
+            </select>
+          </label>
+        </div>
+        <div class="source-status" id="edition-status">
+          Editionskatalog wird geladen…
+        </div>
+      </section>
+
       <section class="side-card">
         <h2 class="side-title">Quelle</h2>
         <div class="picker-row">
@@ -566,10 +583,10 @@
             JSON-Datei öffnen
             <input type="file" id="json-file" accept=".json,application/json">
           </label>
-          <button class="reader-btn" id="reload-source" type="button">Automatisch neu laden</button>
+          <button class="reader-btn" id="reload-source" type="button">Aktuelles Werk neu laden</button>
         </div>
         <div class="source-status" id="source-status">
-          Automatisches Laden wird versucht…
+          Werkdatei wird geladen…
         </div>
       </section>
 
@@ -586,11 +603,11 @@
         <div class="range-grid">
           <div class="range-field">
             <span>Start PDF</span>
-            <label><input type="number" id="start-page" min="1" value="10"></label>
+            <label><input type="number" id="start-page" min="1" value="1"></label>
           </div>
           <div class="range-field">
             <span>Anzahl Seiten</span>
-            <label><input type="number" id="page-count" min="1" max="160" value="24"></label>
+            <label><input type="number" id="page-count" min="1" max="800" value="24"></label>
           </div>
         </div>
         <button class="reader-btn primary" id="render-range" type="button" style="margin-top:14px;">Ausschnitt rendern</button>
@@ -632,8 +649,8 @@
           <div>
             <h2 class="summary-title">Noch kein Korpus geladen</h2>
             <p class="summary-subtitle">
-              Wenn das automatische Laden fehlschlägt, kannst du hier einfach die aktuelle Datei
-              <code>out/master.json</code> manuell auswählen.
+              Sobald Editionskatalog und Werkdatei geladen sind, erscheint hier der ausgewählte Band. Wenn das
+              automatische Laden fehlschlägt, kannst du weiterhin eine JSON-Datei manuell öffnen.
             </p>
           </div>
         </div>
