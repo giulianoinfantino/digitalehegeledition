@@ -191,6 +191,7 @@
       color: var(--text-muted);
     }
     .range-field input,
+    .range-field select,
     .sort-field select,
     .query-input {
       width: 100%;
@@ -204,6 +205,7 @@
       font-family: var(--font-ui);
     }
     .range-field input:focus,
+    .range-field select:focus,
     .sort-field select:focus,
     .query-input:focus {
       outline: none;
@@ -479,21 +481,25 @@
   <div class="search-layout">
     <aside class="search-sidebar">
       <section class="side-card">
-        <h2 class="side-title">Quelle</h2>
+        <h2 class="side-title">Edition</h2>
         <div class="picker-row">
-          <label class="file-picker">
-            JSON-Datei öffnen
-            <input type="file" id="json-file" accept=".json,application/json">
-          </label>
-          <button class="search-btn" id="reload-source" type="button">Automatisch neu laden</button>
+          <button class="search-btn" id="reload-source" type="button">Edition neu laden</button>
         </div>
         <div class="source-status" id="source-status">
-          Automatisches Laden wird versucht…
+          Editionskatalog und Suchindex werden geladen…
         </div>
       </section>
 
       <section class="side-card">
         <h2 class="side-title">Filter</h2>
+        <div class="range-field">
+          <span>Werk</span>
+          <label>
+            <select id="work-filter">
+              <option value="all">Gesamte Edition</option>
+            </select>
+          </label>
+        </div>
         <div class="toggle-grid">
           <label><input type="checkbox" id="include-headings" checked> Überschriften durchsuchen</label>
           <label><input type="checkbox" id="include-frontmatter" checked> Paratexte durchsuchen</label>
@@ -518,16 +524,16 @@
         <h2 class="side-title">Edition auf einen Blick</h2>
         <div class="stat-grid">
           <div class="stat-tile">
+            <strong id="stat-works">—</strong>
+            <span>Werke</span>
+          </div>
+          <div class="stat-tile">
             <strong id="stat-pages">—</strong>
             <span>Seiten</span>
           </div>
           <div class="stat-tile">
             <strong id="stat-entries">—</strong>
             <span>Suchstellen</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-headings">—</strong>
-            <span>Überschriften</span>
           </div>
           <div class="stat-tile">
             <strong id="stat-footnotes">—</strong>
@@ -557,8 +563,8 @@
           <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
         </div>
         <p class="query-note">
-          Die Suche arbeitet direkt gegen die strukturierte JSON-Ausgabe. Treffer verlinken auf die passende
-          PDF-Seite in <code>text.html</code>.
+          Die Suche arbeitet direkt gegen den aggregierten Editionsindex. Du kannst die gesamte Edition oder
+          gezielt ein einzelnes Werk durchsuchen; Treffer springen in die passende PDF-Seite des Readers.
         </p>
       </section>
 

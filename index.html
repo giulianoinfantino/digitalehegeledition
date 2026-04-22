@@ -206,6 +206,28 @@
       line-height: 1.65;
       font-size: 0.98rem;
     }
+    .feature-card .meta-list {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .feature-card .meta-list strong {
+      color: var(--text-main);
+    }
+    .work-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .work-card-actions .btn {
+      min-height: 42px;
+      padding: 0 16px;
+      font-size: 0.92rem;
+    }
     .workflow-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -289,100 +311,84 @@
 <main class="landing">
   <section class="hero">
     <div class="hero-copy">
-      <div class="eyebrow">Arbeitsversion einer digitalen Hegel-Edition</div>
-      <h1>Wissenschaft<br>der Logik I</h1>
+      <div class="eyebrow">Arbeitsversion einer mehrbändigen digitalen Hegel-Edition</div>
+      <h1>Digitale<br>Hegel-Edition</h1>
       <p class="hero-lead">
-        Eine lesbare, durchsuchbare und strukturell gegliederte Webausgabe auf Basis der extrahierten Druckvorlage.
-        Die Startseite soll nicht bloß dekorativ sein, sondern den Leser direkt in den Text, in die Suche und in die
-        experimentellen Analysewerkzeuge führen.
+        Die Website ist nicht mehr auf einen Einzelband festgelegt, sondern organisiert mehrere Werke als gemeinsame
+        Edition: mit direktem Einstieg pro Band, einem werkbezogenen Reader und einer Suche, die sowohl global durch
+        die Edition als auch gezielt innerhalb einzelner Werke arbeiten kann.
       </p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="text.html">Edition betreten</a>
+        <a class="btn btn-primary" href="#works-section">Werke auswählen</a>
+        <a class="btn btn-secondary" href="text.html">Standardwerk lesen</a>
+        <a class="btn btn-secondary" href="search.html">Edition durchsuchen</a>
         <a class="btn btn-secondary" href="preview.html">JSON previewen</a>
-        <a class="btn btn-secondary" href="search.html">Im Korpus suchen</a>
-        <a class="btn btn-secondary" href="network.html">Netzwerk ansehen</a>
       </div>
       <p class="hero-note">
-        Fokus dieser Fassung: sauberer Einstieg, bessere Informationsarchitektur und ein seriöserer Eindruck als bei einer reinen Placeholder-Startseite.
+        Fokus dieser Fassung: echter Editionskatalog statt bloßer Startkachel, klare Werkpfade und eine Informationsarchitektur,
+        die auch bei weiteren Bänden tragfähig bleibt.
       </p>
     </div>
 
     <aside class="hero-panel">
-      <div class="panel-kicker">Aktuelle Ausgabe</div>
-      <h2 class="edition-title">Georg Wilhelm Friedrich Hegel<br>Wissenschaft der Logik I</h2>
+      <div class="panel-kicker">Aktueller Editionsstand</div>
+      <h2 class="edition-title">Georg Wilhelm Friedrich Hegel<br>Werke</h2>
       <div class="meta-grid">
         <div class="meta-item">
-          <span class="meta-label">Band</span>
-          <span class="meta-value">TWA 5</span>
+          <span class="meta-label">Werke</span>
+          <span class="meta-value" id="meta-works-count">—</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">Teil</span>
-          <span class="meta-value">Die objektive Logik · Erstes Buch</span>
+          <span class="meta-label">Umfang</span>
+          <span class="meta-value" id="meta-total-pages">—</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Zugriff</span>
-          <span class="meta-value">Lesetext · Suche · Netzwerk</span>
+          <span class="meta-value">Reader · Suche · Netzwerk</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Status</span>
-          <span class="meta-value">fortlaufend überarbeitet</span>
+          <span class="meta-value" id="meta-default-work">Edition wird geladen…</span>
         </div>
       </div>
       <div class="quote-box">
-        Ziel ist nicht bloß, PDF-Seiten anzuzeigen, sondern eine wirkliche digitale Edition mit lesbarer Struktur,
-        durchsuchbarem Haupttext und ausbaufähiger semantischer Ordnung.
+        Ziel ist nicht bloß, einzelne PDF-Seiten sichtbar zu machen, sondern aus mehreren Bänden einen kohärenten
+        digitalen Editionsraum mit Werkübersicht, Navigierbarkeit und gemeinsamer Suche zu bauen.
       </div>
     </aside>
   </section>
 
   <section class="stats-strip" aria-label="Korpusdaten">
     <article class="stat-card">
-      <div class="stat-number" id="stat-pages">—</div>
-      <div class="stat-label">Haupttext-Seiten im aktuellen JSON</div>
+      <div class="stat-number" id="stat-works">—</div>
+      <div class="stat-label">Werke in der Edition</div>
     </article>
     <article class="stat-card">
-      <div class="stat-number" id="stat-headings">—</div>
-      <div class="stat-label">erkannte Überschriften im Haupttext</div>
+      <div class="stat-number" id="stat-pages">—</div>
+      <div class="stat-label">Seiten über alle Werke</div>
     </article>
     <article class="stat-card">
       <div class="stat-number" id="stat-blocks">—</div>
-      <div class="stat-label">durchsuchbare Textblöcke</div>
+      <div class="stat-label">durchsuchbare Einheiten</div>
     </article>
     <article class="stat-card">
       <div class="stat-number" id="stat-notes">—</div>
-      <div class="stat-label">abgetrennte Fußnotenblöcke</div>
+      <div class="stat-label">abgetrennte Fußnoten</div>
     </article>
   </section>
 
-  <section class="section">
+  <section class="section" id="works-section">
     <div class="section-header">
-      <h2>Wie man diese Seite benutzen kann</h2>
+      <h2>Werke der Edition</h2>
       <p>
-        Die Startseite soll drei Zugänge bündeln: lineares Lesen, gezielte Begriffssuche und experimentelle Strukturansicht.
-        So wird aus einer bloßen PDF-Ablage ein editorischer Arbeitsraum.
+        Jedes Werk erhält einen eigenen Reader, eigene Pfade durch die Seiten sowie einen spezifischen Sucheinstieg.
+        Zugleich bleibt die Edition als Ganzes durchsuchbar.
       </p>
     </div>
-    <div class="feature-grid">
+    <div class="feature-grid" id="works-grid">
       <article class="feature-card">
-        <h3>Text lesen</h3>
-        <p>
-          Der Reader zeigt nur den eigentlichen Haupttext, mit Gliederung und Seiten-Siglen. Frontmatter,
-          Verlagsseiten und Inhaltsverzeichnis können dadurch aus dem Lesefluss verschwinden.
-        </p>
-      </article>
-      <article class="feature-card">
-        <h3>Suche</h3>
-        <p>
-          Die Suche arbeitet blockweise auf dem normalisierten Haupttext. Sie ist damit für inhaltliche Orientierung
-          und philologische Schnellabfragen deutlich nützlicher als ein bloßes Browser-Finden innerhalb eines PDFs.
-        </p>
-      </article>
-      <article class="feature-card">
-        <h3>Netzwerk</h3>
-        <p>
-          Die Netzwerkansicht bleibt explorativ. Sie kann Beziehungen und Häufungen sichtbar machen, sollte aber nur
-          auf einem hinreichend bereinigten Korpus wissenschaftlich ernst genommen werden.
-        </p>
+        <h3>Edition wird geladen</h3>
+        <p>Die Werkliste wird aus dem aktuellen Extraktor-Output aufgebaut.</p>
       </article>
     </div>
   </section>
@@ -424,98 +430,107 @@
 </main>
 
 <script>
-  const AUTO_SOURCES = [
-    { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
-    { label: 'Web-Export', path: '../out/web.json' },
-    { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' }
+  const EDITION_SOURCES = [
+    { label: 'Editionskatalog', path: '../out/edition.json' }
   ];
 
-  function getUnitLabel(unit) {
-    const ann = unit?.annotations?.[0] || {};
-    return ann.label || unit.type || unit.label || 'paragraph';
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
-  function getUnitText(unit) {
-    return unit.text_normalized ?? unit.text ?? unit.plain ?? unit.text_raw ?? unit.content ?? '';
-  }
-
-  function extractPages(corpus) {
-    return (corpus.pages || []).map((page, index) => ({
-      page_pdf: page.page_pdf ?? page.page ?? page.id ?? index + 1,
-      page_kind: page.page_kind || page.section_type || 'body',
-      units: Array.isArray(page.units)
-        ? page.units
-        : Array.isArray(page.blocks)
-          ? page.blocks
-          : []
-    }));
-  }
-
-  function computeStats(corpus) {
-    const pages = extractPages(corpus).filter(page => {
-      if (!page.page_kind) return true;
-      return ['body', 'maintext'].includes(page.page_kind);
-    });
-
-    let headings = 0;
-    let searchableBlocks = 0;
-    let notes = 0;
-
-    pages.forEach(page => {
-      page.units.forEach(unit => {
-        const label = getUnitLabel(unit);
-        const text = String(getUnitText(unit)).trim();
-        if (!text) return;
-
-        if (label === 'heading') headings += 1;
-        if (label === 'paragraph' || label === 'heading') searchableBlocks += 1;
-        if (label === 'footnote') notes += 1;
-      });
-    });
-
-    return {
-      pages: pages.length,
-      headings,
-      searchableBlocks,
-      notes
-    };
-  }
-
-  async function loadCorpus() {
-    for (const source of AUTO_SOURCES) {
+  async function loadEdition() {
+    for (const source of EDITION_SOURCES) {
       try {
         const response = await fetch(`${source.path}?v=${Date.now()}`);
         if (!response.ok) continue;
-        const corpus = await response.json();
-        return { corpus, source };
+        const edition = await response.json();
+        return { edition, source };
       } catch (error) {
         // Try next source silently.
       }
     }
-    throw new Error('Kein passender JSON-Pfad gefunden');
+    throw new Error('Kein Editionskatalog gefunden');
   }
 
-  async function populateStats() {
+  function renderWorks(edition) {
+    const works = edition.works || [];
+    const grid = document.getElementById('works-grid');
+    if (!works.length) {
+      grid.innerHTML = `
+        <article class="feature-card">
+          <h3>Keine Werke gefunden</h3>
+          <p>Im aktuellen Editionskatalog sind noch keine Werke eingetragen.</p>
+        </article>
+      `;
+      return;
+    }
+
+    grid.innerHTML = works.map(work => `
+      <article class="feature-card">
+        <h3>${escapeHtml(work.title)}</h3>
+        <p>
+          ${escapeHtml(work.siglum || `TWA ${work.band || '—'}`)} · ${escapeHtml(String(work.stats.pages_total || 0))} Seiten ·
+          ${escapeHtml(String(work.stats.search_entries || 0))} suchbare Einheiten.
+        </p>
+        <div class="meta-list">
+          <div><strong>Haupttext-Seiten:</strong> ${escapeHtml(String(work.stats.pages_body || 0))}</div>
+          <div><strong>Überschriften:</strong> ${escapeHtml(String(work.stats.headings || 0))}</div>
+          <div><strong>Fußnoten:</strong> ${escapeHtml(String(work.stats.footnotes || 0))}</div>
+          <div><strong>Druckseiten:</strong> ${work.stats.page_book_min != null && work.stats.page_book_max != null
+            ? `${escapeHtml(String(work.stats.page_book_min))}–${escapeHtml(String(work.stats.page_book_max))}`
+            : 'noch nicht erschlossen'}</div>
+        </div>
+        <div class="work-card-actions">
+          <a class="btn btn-primary" href="text.html?work=${encodeURIComponent(work.work_id)}">Lesen</a>
+          <a class="btn btn-secondary" href="search.html?work=${encodeURIComponent(work.work_id)}">Werk durchsuchen</a>
+          <a class="btn btn-secondary" href="network.html?work=${encodeURIComponent(work.work_id)}">Netzwerk</a>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  async function populateEdition() {
     const status = document.getElementById('data-status');
     try {
-      const { corpus, source } = await loadCorpus();
-      const stats = computeStats(corpus);
+      const { edition, source } = await loadEdition();
+      const stats = edition.metadata?.stats || {};
+      const works = edition.works || [];
+      const defaultWork = works.find(work => work.work_id === edition.metadata?.default_work_id) || works[0];
 
-      document.getElementById('stat-pages').textContent = stats.pages.toLocaleString('de-DE');
-      document.getElementById('stat-headings').textContent = stats.headings.toLocaleString('de-DE');
-      document.getElementById('stat-blocks').textContent = stats.searchableBlocks.toLocaleString('de-DE');
-      document.getElementById('stat-notes').textContent = stats.notes.toLocaleString('de-DE');
-      status.textContent = `Korpusdaten erfolgreich geladen · ${source.label}`;
+      document.getElementById('stat-works').textContent = (edition.metadata?.works_count || works.length || 0).toLocaleString('de-DE');
+      document.getElementById('stat-pages').textContent = (stats.pages_total || 0).toLocaleString('de-DE');
+      document.getElementById('stat-blocks').textContent = (stats.search_entries || 0).toLocaleString('de-DE');
+      document.getElementById('stat-notes').textContent = (stats.footnotes || 0).toLocaleString('de-DE');
+
+      document.getElementById('meta-works-count').textContent = `${edition.metadata?.works_count || works.length || 0} Bände`;
+      document.getElementById('meta-total-pages').textContent = `${(stats.pages_total || 0).toLocaleString('de-DE')} Seiten`;
+      document.getElementById('meta-default-work').textContent = defaultWork
+        ? `Default: ${defaultWork.title}`
+        : 'fortlaufend überarbeitet';
+
+      renderWorks(edition);
+      status.textContent = `Editionskatalog erfolgreich geladen · ${source.label}`;
     } catch (error) {
+      document.getElementById('stat-works').textContent = '—';
       document.getElementById('stat-pages').textContent = '—';
-      document.getElementById('stat-headings').textContent = '—';
       document.getElementById('stat-blocks').textContent = '—';
       document.getElementById('stat-notes').textContent = '—';
-      status.textContent = 'Korpusdaten nicht geladen: ' + error.message;
+      document.getElementById('works-grid').innerHTML = `
+        <article class="feature-card">
+          <h3>Werkliste konnte nicht geladen werden</h3>
+          <p>${escapeHtml(error.message)}</p>
+        </article>
+      `;
+      status.textContent = 'Editionskatalog nicht geladen: ' + error.message;
     }
   }
 
-  populateStats();
+  populateEdition();
 </script>
 </body>
 </html>
