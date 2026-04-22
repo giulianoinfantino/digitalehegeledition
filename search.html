@@ -7,19 +7,52 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
-    .search-container { max-width: 860px; margin: 0 auto; }
+    .search-container { max-width: 920px; margin: 0 auto; }
     .search-header { margin-bottom: 36px; }
     .search-header h1 { font-family: var(--font-text); font-size: 3rem; font-weight: normal; margin-bottom: 12px; }
-    .search-header p { color: var(--text-muted); font-size: 1.1rem; }
-    .search-box-wrapper { position: sticky; top: 80px; background: rgba(252,251,249,0.94); backdrop-filter: blur(8px); padding: 14px 0; z-index: 100; margin-bottom: 28px; }
-    .search-input { width: 100%; padding: 20px 24px; font-size: 1.35rem; font-family: var(--font-ui); border: 2px solid var(--border); border-radius: 12px; box-sizing: border-box; }
+    .search-header p { color: var(--text-muted); font-size: 1.08rem; line-height: 1.55; }
+    .search-box-wrapper {
+      position: sticky; top: 80px; background: rgba(252,251,249,0.94); backdrop-filter: blur(8px);
+      padding: 14px 0; z-index: 100; margin-bottom: 20px;
+    }
+    .search-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+    .search-input {
+      width: 100%; padding: 20px 24px; font-size: 1.35rem; font-family: var(--font-ui);
+      border: 2px solid var(--border); border-radius: 12px; box-sizing: border-box;
+    }
     .search-input:focus { outline: none; border-color: var(--accent); }
-    .results-info { font-family: var(--font-ui); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 22px; }
-    .result-card { margin-bottom: 28px; padding: 22px; border-radius: 12px; background: white; border: 1px solid var(--border); }
-    .result-meta { font-family: var(--font-ui); font-size: 0.82rem; font-weight: 600; color: var(--accent); margin-bottom: 10px; display: flex; gap: 10px; }
-    .result-content { font-family: var(--font-text); font-size: 1.2rem; line-height: 1.7; text-align: justify; }
-    mark { background: rgba(142, 32, 32, 0.12); color: inherit; border-bottom: 2px solid rgba(142, 32, 32, 0.3); padding: 0 2px; }
+    .search-btn {
+      padding: 16px 18px; border-radius: 12px; border: 1px solid var(--border);
+      background: white; font-family: var(--font-ui); cursor: pointer;
+    }
+    .search-options { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; font-family: var(--font-ui); font-size: .9rem; color: var(--text-muted); }
+    .search-options label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+    .results-info {
+      font-family: var(--font-ui); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--accent); margin-bottom: 22px;
+    }
+    .result-card {
+      margin-bottom: 20px; padding: 22px; border-radius: 12px; background: white;
+      border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    }
+    .result-meta {
+      font-family: var(--font-ui); font-size: 0.82rem; font-weight: 600; color: var(--accent);
+      margin-bottom: 8px; display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .result-title {
+      font-family: var(--font-ui); font-size: 1rem; font-weight: 600; margin-bottom: 10px;
+      color: var(--text);
+    }
+    .result-content {
+      font-family: var(--font-text); font-size: 1.18rem; line-height: 1.68; text-align: justify;
+    }
+    .result-link { font-family: var(--font-ui); font-size: .9rem; margin-top: 12px; display: inline-block; }
+    mark {
+      background: rgba(142, 32, 32, 0.12); color: inherit;
+      border-bottom: 2px solid rgba(142, 32, 32, 0.3); padding: 0 2px;
+    }
     .no-results { text-align: center; padding: 60px; color: var(--text-muted); font-size: 1.25rem; font-style: italic; }
+    .muted { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -42,11 +75,21 @@
   <div class="search-container">
     <div class="search-header">
       <h1>Korpus-Suche</h1>
-      <p>Durchsucht nur den Haupttext und ignoriert Titelei, Verlagsseiten und Inhaltsverzeichnis.</p>
+      <p>Durchsucht den Haupttext und die Überschriften. Titelei, Verlagsseiten und Inhaltsverzeichnis werden ausgeschlossen. Die Treffer springen zur passenden Seite in der Textansicht.</p>
     </div>
+
     <div class="search-box-wrapper">
-      <input type="text" id="search-input" class="search-input" placeholder="Begriff oder Phrase suchen..." autofocus>
+      <div class="search-row">
+        <input type="text" id="search-input" class="search-input" placeholder="Begriff oder Phrase suchen..." autofocus>
+        <button class="search-btn" id="search-btn">Suchen</button>
+      </div>
+      <div class="search-options">
+        <label><input type="checkbox" id="option-headings" checked> Überschriften einbeziehen</label>
+        <label><input type="checkbox" id="option-case"> Groß-/Kleinschreibung beachten</label>
+        <label><input type="checkbox" id="option-exact"> exakte Phrase</label>
+      </div>
     </div>
+
     <div id="status-line" class="results-info">Initialisiere Index…</div>
     <div id="results-area"></div>
   </div>
@@ -55,14 +98,124 @@
 <script>
 let blocks = [];
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function escapeRegex(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function highlight(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
+function normalizeText(raw) {
+  if (!raw) return '';
+  return raw
+    .replace(/-\s*\n\s*/g, '')
+    .replace(/\n/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\b([A-Za-zÄÖÜäöüß])(\s[A-Za-zÄÖÜäöüß]){2,}\b/g, m => m.replace(/\s/g, ''))
+    .trim();
+}
+
+function getBlockText(block) {
+  return normalizeText(block.text_normalized || block.text_raw || block.content || block.plain || '');
+}
+
+function getAnchor(page) {
+  return `page-${page.page_pdf || page.page_book || page.id || 0}`;
+}
+
+function sectionIsSearchable(page) {
+  const st = page.section_type || '';
+  return st === 'main_text' || st === 'maintext' || st === '' || st === null;
+}
+
+function typeIsSearchable(block, includeHeadings = true) {
+  if (!block || !block.type) return false;
+  if (block.type === 'main_text' || block.type === 'paragraph' || block.type === 'unknown') return true;
+  if (includeHeadings && block.type === 'heading') return true;
+  return false;
+}
+
+function pageLabel(page, band) {
+  if (page.sigel) return page.sigel;
+  const n = page.page_book || page.page_pdf || '';
+  return n ? `TWA ${band}, ${n}` : `TWA ${band}`;
+}
+
+function buildContext(text, query, exact, caseSensitive) {
+  if (!text) return '';
+  const hay = caseSensitive ? text : text.toLowerCase();
+  const needle = caseSensitive ? query : query.toLowerCase();
+
+  if (exact) {
+    const idx = hay.indexOf(needle);
+    if (idx === -1) return text.slice(0, 240);
+    const start = Math.max(0, idx - 90);
+    const end = Math.min(text.length, idx + query.length + 140);
+    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+  }
+
+  const tokens = query.split(/\s+/).filter(Boolean);
+  let bestIdx = -1;
+  for (const tok of tokens) {
+    const pos = hay.indexOf(caseSensitive ? tok : tok.toLowerCase());
+    if (pos !== -1 && (bestIdx === -1 || pos < bestIdx)) bestIdx = pos;
+  }
+  if (bestIdx === -1) return text.slice(0, 240) + (text.length > 240 ? '…' : '');
+  const start = Math.max(0, bestIdx - 90);
+  const end = Math.min(text.length, bestIdx + 180);
+  return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+}
+
+function highlight(text, query, exact, caseSensitive) {
+  if (!query) return escapeHtml(text);
+  const safe = escapeHtml(text);
+  if (exact) {
+    const flags = caseSensitive ? 'g' : 'gi';
+    const regex = new RegExp(`(${escapeRegex(query)})`, flags);
+    return safe.replace(regex, '<mark>$1</mark>');
+  }
+
+  const tokens = query.split(/\s+/).filter(Boolean).sort((a,b) => b.length - a.length);
+  if (!tokens.length) return safe;
+  const flags = caseSensitive ? 'g' : 'gi';
+  const regex = new RegExp(`(${tokens.map(escapeRegex).join('|')})`, flags);
+  return safe.replace(regex, '<mark>$1</mark>');
+}
+
+function scoreHit(entry, query, exact, caseSensitive) {
+  const text = entry.text;
+  const hay = caseSensitive ? text : text.toLowerCase();
+  const needle = caseSensitive ? query : query.toLowerCase();
+  let score = 0;
+
+  if (exact && hay.includes(needle)) score += 100;
+
+  const tokens = exact ? [query] : query.split(/\s+/).filter(Boolean);
+  for (const token of tokens) {
+    const t = caseSensitive ? token : token.toLowerCase();
+    if (!t) continue;
+    const matches = hay.split(t).length - 1;
+    score += matches * 10;
+  }
+
+  if (entry.type === 'heading') score += 8;
+  if (entry.text.length < 140) score += 2;
+  return score;
+}
+
+function matches(entry, query, exact, caseSensitive) {
+  const hay = caseSensitive ? entry.text : entry.text.toLowerCase();
+  const needle = caseSensitive ? query : query.toLowerCase();
+
+  if (exact) return hay.includes(needle);
+
+  const tokens = query.split(/\s+/).filter(Boolean);
+  return tokens.every(tok => hay.includes(caseSensitive ? tok : tok.toLowerCase()));
 }
 
 async function init() {
@@ -70,71 +223,129 @@ async function init() {
   const results = document.getElementById('results-area');
 
   try {
-    const res = await fetch('data/twa_band_5_v2.json?v=' + Date.now());
-    const corpus = await res.json();
+    let corpus = null;
+    const candidates = [
+      'data/twa_band_5_v2_corrected.json',
+      'data/twa_band_5_v2.json',
+      'data/twa_band_5.json'
+    ];
+
+    for (const path of candidates) {
+      const res = await fetch(path + '?v=' + Date.now());
+      if (res.ok) {
+        corpus = await res.json();
+        break;
+      }
+    }
+
+    if (!corpus) throw new Error('Keine JSON-Datei gefunden.');
+
+    const band = corpus.metadata?.band || '5';
     blocks = [];
 
     (corpus.pages || [])
-      .filter(page => !page.section_type || page.section_type === 'maintext')
+      .filter(sectionIsSearchable)
       .forEach(page => {
         (page.blocks || []).forEach((block, idx) => {
-          if (block.type === 'paragraph' || block.type === 'heading') {
-            blocks.push({
-              pageBook: page.page_book || page.id,
-              sigel: page.sigel || '',
-              type: block.type,
-              text: block.plain || '',
-              html: block.content || '',
-              anchor: `page-${page.page_book || page.id}`
-            });
-          }
+          const text = getBlockText(block);
+          if (!text) return;
+          if (!typeIsSearchable(block, true)) return;
+
+          blocks.push({
+            pagePdf: page.page_pdf || null,
+            pageBook: page.page_book || page.id || null,
+            sigel: pageLabel(page, band),
+            type: block.type,
+            level: block.level || null,
+            text,
+            anchor: getAnchor(page),
+            blockId: block.id || `${getAnchor(page)}-b${idx}`
+          });
         });
       });
 
     status.textContent = `Index bereit: ${blocks.length} Textblöcke`;
+    results.innerHTML = '<div class="muted">Gib mindestens zwei Zeichen ein.</div>';
     wireSearch();
   } catch (err) {
     status.textContent = `Fehler: ${err.message}`;
     results.innerHTML = '';
+    console.error(err);
   }
+}
+
+function runSearch() {
+  const input = document.getElementById('search-input');
+  const includeHeadings = document.getElementById('option-headings').checked;
+  const caseSensitive = document.getElementById('option-case').checked;
+  const exact = document.getElementById('option-exact').checked;
+  const status = document.getElementById('status-line');
+  const results = document.getElementById('results-area');
+
+  const query = input.value.trim();
+  results.innerHTML = '';
+
+  if (query.length < 2) {
+    status.textContent = `Index bereit: ${blocks.length} Textblöcke`;
+    results.innerHTML = '<div class="muted">Gib mindestens zwei Zeichen ein.</div>';
+    return;
+  }
+
+  const base = includeHeadings ? blocks : blocks.filter(b => b.type !== 'heading');
+  const hits = base
+    .filter(entry => matches(entry, query, exact, caseSensitive))
+    .map(entry => ({ ...entry, score: scoreHit(entry, query, exact, caseSensitive) }))
+    .sort((a, b) => b.score - a.score || (a.pageBook || 0) - (b.pageBook || 0))
+    .slice(0, 200);
+
+  status.textContent = `${hits.length} Treffer für „${query}“`;
+
+  if (!hits.length) {
+    results.innerHTML = '<div class="no-results">Keine Treffer gefunden.</div>';
+    return;
+  }
+
+  hits.forEach(hit => {
+    const context = buildContext(hit.text, query, exact, caseSensitive);
+    const content = highlight(context, query, exact, caseSensitive);
+    const label = hit.type === 'heading' ? 'Überschrift' : 'Absatz';
+
+    results.insertAdjacentHTML('beforeend', `
+      <article class="result-card">
+        <div class="result-meta">
+          <span>${escapeHtml(hit.sigel)}</span>
+          <span>${label}</span>
+          ${hit.level ? `<span>Level ${hit.level}</span>` : ''}
+        </div>
+        <div class="result-title">${highlight(hit.text.slice(0, 140) + (hit.text.length > 140 ? '…' : ''), query, exact, caseSensitive)}</div>
+        <div class="result-content">${content}</div>
+        <a class="result-link" href="text.html#${encodeURIComponent(hit.anchor)}">zur Stelle</a>
+      </article>
+    `);
+  });
 }
 
 function wireSearch() {
   const input = document.getElementById('search-input');
-  const status = document.getElementById('status-line');
-  const results = document.getElementById('results-area');
+  const button = document.getElementById('search-btn');
+  const optionHeadings = document.getElementById('option-headings');
+  const optionCase = document.getElementById('option-case');
+  const optionExact = document.getElementById('option-exact');
 
-  input.addEventListener('input', () => {
-    const query = input.value.trim();
-    results.innerHTML = '';
+  let timer = null;
+  const delayed = () => {
+    clearTimeout(timer);
+    timer = setTimeout(runSearch, 120);
+  };
 
-    if (query.length < 2) {
-      status.textContent = `Index bereit: ${blocks.length} Textblöcke`;
-      return;
-    }
-
-    const hits = blocks.filter(b => b.text.toLowerCase().includes(query.toLowerCase())).slice(0, 200);
-    status.textContent = `${hits.length} Treffer für „${query}“`;
-
-    if (!hits.length) {
-      results.innerHTML = '<div class="no-results">Keine Treffer gefunden.</div>';
-      return;
-    }
-
-    hits.forEach(hit => {
-      const text = highlight(hit.text, query);
-      results.insertAdjacentHTML('beforeend', `
-        <article class="result-card">
-          <div class="result-meta">
-            <span>${hit.sigel}</span>
-            <span>${hit.type === 'heading' ? 'Überschrift' : 'Absatz'}</span>
-            <a href="text.html#${hit.anchor}">zur Stelle</a>
-          </div>
-          <div class="result-content">${text}</div>
-        </article>
-      `);
-    });
+  input.addEventListener('input', delayed);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') runSearch();
   });
+  button.addEventListener('click', runSearch);
+  optionHeadings.addEventListener('change', runSearch);
+  optionCase.addEventListener('change', runSearch);
+  optionExact.addEventListener('change', runSearch);
 }
 
 init();
