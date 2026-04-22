@@ -131,13 +131,18 @@
       color: var(--text-main);
     }
     body[data-theme="dark"] .btn-primary {
-      color: var(--accent);
+      color: #17120f;
     }
     body[data-theme="dark"] .hero-note,
     body[data-theme="dark"] .quote-box,
     body[data-theme="dark"] .feature-card p,
     body[data-theme="dark"] .feature-card .meta-list,
-    body[data-theme="dark"] .section-header p {
+    body[data-theme="dark"] .section-header p,
+    body[data-theme="dark"] .meta-label,
+    body[data-theme="dark"] .stat-label,
+    body[data-theme="dark"] .work-meta,
+    body[data-theme="dark"] .edition-subline,
+    body[data-theme="dark"] .hero-lead {
       color: #cdbdac;
     }
     body[data-theme="dark"] .quote-box {
@@ -491,7 +496,6 @@
       <li><a href="index.html" class="current">Start</a></li>
       <li><a href="text.html">Text lesen</a></li>
       <li><a href="search.html">Suche</a></li>
-      <li><a href="network.html">Netzwerk</a></li>
     </ul>
   </nav>
 </header>
@@ -531,7 +535,7 @@
         </div>
         <div class="meta-item">
           <span class="meta-label">Zugriff</span>
-          <span class="meta-value">Reader · Suche · Netzwerk</span>
+          <span class="meta-value">Reader · Suche</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Status</span>

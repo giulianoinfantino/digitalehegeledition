@@ -2,6 +2,9 @@
   
   --bg-color: #fcfbf9; --text-main: #1a1a1a; --text-muted: #666;
   --accent: #8e2020; --border: #e8e6e1;
+  --surface-strong: rgba(255, 255, 255, 0.84);
+  --surface-soft: rgba(255, 255, 255, 0.74);
+  --surface-faint: rgba(255, 255, 255, 0.04);
   --font-ui: 'Inter Tight', sans-serif; --font-text: 'EB Garamond', serif;
 }
 html { scroll-behavior: smooth; }
@@ -55,9 +58,74 @@ body[data-theme="dark"] {
   --text-muted: #999;
   --border: #333;
   --accent: #d45d5d;
+  --surface-strong: rgba(240, 230, 215, 0.05);
+  --surface-soft: rgba(240, 230, 215, 0.04);
+  --surface-faint: rgba(240, 230, 215, 0.03);
 }
 body[data-theme="dark"] .site-header {
   background: rgba(26, 26, 26, 0.9);
+}
+body[data-theme="dark"] .site-title,
+body[data-theme="dark"] .site-title-main,
+body[data-theme="dark"] .site-title-eyebrow,
+body[data-theme="dark"] .sitenav a,
+body[data-theme="dark"] .sitenav a:visited {
+  color: var(--text-main);
+}
+body[data-theme="dark"] .site-title-eyebrow,
+body[data-theme="dark"] .sitenav a {
+  color: var(--text-muted);
+}
+body[data-theme="dark"] .sitenav a.current,
+body[data-theme="dark"] .sitenav a:hover {
+  color: var(--accent);
+}
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6,
+body[data-theme="dark"] strong,
+body[data-theme="dark"] b,
+body[data-theme="dark"] dt,
+body[data-theme="dark"] label,
+body[data-theme="dark"] legend,
+body[data-theme="dark"] th {
+  color: var(--text-main);
+}
+body[data-theme="dark"] p,
+body[data-theme="dark"] li,
+body[data-theme="dark"] dd,
+body[data-theme="dark"] td,
+body[data-theme="dark"] small,
+body[data-theme="dark"] figcaption,
+body[data-theme="dark"] blockquote,
+body[data-theme="dark"] span:not(.theme-toggle):not(.theme-btn) {
+  color: inherit;
+}
+body[data-theme="dark"] input,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] select,
+body[data-theme="dark"] button {
+  color: var(--text-main);
+}
+body[data-theme="dark"] ::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+body[data-theme="dark"] input,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] select {
+  border-color: var(--border);
+}
+body[data-theme="dark"] .theme-toggle,
+body[data-theme="dark"] .theme-btn {
+  color: var(--text-muted);
+}
+body[data-theme="dark"] .theme-toggle:hover,
+body[data-theme="dark"] .theme-btn:hover {
+  color: var(--text-main);
 }
 
 /* Scroll-Spy: Aktive Seite im Inhaltsverzeichnis */

@@ -275,8 +275,27 @@
     body[data-theme="dark"] .summary-chip,
     body[data-theme="dark"] .page-meta,
     body[data-theme="dark"] .toc-entry-meta,
-    body[data-theme="dark"] .footnote-text {
+    body[data-theme="dark"] .footnote-text,
+    body[data-theme="dark"] .reader-intro p,
+    body[data-theme="dark"] .source-status,
+    body[data-theme="dark"] .side-title,
+    body[data-theme="dark"] .stat-tile span,
+    body[data-theme="dark"] .checklist label,
+    body[data-theme="dark"] .range-field span,
+    body[data-theme="dark"] .edition-subheading,
+    body[data-theme="dark"] .unit-meta {
       color: #cdbdac;
+    }
+    body[data-theme="dark"] .reader-btn.primary,
+    body[data-theme="dark"] .mode-btn.is-active {
+      color: var(--reader-accent-soft);
+    }
+    body[data-theme="dark"] .toc-list a,
+    body[data-theme="dark"] .edition-heading,
+    body[data-theme="dark"] .summary-title,
+    body[data-theme="dark"] .stat-tile strong,
+    body[data-theme="dark"] .source-status strong {
+      color: var(--reader-ink);
     }
     .stat-grid {
       display: grid;
@@ -616,7 +635,6 @@
       <li><a href="index.html">Start</a></li>
       <li><a href="text.html" class="current">Text lesen</a></li>
       <li><a href="search.html">Suche</a></li>
-      <li><a href="network.html">Netzwerk</a></li>
     </ul>
   </nav>
 </header>
