@@ -749,7 +749,7 @@ function normalizeEntry(raw) {
     work_short_title: raw.work_short_title || raw.work_title || 'Unbekanntes Werk',
     text: formatSearchText(raw.text),
     title: formatSearchText(raw.title || ''),
-    sigel: raw.sigel || (raw.band ? `TWA ${raw.band}` : `PDF ${raw.page_pdf}`),
+    sigel: raw.sigel || (raw.siglum ? raw.siglum : (raw.band ? `Band ${raw.band}` : `PDF ${raw.page_pdf}`)),
     page_pdf: Number(raw.page_pdf) || 1,
     page_book: raw.page_book ?? null,
     level: raw.level ?? null,
@@ -757,6 +757,12 @@ function normalizeEntry(raw) {
     page_kind: raw.page_kind || 'body',
     label: raw.label || 'paragraph'
   };
+}
+
+function displayWorkLabel(work) {
+  const siglum = work?.siglum || '';
+  const title = work?.title || 'Unbekanntes Werk';
+  return siglum ? `${siglum} · ${title}` : title;
 }
 
 function humanLabel(label) {
@@ -864,7 +870,7 @@ function renderWorkOptions() {
   const select = document.getElementById('work-filter');
   const options = [
     `<option value="all">Gesamte Edition</option>`,
-    ...state.works.map(work => `<option value="${escapeHtml(work.work_id)}">${escapeHtml(work.title)}</option>`)
+    ...state.works.map(work => `<option value="${escapeHtml(work.work_id)}">${escapeHtml(displayWorkLabel(work))}</option>`)
   ];
   select.innerHTML = options.join('');
   if (state.workFilter !== 'all' && state.worksById[state.workFilter]) {
@@ -1192,7 +1198,7 @@ function renderSummary(results) {
           </p>
         </div>
         <div class="chip-row">
-          <span class="section-chip">${work ? escapeHtml(work.siglum || `TWA ${work.band}`) : `${state.works.length} Werke`}</span>
+          <span class="section-chip">${work ? escapeHtml(work.siglum || work.title) : `${state.works.length} Werke`}</span>
           <span class="section-chip">${work ? work.stats.pages_total : state.edition.metadata?.stats?.pages_total || 0} Seiten</span>
           <span class="section-chip">${work ? work.stats.search_entries : state.entries.length} Suchstellen</span>
         </div>

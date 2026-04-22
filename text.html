@@ -737,10 +737,16 @@ function inferBand(metadata, pages) {
   if (fromTitle) return fromTitle[1];
   const sigelPage = pages.find(page => page.sigel);
   if (sigelPage?.sigel) {
-    const match = sigelPage.sigel.match(/TWA\s*([0-9]+)/i);
+    const match = sigelPage.sigel.match(/[A-Z]{2,6}\s*([0-9]+)/i);
     if (match) return match[1];
   }
   return '5';
+}
+
+function displayWorkLabel(work) {
+  const siglum = work?.siglum || '';
+  const title = work?.title || 'Unbenanntes Werk';
+  return siglum ? `${siglum} · ${title}` : title;
 }
 
 function normalizeUnit(rawUnit, page, index) {
@@ -891,7 +897,7 @@ function renderWorkOptions() {
   }
 
   select.innerHTML = state.works.map(work => `
-    <option value="${escapeHtml(work.work_id)}">${escapeHtml(work.title)}</option>
+    <option value="${escapeHtml(work.work_id)}">${escapeHtml(displayWorkLabel(work))}</option>
   `).join('');
 
   if (state.selectedWorkId && state.worksById[state.selectedWorkId]) {
@@ -905,7 +911,8 @@ function renderWorkOptions() {
 
 function resolveSigel(page) {
   if (page.sigel) return page.sigel;
-  if (page.page_book != null) return `TWA ${state.corpus.band}, ${page.page_book}`;
+  const fallbackSiglum = state.selectedWork?.siglum || (state.corpus.band ? `Band ${state.corpus.band}` : 'Band');
+  if (page.page_book != null) return `${fallbackSiglum}, ${page.page_book}`;
   return `PDF ${page.page_pdf}`;
 }
 

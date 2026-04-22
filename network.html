@@ -541,6 +541,12 @@ function getRequestedWorkId() {
   return new URLSearchParams(window.location.search).get('work') || '';
 }
 
+function displayWorkLabel(work) {
+  const siglum = work?.siglum || '';
+  const title = work?.title || 'Unbenanntes Werk';
+  return siglum ? `${siglum} · ${title}` : title;
+}
+
 function updateWorkUrl(workId) {
   const url = new URL(window.location.href);
   if (workId) url.searchParams.set('work', workId);
@@ -906,7 +912,7 @@ async function loadCorpus() {
     selectedWorkId = getRequestedWorkId() || editionPayload.data.metadata?.default_work_id || editionWorks[0]?.work_id || '';
 
     workSelect.innerHTML = editionWorks.map(work => `
-      <option value="${work.work_id}">${work.title}</option>
+      <option value="${work.work_id}">${displayWorkLabel(work)}</option>
     `).join('') || '<option value="">Kein Werk gefunden</option>';
 
     if (selectedWorkId && worksById[selectedWorkId]) {
