@@ -386,12 +386,6 @@
       text-transform: uppercase;
       line-height: 1.6;
     }
-    .page-actions,
-    .unit-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
     .page-kind-chip,
     .unit-badge {
       display: none;
@@ -510,29 +504,6 @@
       font-size: 1.04rem;
       line-height: 1.65;
     }
-    .copy-feedback {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 30;
-      max-width: min(420px, calc(100vw - 36px));
-      padding: 12px 14px;
-      border: 1px solid var(--reader-rule);
-      border-radius: 0;
-      background: rgba(246, 240, 229, 0.96);
-      color: var(--reader-ink);
-      font-family: var(--font-text);
-      font-size: 1rem;
-      line-height: 1.5;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 0.18s ease, transform 0.18s ease;
-    }
-    .copy-feedback.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
     .empty-state {
       padding: 0;
       color: var(--reader-muted);
@@ -585,9 +556,7 @@
         align-items: flex-start;
         flex-direction: column;
       }
-      .summary-strip,
-      .page-actions,
-      .unit-actions {
+      .summary-strip {
         gap: 10px;
       }
     }
@@ -657,17 +626,6 @@
           <label><input type="checkbox" id="toggle-footnotes" checked> Fußnoten anzeigen</label>
           <label><input type="checkbox" id="toggle-tags"> Struktur-Tags anzeigen</label>
         </div>
-        <div class="range-grid">
-          <div class="range-field">
-            <span>Startansicht</span>
-            <label><input type="number" id="start-page" min="1" value="1"></label>
-          </div>
-          <div class="range-field">
-            <span>Anzahl Seiten</span>
-            <label><input type="number" id="page-count" min="1" max="800" value="24"></label>
-          </div>
-        </div>
-        <button class="reader-btn primary" id="render-range" type="button" style="margin-top:14px;">Ausschnitt rendern</button>
       </section>
 
       <section class="side-card">
@@ -743,8 +701,6 @@
   </div>
 </main>
 
-<div class="copy-feedback" id="copy-feedback" aria-live="polite"></div>
-
 <script src="assets/edition-data.js"></script>
 <script>
 const state = {
@@ -758,7 +714,6 @@ const state = {
   mode: 'normalized',
   showFootnotes: true,
   showTags: false,
-  copyFeedbackTimer: null,
 };
 
 const CURATED_OUTLINES = {
@@ -1081,27 +1036,6 @@ function setJumpStatus(html, className = '') {
   el.innerHTML = html;
 }
 
-function showCopyFeedback(message) {
-  const el = document.getElementById('copy-feedback');
-  el.textContent = message;
-  el.classList.add('is-visible');
-  if (state.copyFeedbackTimer) clearTimeout(state.copyFeedbackTimer);
-  state.copyFeedbackTimer = setTimeout(() => {
-    el.classList.remove('is-visible');
-  }, 2200);
-}
-
-async function copyToClipboard(text, feedback) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showCopyFeedback(feedback);
-    return true;
-  } catch (error) {
-    showCopyFeedback('Kopieren fehlgeschlagen.');
-    return false;
-  }
-}
-
 function renderWorkOptions() {
   const select = document.getElementById('work-select');
   if (!state.works.length) {
@@ -1186,19 +1120,7 @@ function ensureHashPageIsVisible() {
   if (!state.corpus) return false;
   const hashId = window.location.hash.replace(/^#/, '');
   if (!hashId) return false;
-  const targetPage = findPageByHashTarget(hashId);
-  if (!targetPage) return false;
-  const hashPage = Number(targetPage.page_pdf);
-
-  const startInput = document.getElementById('start-page');
-  const countInput = document.getElementById('page-count');
-  const count = Math.max(1, Number(countInput.value) || 24);
-  const start = Math.max(1, Number(startInput.value) || 1);
-  const end = start + count - 1;
-
-  if (hashPage >= start && hashPage <= end) return false;
-  startInput.value = Math.max(1, hashPage - Math.min(2, count - 1));
-  return true;
+  return Boolean(findPageByHashTarget(hashId));
 }
 
 function focusHashTarget() {
@@ -1217,8 +1139,7 @@ function focusHashTarget() {
 
 function handleHashNavigation() {
   if (!state.corpus) return;
-  const changedRange = ensureHashPageIsVisible();
-  if (changedRange) renderAll();
+  ensureHashPageIsVisible();
   focusHashTarget();
 }
 
@@ -1236,9 +1157,6 @@ function renderSummary() {
   const sourcePdf = state.selectedWork?.pdf_filename || state.corpus.metadata.pdf_filename || state.corpus.metadata.source_pdf || 'keine Quelle notiert';
   const series = state.selectedWork?.series || state.corpus.metadata?.series || '';
   const summary = document.getElementById('reader-summary');
-  const start = Number(document.getElementById('start-page').value) || 1;
-  const count = Number(document.getElementById('page-count').value) || 24;
-  const end = start + count - 1;
 
   summary.innerHTML = `
     <div class="summary-head">
@@ -1246,7 +1164,7 @@ function renderSummary() {
         <h2 class="summary-title">${escapeHtml(title)}</h2>
         <p class="summary-subtitle">
           Diese Lesefassung wird direkt aus <strong>${escapeHtml(state.sourceLabel)}</strong> gerendert.
-          Sichtbar ist aktuell der Ausschnitt ${start} bis ${end} innerhalb des geladenen Werkflusses.
+          Angezeigt wird der gesamte editorische Werktext als durchlaufende digitale Lesefassung.
         </p>
       </div>
       <div class="summary-strip">
@@ -1363,12 +1281,6 @@ function renderUnit(unit, page) {
   const rawClass = state.mode === 'raw' ? ' is-raw' : '';
   const badge = state.showTags ? `<div class="unit-badge">${escapeHtml(textLabel(unit))}</div>` : '';
   const citation = buildCitation(unit, page);
-  const actionBar = `
-    <div class="unit-actions">
-      <button class="unit-action-btn" type="button" data-copy-citation="${escapeHtml(unit.unit_id)}">Zitat kopieren</button>
-      <button class="unit-action-btn" type="button" data-copy-link="${escapeHtml(unit.unit_id)}">Link kopieren</button>
-    </div>
-  `;
 
   if (unit.label === 'heading') {
     const level = Math.min(Math.max(unit.level || 2, 1), 5);
@@ -1376,7 +1288,6 @@ function renderUnit(unit, page) {
       <section class="unit unit-heading" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
         ${badge}
         <h3 class="edition-heading heading-l${level}">${text}</h3>
-        ${actionBar}
       </section>
     `;
   }
@@ -1386,7 +1297,6 @@ function renderUnit(unit, page) {
       <section class="unit unit-frontmatter" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
         ${badge}
         <div class="frontmatter-text${rawClass}">${text}</div>
-        ${actionBar}
       </section>
     `;
   }
@@ -1402,7 +1312,6 @@ function renderUnit(unit, page) {
           <span>Referenz ${escapeHtml(pageRef)}</span>
         </div>
         <div class="toc-entry-title${rawClass}">${formatText(title, state.mode)}</div>
-        ${actionBar}
       </section>
     `;
   }
@@ -1415,7 +1324,6 @@ function renderUnit(unit, page) {
     <section class="unit unit-paragraph" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
       ${badge}
       <p class="${rawClass.trim()}">${text}</p>
-      ${actionBar}
     </section>
   `;
 }
@@ -1444,7 +1352,6 @@ function renderPage(page) {
   const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
   const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
 
-  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}` : ''}${gwPage && oaPage ? ', ' : ''}${oaPage ? `OA ${oaPage}` : ''}`;
   return `
     <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
       <aside class="page-rail">
@@ -1454,10 +1361,6 @@ function renderPage(page) {
           ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
           ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${page.units.length} Units
-        </div>
-        <div class="page-actions">
-          <button class="unit-action-btn" type="button" data-copy-page-citation="${escapeHtml(page.page_pdf)}" data-page-citation="${escapeHtml(pageCitation)}">Seite zitieren</button>
-          <button class="unit-action-btn" type="button" data-copy-page-link="${escapeHtml(page.page_pdf)}">Seitenlink</button>
         </div>
         <div class="page-kind-chip">${escapeHtml(page.page_kind || 'body')}</div>
       </aside>
@@ -1507,19 +1410,15 @@ function renderPages() {
     return;
   }
 
-  const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
-  const count = Math.max(1, Number(document.getElementById('page-count').value) || 24);
   const selectedSeries = state.selectedWork?.series || state.corpus.metadata?.series || '';
   const pages = state.corpus.pages
-    .filter(page => page.page_pdf >= start)
-    .filter(page => shouldRenderReaderPage(page, selectedSeries))
-    .slice(0, count);
+    .filter(page => shouldRenderReaderPage(page, selectedSeries));
 
   if (!pages.length) {
     container.innerHTML = `
       <div class="empty-state">
-        <strong>Keine Seiten im gewählten Bereich.</strong><br>
-        Die aktuelle Startansicht liegt außerhalb des geladenen Werkes.
+        <strong>Keine darstellbaren Seiten gefunden.</strong><br>
+        Im aktuellen Werk stehen nach der Filterung keine geeigneten Leseseiten bereit.
       </div>
     `;
     return;
@@ -1529,50 +1428,11 @@ function renderPages() {
   syncVisiblePage();
 }
 
-async function handleReaderAction(event) {
-  const copyCitationTarget = event.target.closest('[data-copy-citation]');
-  if (copyCitationTarget) {
-    const unitId = copyCitationTarget.dataset.copyCitation;
-    const unit = document.getElementById(unitId);
-    if (!unit) return;
-    await copyToClipboard(unit.dataset.citation || '', 'Zitatangabe kopiert.');
-    return;
-  }
-
-  const copyLinkTarget = event.target.closest('[data-copy-link]');
-  if (copyLinkTarget) {
-    const unitId = copyLinkTarget.dataset.copyLink;
-    const url = new URL(window.location.href);
-    url.hash = unitId;
-    await copyToClipboard(String(url), 'Direktlink zur Textstelle kopiert.');
-    return;
-  }
-
-  const copyPageCitationTarget = event.target.closest('[data-copy-page-citation]');
-  if (copyPageCitationTarget) {
-    await copyToClipboard(copyPageCitationTarget.dataset.pageCitation || '', 'Seitenzitat kopiert.');
-    return;
-  }
-
-  const copyPageLinkTarget = event.target.closest('[data-copy-page-link]');
-  if (copyPageLinkTarget) {
-    const pageId = copyPageLinkTarget.dataset.copyPageLink;
-    const url = new URL(window.location.href);
-    url.hash = `page-${pageId}`;
-    await copyToClipboard(String(url), 'Direktlink zur Seite kopiert.');
-  }
-}
-
 function jumpToResolvedPage(page, sourceLabel) {
   if (!page) {
     setJumpStatus('<strong>Keine passende Stelle gefunden.</strong><br>Bitte Referenz prüfen.', 'is-warning');
     return;
   }
-  document.getElementById('start-page').value = page.page_pdf;
-  if ((Number(document.getElementById('page-count').value) || 24) < 8) {
-    document.getElementById('page-count').value = 8;
-  }
-  renderAll();
   setJumpStatus(
     `<strong>Gefunden:</strong> ${escapeHtml(sourceLabel)}${page.gw_page ? ` → GW ${escapeHtml(page.gw_page)}` : ''}${page.oa_page ? ` · OA ${escapeHtml(page.oa_page)}` : ''}`,
     'is-ready'
@@ -1721,15 +1581,12 @@ function bindEvents() {
     if (!nextWorkId || !state.worksById[nextWorkId]) return;
     state.selectedWorkId = nextWorkId;
     state.selectedWork = state.worksById[nextWorkId];
-    document.getElementById('start-page').value = 1;
     updateWorkUrl(nextWorkId);
     await loadSelectedWork();
   });
 
-  document.getElementById('render-range').addEventListener('click', renderAll);
   document.getElementById('reload-source').addEventListener('click', handleAutoReload);
   document.getElementById('jump-to-page').addEventListener('click', handleJumpToPage);
-  document.getElementById('reader-pages').addEventListener('click', handleReaderAction);
 
   window.addEventListener('scroll', syncVisiblePage, { passive: true });
   window.addEventListener('hashchange', handleHashNavigation);

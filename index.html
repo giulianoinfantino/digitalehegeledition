@@ -623,7 +623,7 @@
           <div><strong>Haupttext-Seiten:</strong> ${escapeHtml(String(work.stats.pages_body || 0))}</div>
           <div><strong>Überschriften:</strong> ${escapeHtml(String(work.stats.headings || 0))}</div>
           <div><strong>Fußnoten:</strong> ${escapeHtml(String(work.stats.footnotes || 0))}</div>
-          <div><strong>Druckseiten:</strong> ${work.stats.page_book_min != null && work.stats.page_book_max != null
+          <div><strong>OA-Führung:</strong> ${work.stats.page_book_min != null && work.stats.page_book_max != null
             ? `${escapeHtml(String(work.stats.page_book_min))}–${escapeHtml(String(work.stats.page_book_max))}`
             : 'noch nicht erschlossen'}</div>
         </div>

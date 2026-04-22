@@ -782,16 +782,6 @@
           <label><input type="checkbox" id="exact-match"> Exakte Phrase</label>
           <label><input type="checkbox" id="case-sensitive"> Groß/Kleinschreibung beachten</label>
         </div>
-        <div class="range-grid">
-          <div class="range-field">
-            <span>Start PDF</span>
-            <label><input type="number" id="start-page" min="1" value="1"></label>
-          </div>
-          <div class="range-field">
-            <span>Ende PDF</span>
-            <label><input type="number" id="end-page" min="1" value="160"></label>
-          </div>
-        </div>
       </section>
 
       <section class="side-card">
@@ -1060,31 +1050,6 @@ function renderWorkOptions() {
   }
 }
 
-function updatePageRangeState() {
-  const work = currentWork();
-  const startInput = document.getElementById('start-page');
-  const endInput = document.getElementById('end-page');
-  const disabled = !work;
-
-  startInput.disabled = disabled;
-  endInput.disabled = disabled;
-
-  if (work) {
-    if (endInput.dataset.workId !== work.work_id) {
-      startInput.value = 1;
-      endInput.value = work.stats.pages_total;
-      endInput.dataset.workId = work.work_id;
-    } else {
-      if (!Number(startInput.value) || Number(startInput.value) < 1) startInput.value = 1;
-      if (!Number(endInput.value) || Number(endInput.value) > work.stats.pages_total) {
-        endInput.value = work.stats.pages_total;
-      }
-    }
-  } else {
-    delete endInput.dataset.workId;
-  }
-}
-
 function readControls() {
   state.query = document.getElementById('query-input').value.trim();
   state.exact = document.getElementById('exact-match').checked;
@@ -1097,7 +1062,6 @@ function readControls() {
   state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
   state.matchMode = document.getElementById('match-mode').value === 'any' ? 'any' : 'all';
   state.workFilter = document.getElementById('work-filter').value || 'all';
-  updatePageRangeState();
 }
 
 function buildSuggestions() {
@@ -1154,13 +1118,7 @@ function entryIsInScope(entry) {
   if (entry.label === 'footnote' && !state.includeFootnotes) return false;
 
   if (state.workFilter !== 'all' && entry.work_id !== state.workFilter) return false;
-
-  const work = currentWork();
-  if (!work) return true;
-
-  const start = Math.max(1, Number(document.getElementById('start-page').value) || 1);
-  const end = Math.max(start, Number(document.getElementById('end-page').value) || start);
-  return entry.page_pdf >= start && entry.page_pdf <= end;
+  return true;
 }
 
 function scoreEntry(entry, query) {
@@ -1486,8 +1444,8 @@ function renderResults() {
           <div class="result-sigel">${escapeHtml(entry.sigel)}</div>
           <div class="result-rail-meta">
             ${escapeHtml(entry.work_title)}<br>
-            PDF ${escapeHtml(entry.page_pdf)}<br>
-            ${entry.page_book != null ? `Druckseite ${escapeHtml(entry.page_book)}<br>` : ''}
+            ${entry.gw_page != null ? `GW ${escapeHtml(entry.gw_page)}<br>` : ''}
+            ${entry.oa_page != null ? `OA ${escapeHtml(entry.oa_page)}<br>` : ''}
             ${entry.page_ref != null ? `TOC-Ziel ${escapeHtml(entry.page_ref)}<br>` : ''}
             ${entry.level ? `Ebene ${escapeHtml(entry.level)}<br>` : ''}
             ${escapeHtml(entry.page_kind || 'body')}
@@ -1514,7 +1472,7 @@ function renderResults() {
             </div>
             <div class="result-meta-card">
               <strong>Stelle</strong>
-              ${escapeHtml(entry.sigel)} · PDF ${escapeHtml(entry.page_pdf)}${entry.page_book != null ? ` · Druckseite ${escapeHtml(entry.page_book)}` : ''}
+              ${escapeHtml(entry.sigel)}${entry.gw_page != null ? ` · GW ${escapeHtml(entry.gw_page)}` : ''}${entry.oa_page != null ? ` · OA ${escapeHtml(entry.oa_page)}` : ''}
             </div>
             <div class="result-meta-card">
               <strong>Textschicht</strong>
@@ -1616,8 +1574,6 @@ function bindEvents() {
     'include-footnotes',
     'sort-order',
     'match-mode',
-    'start-page',
-    'end-page',
     'work-filter'
   ].forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
