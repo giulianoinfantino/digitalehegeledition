@@ -151,6 +151,10 @@
     .mode-row {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .tool-grid {
+      display: grid;
+      gap: 12px;
+    }
     .mode-btn.is-active {
       background: rgba(142,32,32,0.08);
       border-color: rgba(142,32,32,0.38);
@@ -313,6 +317,11 @@
       font-weight: 600;
       color: var(--text-muted);
     }
+    .jump-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
     .reader-pages {
       display: grid;
       gap: 18px;
@@ -353,6 +362,36 @@
       font-size: 0.86rem;
       line-height: 1.5;
     }
+    .page-actions,
+    .unit-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .page-actions {
+      margin-top: 4px;
+    }
+    .reader-btn.ghost,
+    .unit-action-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.92);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    }
+    .reader-btn.ghost:hover,
+    .unit-action-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(142,32,32,0.38);
+      color: var(--accent);
+    }
     .page-kind-chip {
       display: inline-flex;
       width: fit-content;
@@ -371,6 +410,10 @@
     }
     .unit {
       margin: 0 0 14px;
+    }
+    .unit[data-cite-target] {
+      position: relative;
+      scroll-margin-top: 96px;
     }
     .unit:last-child {
       margin-bottom: 0;
@@ -490,6 +533,29 @@
       font-size: 1rem;
       line-height: 1.6;
     }
+    .copy-feedback {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      max-width: min(420px, calc(100vw - 36px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(142,32,32,0.2);
+      background: rgba(255,251,247,0.98);
+      box-shadow: 0 18px 38px rgba(26,26,26,0.12);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .copy-feedback.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
     .empty-state {
       padding: 34px 28px;
       color: var(--text-muted);
@@ -520,6 +586,7 @@
         border-bottom: 1px solid var(--border);
       }
       .range-grid,
+      .jump-grid,
       .stat-grid,
       .mode-row {
         grid-template-columns: 1fr;
@@ -610,6 +677,30 @@
       </section>
 
       <section class="side-card">
+        <h2 class="side-title">Editionswerkzeuge</h2>
+        <div class="tool-grid">
+          <div class="jump-grid">
+            <div class="range-field">
+              <span>GW-Seite</span>
+              <label><input type="text" id="jump-gw-page" placeholder="z. B. 147"></label>
+            </div>
+            <div class="range-field">
+              <span>OA-Seite</span>
+              <label><input type="text" id="jump-oa-page" placeholder="z. B. 226"></label>
+            </div>
+            <div class="range-field">
+              <span>PDF-Seite</span>
+              <label><input type="number" id="jump-pdf-page" min="1" placeholder="z. B. 153"></label>
+            </div>
+          </div>
+          <button class="reader-btn ghost" id="jump-to-page" type="button">Zur Stelle springen</button>
+          <div class="source-status" id="jump-status">
+            Navigiere direkt nach <strong>GW</strong>-, <strong>OA</strong>- oder <strong>PDF</strong>-Seite.
+          </div>
+        </div>
+      </section>
+
+      <section class="side-card">
         <h2 class="side-title">Korpusdaten</h2>
         <div class="stat-grid">
           <div class="stat-tile">
@@ -662,6 +753,8 @@
   </div>
 </main>
 
+<div class="copy-feedback" id="copy-feedback" aria-live="polite"></div>
+
 <script src="assets/edition-data.js"></script>
 <script>
 const state = {
@@ -675,6 +768,7 @@ const state = {
   mode: 'normalized',
   showFootnotes: true,
   showTags: true,
+  copyFeedbackTimer: null,
 };
 
 const EDITION_SOURCES = [
@@ -889,6 +983,33 @@ function setEditionStatus(html, className = '') {
   el.innerHTML = html;
 }
 
+function setJumpStatus(html, className = '') {
+  const el = document.getElementById('jump-status');
+  el.className = `source-status ${className}`.trim();
+  el.innerHTML = html;
+}
+
+function showCopyFeedback(message) {
+  const el = document.getElementById('copy-feedback');
+  el.textContent = message;
+  el.classList.add('is-visible');
+  if (state.copyFeedbackTimer) clearTimeout(state.copyFeedbackTimer);
+  state.copyFeedbackTimer = setTimeout(() => {
+    el.classList.remove('is-visible');
+  }, 2200);
+}
+
+async function copyToClipboard(text, feedback) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showCopyFeedback(feedback);
+    return true;
+  } catch (error) {
+    showCopyFeedback('Kopieren fehlgeschlagen.');
+    return false;
+  }
+}
+
 function renderWorkOptions() {
   const select = document.getElementById('work-select');
   if (!state.works.length) {
@@ -932,15 +1053,54 @@ function resolvePageAnchorByBook(pageRef) {
   return '';
 }
 
+function normalizeNumericToken(value) {
+  if (value === null || value === undefined) return null;
+  const match = String(value).match(/\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+function resolvePageByReference(kind, value) {
+  if (!state.corpus || value === null || value === undefined || value === '') return null;
+  const token = normalizeNumericToken(value);
+  if (token === null) return null;
+
+  if (kind === 'pdf') {
+    return state.corpus.pages.find(page => Number(page.page_pdf) === token) || null;
+  }
+  if (kind === 'gw') {
+    return state.corpus.pages.find(page => normalizeNumericToken(page.gw_page) === token) || null;
+  }
+  if (kind === 'oa') {
+    return state.corpus.pages.find(page => {
+      const oa = String(page.oa_page || '');
+      const matches = [...oa.matchAll(/\d+/g)].map(match => Number(match[0]));
+      return matches.includes(token);
+    }) || null;
+  }
+  return null;
+}
+
 function getHashPageTarget() {
   const match = window.location.hash.match(/^#page-(\d+)$/);
   return match ? Number(match[1]) : null;
 }
 
+function findPageByHashTarget(targetId) {
+  if (!state.corpus || !targetId) return null;
+  if (/^page-\d+$/.test(targetId)) {
+    const pagePdf = Number(targetId.replace('page-', ''));
+    return state.corpus.pages.find(page => Number(page.page_pdf) === pagePdf) || null;
+  }
+  return state.corpus.pages.find(page => (page.units || []).some(unit => unit.unit_id === targetId)) || null;
+}
+
 function ensureHashPageIsVisible() {
   if (!state.corpus) return false;
-  const hashPage = getHashPageTarget();
-  if (!hashPage) return false;
+  const hashId = window.location.hash.replace(/^#/, '');
+  if (!hashId) return false;
+  const targetPage = findPageByHashTarget(hashId);
+  if (!targetPage) return false;
+  const hashPage = Number(targetPage.page_pdf);
 
   const startInput = document.getElementById('start-page');
   const countInput = document.getElementById('page-count');
@@ -1009,6 +1169,7 @@ function renderSummary() {
       </div>
     </div>
     <div class="summary-strip">
+      <span class="summary-chip">Sigle ${escapeHtml(state.selectedWork?.siglum || `${series} ${state.corpus.band}`.trim())}</span>
       <span class="summary-chip">Quelle PDF: ${escapeHtml(sourcePdf)}</span>
       <span class="summary-chip">Fußnoten ${state.showFootnotes ? 'sichtbar' : 'ausgeblendet'}</span>
       <span class="summary-chip">Struktur-Tags ${state.showTags ? 'sichtbar' : 'ausgeblendet'}</span>
@@ -1042,26 +1203,46 @@ function renderToc() {
   }).join('');
 }
 
-function renderUnit(unit) {
+function buildCitation(unit, page) {
+  const siglum = state.selectedWork?.siglum || resolveSigel(page);
+  const locator = [];
+  if (page.gw_page) locator.push(`GW ${page.gw_page}`);
+  if (page.oa_page) locator.push(`OA ${page.oa_page}`);
+  locator.push(`PDF ${page.page_pdf}`);
+  if (page.page_book != null) locator.push(`Druckseite ${page.page_book}`);
+  const unitType = unit.label === 'heading' ? 'Überschrift' : unit.label === 'footnote' ? 'Fußnote' : 'Textstelle';
+  return `Hegel, ${siglum}, ${locator.join(', ')}, ${unitType}, Abschnitt ${unit.unit_id}`;
+}
+
+function renderUnit(unit, page) {
   const text = formatText(getUnitText(unit), state.mode);
   const rawClass = state.mode === 'raw' ? ' is-raw' : '';
   const badge = state.showTags ? `<div class="unit-badge">${escapeHtml(textLabel(unit))}</div>` : '';
+  const citation = buildCitation(unit, page);
+  const actionBar = `
+    <div class="unit-actions">
+      <button class="unit-action-btn" type="button" data-copy-citation="${escapeHtml(unit.unit_id)}">Zitat kopieren</button>
+      <button class="unit-action-btn" type="button" data-copy-link="${escapeHtml(unit.unit_id)}">Link kopieren</button>
+    </div>
+  `;
 
   if (unit.label === 'heading') {
     const level = Math.min(Math.max(unit.level || 2, 1), 5);
     return `
-      <section class="unit unit-heading">
+      <section class="unit unit-heading" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
         ${badge}
         <h3 class="edition-heading heading-l${level}">${text}</h3>
+        ${actionBar}
       </section>
     `;
   }
 
   if (unit.label === 'frontmatter') {
     return `
-      <section class="unit unit-frontmatter">
+      <section class="unit unit-frontmatter" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
         ${badge}
         <div class="frontmatter-text${rawClass}">${text}</div>
+        ${actionBar}
       </section>
     `;
   }
@@ -1070,13 +1251,14 @@ function renderUnit(unit) {
     const pageRef = unit.page_ref ?? unit.annotations?.[0]?.page_ref ?? '';
     const title = unit.title || unit.annotations?.[0]?.title || getUnitText(unit);
     return `
-      <section class="unit unit-toc-entry">
+      <section class="unit unit-toc-entry" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
         ${badge}
         <div class="toc-entry-meta">
           <span>TOC</span>
           <span>Druckseite ${escapeHtml(pageRef)}</span>
         </div>
         <div class="toc-entry-title${rawClass}">${formatText(title, state.mode)}</div>
+        ${actionBar}
       </section>
     `;
   }
@@ -1086,9 +1268,10 @@ function renderUnit(unit) {
   }
 
   return `
-    <section class="unit unit-paragraph">
+    <section class="unit unit-paragraph" id="${escapeHtml(unit.unit_id)}" data-cite-target="${escapeHtml(unit.unit_id)}" data-citation="${escapeHtml(citation)}">
       ${badge}
       <p class="${rawClass.trim()}">${text}</p>
+      ${actionBar}
     </section>
   `;
 }
@@ -1117,6 +1300,7 @@ function renderPage(page) {
   const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
   const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
 
+  const pageCitation = `Hegel, ${state.selectedWork?.siglum || resolveSigel(page)}, ${gwPage ? `GW ${gwPage}, ` : ''}${oaPage ? `OA ${oaPage}, ` : ''}PDF ${page.page_pdf}${page.page_book != null ? `, Druckseite ${page.page_book}` : ''}`;
   return `
     <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
       <aside class="page-rail">
@@ -1129,10 +1313,14 @@ function renderPage(page) {
           ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${page.units.length} Units
         </div>
+        <div class="page-actions">
+          <button class="unit-action-btn" type="button" data-copy-page-citation="${escapeHtml(page.page_pdf)}" data-page-citation="${escapeHtml(pageCitation)}">Seite zitieren</button>
+          <button class="unit-action-btn" type="button" data-copy-page-link="${escapeHtml(page.page_pdf)}">Seitenlink</button>
+        </div>
         <div class="page-kind-chip">${escapeHtml(page.page_kind || 'body')}</div>
       </aside>
       <div class="page-flow">
-        ${mainUnits.map(renderUnit).join('')}
+        ${mainUnits.map(unit => renderUnit(unit, page)).join('')}
         ${renderFootnotes(footnotes)}
       </div>
     </article>
@@ -1197,6 +1385,78 @@ function renderPages() {
 
   container.innerHTML = pages.map(renderPage).join('');
   syncVisiblePage();
+}
+
+async function handleReaderAction(event) {
+  const copyCitationTarget = event.target.closest('[data-copy-citation]');
+  if (copyCitationTarget) {
+    const unitId = copyCitationTarget.dataset.copyCitation;
+    const unit = document.getElementById(unitId);
+    if (!unit) return;
+    await copyToClipboard(unit.dataset.citation || '', 'Zitatangabe kopiert.');
+    return;
+  }
+
+  const copyLinkTarget = event.target.closest('[data-copy-link]');
+  if (copyLinkTarget) {
+    const unitId = copyLinkTarget.dataset.copyLink;
+    const url = new URL(window.location.href);
+    url.hash = unitId;
+    await copyToClipboard(String(url), 'Direktlink zur Textstelle kopiert.');
+    return;
+  }
+
+  const copyPageCitationTarget = event.target.closest('[data-copy-page-citation]');
+  if (copyPageCitationTarget) {
+    await copyToClipboard(copyPageCitationTarget.dataset.pageCitation || '', 'Seitenzitat kopiert.');
+    return;
+  }
+
+  const copyPageLinkTarget = event.target.closest('[data-copy-page-link]');
+  if (copyPageLinkTarget) {
+    const pageId = copyPageLinkTarget.dataset.copyPageLink;
+    const url = new URL(window.location.href);
+    url.hash = `page-${pageId}`;
+    await copyToClipboard(String(url), 'Direktlink zur Seite kopiert.');
+  }
+}
+
+function jumpToResolvedPage(page, sourceLabel) {
+  if (!page) {
+    setJumpStatus('<strong>Keine passende Stelle gefunden.</strong><br>Bitte Referenz prüfen.', 'is-warning');
+    return;
+  }
+  document.getElementById('start-page').value = page.page_pdf;
+  if ((Number(document.getElementById('page-count').value) || 24) < 8) {
+    document.getElementById('page-count').value = 8;
+  }
+  renderAll();
+  setJumpStatus(
+    `<strong>Gefunden:</strong> ${escapeHtml(sourceLabel)} → PDF ${escapeHtml(page.page_pdf)}${page.gw_page ? ` · GW ${escapeHtml(page.gw_page)}` : ''}${page.oa_page ? ` · OA ${escapeHtml(page.oa_page)}` : ''}`,
+    'is-ready'
+  );
+  window.location.hash = `page-${page.page_pdf}`;
+  handleHashNavigation();
+}
+
+function handleJumpToPage() {
+  const gwValue = document.getElementById('jump-gw-page').value.trim();
+  const oaValue = document.getElementById('jump-oa-page').value.trim();
+  const pdfValue = document.getElementById('jump-pdf-page').value.trim();
+
+  if (gwValue) {
+    jumpToResolvedPage(resolvePageByReference('gw', gwValue), `GW ${gwValue}`);
+    return;
+  }
+  if (oaValue) {
+    jumpToResolvedPage(resolvePageByReference('oa', oaValue), `OA ${oaValue}`);
+    return;
+  }
+  if (pdfValue) {
+    jumpToResolvedPage(resolvePageByReference('pdf', pdfValue), `PDF ${pdfValue}`);
+    return;
+  }
+  setJumpStatus('<strong>Bitte eine Referenz eingeben.</strong><br>GW, OA oder PDF.', 'is-warning');
 }
 
 function renderAll() {
@@ -1331,6 +1591,8 @@ function bindEvents() {
 
   document.getElementById('render-range').addEventListener('click', renderAll);
   document.getElementById('reload-source').addEventListener('click', handleAutoReload);
+  document.getElementById('jump-to-page').addEventListener('click', handleJumpToPage);
+  document.getElementById('reader-pages').addEventListener('click', handleReaderAction);
 
   window.addEventListener('scroll', syncVisiblePage, { passive: true });
   window.addEventListener('hashchange', handleHashNavigation);
