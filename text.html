@@ -668,6 +668,11 @@
 
 <script>
 const state = {
+  edition: null,
+  works: [],
+  worksById: {},
+  selectedWorkId: '',
+  selectedWork: null,
   corpus: null,
   sourceLabel: '',
   mode: 'normalized',
@@ -675,11 +680,13 @@ const state = {
   showTags: true,
 };
 
-const AUTO_SOURCES = [
-  { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
-  { label: 'Web-Export', path: '../out/web.json' },
-  { label: 'Site-Daten v2', path: 'data/twa_band_5_v2.json' },
-  { label: 'Site-Daten v1', path: 'data/twa_band_5_v1.json' }
+const EDITION_SOURCES = [
+  { label: 'Editionskatalog', path: '../out/edition.json' }
+];
+
+const FALLBACK_SOURCES = [
+  { label: 'Standard-Export', path: '../out/master.json' },
+  { label: 'Web-Export', path: '../out/web.json' }
 ];
 
 function escapeHtml(value) {
@@ -819,6 +826,62 @@ function normalizeCorpus(raw) {
   };
 }
 
+async function fetchFirstAvailable(sources) {
+  for (const source of sources) {
+    try {
+      const response = await fetch(`${source.path}?v=${Date.now()}`);
+      if (!response.ok) continue;
+      return { data: await response.json(), source };
+    } catch (error) {
+      // Try next source silently.
+    }
+  }
+  return null;
+}
+
+function getRequestedWorkId() {
+  return new URLSearchParams(window.location.search).get('work') || '';
+}
+
+function updateWorkUrl(workId) {
+  const url = new URL(window.location.href);
+  if (workId) url.searchParams.set('work', workId);
+  else url.searchParams.delete('work');
+  history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+}
+
+function setSourceStatus(html, className = '') {
+  const el = document.getElementById('source-status');
+  el.className = `source-status ${className}`.trim();
+  el.innerHTML = html;
+}
+
+function setEditionStatus(html, className = '') {
+  const el = document.getElementById('edition-status');
+  el.className = `source-status ${className}`.trim();
+  el.innerHTML = html;
+}
+
+function renderWorkOptions() {
+  const select = document.getElementById('work-select');
+  if (!state.works.length) {
+    select.innerHTML = '<option value="">Kein Werkkatalog geladen</option>';
+    return;
+  }
+
+  select.innerHTML = state.works.map(work => `
+    <option value="${escapeHtml(work.work_id)}">${escapeHtml(work.title)}</option>
+  `).join('');
+
+  if (state.selectedWorkId && state.worksById[state.selectedWorkId]) {
+    select.value = state.selectedWorkId;
+  } else {
+    state.selectedWorkId = state.works[0].work_id;
+    state.selectedWork = state.works[0];
+    select.value = state.selectedWorkId;
+  }
+}
+
 function resolveSigel(page) {
   if (page.sigel) return page.sigel;
   if (page.page_book != null) return `TWA ${state.corpus.band}, ${page.page_book}`;
@@ -839,12 +902,6 @@ function resolvePageAnchorByBook(pageRef) {
     return `page-${candidates[0].page.page_pdf}`;
   }
   return '';
-}
-
-function setSourceStatus(html, className = '') {
-  const el = document.getElementById('source-status');
-  el.className = `source-status ${className}`.trim();
-  el.innerHTML = html;
 }
 
 function getHashPageTarget() {
@@ -899,8 +956,8 @@ function updateStats() {
 
 function renderSummary() {
   if (!state.corpus) return;
-  const title = state.corpus.metadata.title || 'Unbenanntes Korpus';
-  const sourcePdf = state.corpus.metadata.source_pdf || 'keine Quelle notiert';
+  const title = state.selectedWork?.title || state.corpus.metadata.title || 'Unbenanntes Korpus';
+  const sourcePdf = state.selectedWork?.pdf_filename || state.corpus.metadata.pdf_filename || state.corpus.metadata.source_pdf || 'keine Quelle notiert';
   const summary = document.getElementById('reader-summary');
   const start = Number(document.getElementById('start-page').value) || 1;
   const count = Number(document.getElementById('page-count').value) || 24;
@@ -1072,7 +1129,7 @@ function renderPages() {
     container.innerHTML = `
       <div class="empty-state">
         <strong>Kein Korpus geladen.</strong><br>
-        Bitte eine JSON-Datei auswählen oder den automatischen Reload benutzen.
+        Bitte ein Werk auswählen, neu laden oder eine JSON-Datei manuell öffnen.
       </div>
     `;
     return;
@@ -1088,7 +1145,7 @@ function renderPages() {
     container.innerHTML = `
       <div class="empty-state">
         <strong>Keine Seiten im gewählten Bereich.</strong><br>
-        Der aktuelle Startwert liegt außerhalb des geladenen Korpus.
+        Der aktuelle Startwert liegt außerhalb des geladenen Werkes.
       </div>
     `;
     return;
@@ -1116,30 +1173,62 @@ function setCorpus(raw, sourceLabel) {
   handleHashNavigation();
 }
 
-async function autoLoadCorpus() {
-  for (const source of AUTO_SOURCES) {
-    try {
-      const response = await fetch(`${source.path}?v=${Date.now()}`);
-      if (!response.ok) continue;
-      const json = await response.json();
-      setCorpus(json, source.label);
+async function loadSelectedWork() {
+  if (state.selectedWork?.paths?.master) {
+    const payload = await fetchFirstAvailable([
+      { label: state.selectedWork.title, path: `../out/${state.selectedWork.paths.master}` }
+    ]);
+    if (payload) {
+      setCorpus(payload.data, `${state.selectedWork.title} · ${payload.source.label}`);
       return true;
-    } catch (error) {
-      // Try next source silently.
     }
+  }
+
+  const fallback = await fetchFirstAvailable(FALLBACK_SOURCES);
+  if (fallback) {
+    setCorpus(fallback.data, fallback.source.label);
+    return true;
   }
   return false;
 }
 
+async function initializeEdition() {
+  const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
+  if (!editionPayload) {
+    setEditionStatus('Kein Editionskatalog gefunden. Es wird auf den Standard-Export zurückgefallen.', 'is-warning');
+    return false;
+  }
+
+  state.edition = editionPayload.data;
+  state.works = state.edition.works || [];
+  state.worksById = Object.fromEntries(state.works.map(work => [work.work_id, work]));
+  state.selectedWorkId = getRequestedWorkId() || state.edition.metadata?.default_work_id || state.works[0]?.work_id || '';
+  state.selectedWork = state.worksById[state.selectedWorkId] || state.works[0] || null;
+  if (state.selectedWork) {
+    state.selectedWorkId = state.selectedWork.work_id;
+    updateWorkUrl(state.selectedWorkId);
+  }
+
+  renderWorkOptions();
+  setEditionStatus(
+    `<strong>Geladen:</strong> ${escapeHtml(editionPayload.source.label)}<br>${escapeHtml(String(state.works.length))} Werke in der Edition.`,
+    'is-ready'
+  );
+  return true;
+}
+
 async function handleAutoReload() {
-  setSourceStatus('Versuche, JSON automatisch zu laden…');
-  const loaded = await autoLoadCorpus();
+  setSourceStatus('Lade Werkdatei…');
+  const hasEdition = await initializeEdition();
+  const loaded = await loadSelectedWork();
 
   if (!loaded) {
     const hint = window.location.protocol === 'file:'
-      ? 'Direkt über <code>file://</code> geöffnet: bitte die Datei <code>out/master.json</code> manuell auswählen.'
-      : 'Kein passender JSON-Pfad gefunden. Bitte <code>out/master.json</code> manuell auswählen.';
-    setSourceStatus(`<strong>Automatisches Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
+      ? 'Direkt über <code>file://</code> geöffnet: bitte einen lokalen Server verwenden oder eine JSON-Datei manuell auswählen.'
+      : 'Keine passende Werkdatei gefunden.';
+    setSourceStatus(`<strong>Laden fehlgeschlagen.</strong><br>${hint}`, 'is-warning');
+  } else if (!hasEdition) {
+    setEditionStatus('Editionskatalog nicht verfügbar; der Reader zeigt den Standard-Export.', 'is-warning');
   }
 }
 
@@ -1166,6 +1255,16 @@ function bindEvents() {
   document.getElementById('toggle-tags').addEventListener('change', event => {
     state.showTags = event.target.checked;
     renderAll();
+  });
+
+  document.getElementById('work-select').addEventListener('change', async event => {
+    const nextWorkId = event.target.value;
+    if (!nextWorkId || !state.worksById[nextWorkId]) return;
+    state.selectedWorkId = nextWorkId;
+    state.selectedWork = state.worksById[nextWorkId];
+    document.getElementById('start-page').value = 1;
+    updateWorkUrl(nextWorkId);
+    await loadSelectedWork();
   });
 
   document.getElementById('render-range').addEventListener('click', renderAll);

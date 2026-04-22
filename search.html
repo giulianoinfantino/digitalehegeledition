@@ -759,10 +759,18 @@ function updatePageRangeState() {
   endInput.disabled = disabled;
 
   if (work) {
-    if (!Number(startInput.value) || Number(startInput.value) < 1) startInput.value = 1;
-    if (!Number(endInput.value) || Number(endInput.value) > work.stats.pages_total) {
+    if (endInput.dataset.workId !== work.work_id) {
+      startInput.value = 1;
       endInput.value = work.stats.pages_total;
+      endInput.dataset.workId = work.work_id;
+    } else {
+      if (!Number(startInput.value) || Number(startInput.value) < 1) startInput.value = 1;
+      if (!Number(endInput.value) || Number(endInput.value) > work.stats.pages_total) {
+        endInput.value = work.stats.pages_total;
+      }
     }
+  } else {
+    delete endInput.dataset.workId;
   }
 }
 

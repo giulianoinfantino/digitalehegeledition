@@ -208,6 +208,21 @@
       line-height: 1.6;
       margin: 0;
     }
+    .panel-select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.88);
+      color: var(--text-main);
+      font-size: 0.98rem;
+      font-family: var(--font-ui);
+      box-sizing: border-box;
+    }
+    .panel-select:focus {
+      outline: none;
+      border-color: rgba(142,32,32,0.4);
+    }
     .term-list,
     .connection-list {
       list-style: none;
@@ -440,6 +455,14 @@
       </section>
 
       <section class="panel-section">
+        <h2 class="panel-title">Werk</h2>
+        <select class="panel-select" id="work-select">
+          <option value="">Werkliste wird geladen…</option>
+        </select>
+        <p class="small-note" id="work-status" style="margin-top:10px;">Editionskatalog wird geladen.</p>
+      </section>
+
+      <section class="panel-section">
         <h2 class="panel-title">Auswahl</h2>
         <p class="panel-lead" id="selection-title">Kein Begriff ausgewählt</p>
         <p class="panel-subtle" id="selection-copy">Klicke auf einen Knoten oder auf einen Begriff in der Liste, um seine stärksten Verbindungen zu sehen.</p>
@@ -475,6 +498,9 @@ const keyTerms = [
   "Objektivität", "Idee", "Natur", "Geist", "Identität", "Unterschied", "Notwendigkeit", "Freiheit"
 ];
 
+const EDITION_SOURCES = [
+  { label: 'Editionskatalog', path: '../out/edition.json' }
+];
 const AUTO_SOURCES = [
   { label: 'Aktueller Extraktor-Export', path: '../out/master.json' },
   { label: 'Web-Export', path: '../out/web.json' },
@@ -490,6 +516,8 @@ const selectionCopy = document.getElementById('selection-copy');
 const metricNodes = document.getElementById('metric-nodes');
 const metricLinks = document.getElementById('metric-links');
 const metricBlocks = document.getElementById('metric-blocks');
+const workSelect = document.getElementById('work-select');
+const workStatus = document.getElementById('work-status');
 
 let rawNodes = [];
 let rawLinks = [];
@@ -500,9 +528,36 @@ let linkSelection = null;
 let nodeSelection = null;
 let selectedTerm = null;
 let totalBlocks = 0;
+let editionWorks = [];
+let worksById = {};
+let selectedWorkId = '';
 
 function escapeRegex(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getRequestedWorkId() {
+  return new URLSearchParams(window.location.search).get('work') || '';
+}
+
+function updateWorkUrl(workId) {
+  const url = new URL(window.location.href);
+  if (workId) url.searchParams.set('work', workId);
+  else url.searchParams.delete('work');
+  history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+}
+
+async function fetchFirstAvailable(sources) {
+  for (const source of sources) {
+    try {
+      const response = await fetch(`${source.path}?v=${Date.now()}`);
+      if (!response.ok) continue;
+      return { data: await response.json(), source };
+    } catch (error) {
+      // Try next source silently.
+    }
+  }
+  return null;
 }
 
 function getUnitLabel(unit) {
@@ -817,12 +872,36 @@ function drawNetwork() {
 }
 
 async function loadCorpus() {
+  const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
+  if (editionPayload) {
+    editionWorks = editionPayload.data.works || [];
+    worksById = Object.fromEntries(editionWorks.map(work => [work.work_id, work]));
+    selectedWorkId = getRequestedWorkId() || editionPayload.data.metadata?.default_work_id || editionWorks[0]?.work_id || '';
+
+    workSelect.innerHTML = editionWorks.map(work => `
+      <option value="${work.work_id}">${work.title}</option>
+    `).join('') || '<option value="">Kein Werk gefunden</option>';
+
+    if (selectedWorkId && worksById[selectedWorkId]) {
+      workSelect.value = selectedWorkId;
+      workStatus.textContent = `${worksById[selectedWorkId].title} geladen aus ${editionPayload.source.label}.`;
+      const workResponse = await fetch(`../out/${worksById[selectedWorkId].paths.master}?v=${Date.now()}`);
+      if (workResponse.ok) {
+        updateWorkUrl(selectedWorkId);
+        return { corpus: await workResponse.json(), source: { label: worksById[selectedWorkId].title }, work: worksById[selectedWorkId] };
+      }
+    } else {
+      workStatus.textContent = `${editionWorks.length} Werke im Katalog gefunden.`;
+    }
+  }
+
   for (const source of AUTO_SOURCES) {
     try {
       const response = await fetch(`${source.path}?v=${Date.now()}`);
       if (!response.ok) continue;
+      workStatus.textContent = `Editionskatalog nicht verfügbar. Fallback auf ${source.label}.`;
       const corpus = await response.json();
-      return { corpus, source };
+      return { corpus, source, work: null };
     } catch (error) {
       // Try next source silently.
     }
@@ -833,11 +912,12 @@ async function loadCorpus() {
 async function init() {
   try {
     statusLine.textContent = 'Lade Korpus…';
-    const { corpus, source } = await loadCorpus();
+    const { corpus, source, work } = await loadCorpus();
+    selectedTerm = null;
     buildStatsFromCorpus(corpus);
     renderTermList();
     drawNetwork();
-    statusLine.textContent = `${statusLine.textContent} · ${source.label}`;
+    statusLine.textContent = `${statusLine.textContent} · ${work?.title || source.label}`;
   } catch (error) {
     console.error(error);
     statusLine.textContent = 'Fehler beim Laden';
@@ -851,6 +931,11 @@ document.getElementById('reset-selection').addEventListener('click', () => setSe
 document.getElementById('restart-layout').addEventListener('click', () => {
   if (!simulation) return;
   simulation.alpha(1).restart();
+});
+workSelect.addEventListener('change', () => {
+  selectedWorkId = workSelect.value || '';
+  updateWorkUrl(selectedWorkId);
+  init();
 });
 window.addEventListener('resize', () => {
   if (!rawNodes.length) return;
