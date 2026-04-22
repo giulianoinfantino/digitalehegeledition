@@ -4,41 +4,74 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Text — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <style>
+    /* ── Textansicht ───────────────────────────────────────────── */
     .text-body p {
       text-align: justify;
       hyphens: auto;
       margin-bottom: 0;
       text-indent: 1.5em;
-      line-height: 1.62;
+      line-height: 1.65;
     }
-    .chapter-heading + p { text-indent: 0; }
-    .chapter-heading { color: var(--accent); margin-top: 2.2em; margin-bottom: 1em; }
-    .heading-l1 { font-size: 2rem; font-weight: normal; text-align: center; }
-    .heading-l2 { font-size: 1.6rem; font-weight: normal; }
-    .heading-l3 { font-size: 1.3rem; font-weight: 600; }
-    .heading-l4 { font-size: 1.12rem; font-weight: 600; }
-    .heading-l5 { font-size: 1rem; font-style: italic; }
-    .toc-item-level-1 { font-weight: 600; margin-top: 15px; font-size: 0.95rem; }
-    .toc-item-level-2 { padding-left: 10px; font-size: 0.86rem; }
-    .toc-item-level-3 { padding-left: 20px; font-size: 0.82rem; }
-    .toc-item-level-4 { padding-left: 28px; font-size: 0.8rem; color: #666; }
-    .toc-item-level-5 { padding-left: 36px; font-size: 0.78rem; color: #777; }
-    .toc a.active {
+    /* Kein Einzug nach einer Überschrift */
+    .chapter-heading + p,
+    .section-label + p { text-indent: 0; }
+
+    /* ── Überschriften-Hierarchie ─────────────────────────────── */
+    .chapter-heading {
+      font-family: var(--font-ui);
       color: var(--accent);
-      font-weight: bold;
-      border-left: 2px solid var(--accent);
-      padding-left: 5px;
-      margin-left: -7px;
+      margin-top: 2.5em;
+      margin-bottom: 1em;
+      font-weight: 400;
+    }
+    .heading-l1 { font-size: 1.9rem; text-align: center; letter-spacing: .02em; }
+    .heading-l2 { font-size: 1.5rem; }
+    .heading-l3 { font-size: 1.25rem; font-weight: 600; }
+    .heading-l4 { font-size: 1.1rem; font-weight: 600; font-style: italic; }
+    .heading-l5 { font-size: 1rem; font-style: italic; }
+
+    /* ── Fußnoten ─────────────────────────────────────────────── */
+    .footnote-container {
+      margin-top: 2.5em;
+      border-top: 1px solid var(--border);
+      padding-top: 0.8em;
     }
     .footnote-item {
-      font-size: 0.85rem;
-      margin-top: 18px;
-      border-top: 1px solid #d8d0c7;
-      padding-top: 10px;
-      color: #444;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin-bottom: 0.4em;
+      text-align: justify;
+    }
+
+    /* ── Seitentrennlinie ─────────────────────────────────────── */
+    .page-break-line {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: 1.8em 0;
+    }
+
+    /* ── Inhaltsverzeichnis ───────────────────────────────────── */
+    .toc-item-level-1 { font-weight: 600; margin-top: 12px; font-size: 0.9rem; }
+    .toc-item-level-2 { padding-left: 10px; font-size: 0.84rem; }
+    .toc-item-level-3 { padding-left: 20px; font-size: 0.80rem; }
+    .toc-item-level-4 { padding-left: 28px; font-size: 0.78rem; color: #777; }
+    .toc a.active {
+      color: var(--accent);
+      font-weight: 600;
+      border-left: 2px solid var(--accent);
+      padding-left: 6px;
+      margin-left: -8px;
+    }
+
+    /* ── Lade-Indikator ───────────────────────────────────────── */
+    .loading-hint {
+      color: var(--text-muted);
+      font-style: italic;
+      font-family: var(--font-text);
     }
   </style>
 </head>
@@ -62,79 +95,217 @@
   <div class="reader-layout">
     <aside class="toc">
       <h3>Inhalt</h3>
-      <ul id="toc-list"></ul>
+      <ul id="toc-list"><li class="loading-hint">Lade…</li></ul>
     </aside>
     <article class="text-body" id="text-render">
-      <p>Lade Hegel-Korpus...</p>
+      <p class="loading-hint">Lade Hegel-Korpus…</p>
     </article>
   </div>
 </main>
 
 <script>
+/* ================================================================
+   Helferfunktionen
+   ================================================================ */
+
+/**
+ * Normalisiert einen Rohtext aus dem JSON:
+ *   • Trennstriche am Zeilenende: "Geschick-\nlichkeit" → "Geschicklichkeit"
+ *   • Übrige Newlines und Mehrfachleerzeichen → ein Leerzeichen
+ *   • Trim
+ */
+function normalizeText(raw) {
+  if (!raw) return '';
+  return raw
+    .replace(/-\s*\n\s*/g, '')   // Silbentrennung: "Wort-\nende" → "Wortende"
+    .replace(/\n/g, ' ')          // restliche Zeilenumbrüche → Leerzeichen
+    .replace(/\s{2,}/g, ' ')      // mehrere Leerzeichen → eines
+    .trim();
+}
+
+/**
+ * Gibt den normalisierten Text eines Blocks zurück.
+ * Unterstützt beide Schema-Varianten (text_normalized / content).
+ */
+function blockText(block) {
+  return normalizeText(block.text_normalized || block.text_raw || block.content || '');
+}
+
+/**
+ * Ergibt true für Blöcke, die zum Fließtext gehören.
+ */
+function isTextBlock(b) {
+  return b.type === 'main_text' || b.type === 'unknown' || b.type === 'paragraph';
+}
+
+/**
+ * Liest die Buchseitenzahl aus dem page_number-Block einer Seite aus.
+ * Fallback: page_book oder page_pdf.
+ */
+function getBookPage(page) {
+  if (page.sigel) return null; // bereits gesetzt
+  const pnBlock = (page.blocks || []).find(b => b.type === 'page_number');
+  if (pnBlock) {
+    const n = parseInt(blockText(pnBlock), 10);
+    if (!isNaN(n)) return n;
+  }
+  return page.page_book || page.page_pdf || page.id || null;
+}
+
+/**
+ * Baut das Sigel: "TWA 5, 13"
+ */
+function buildSigel(page, band) {
+  if (page.sigel && page.sigel !== 'null') return page.sigel;
+  const p = getBookPage(page);
+  return p ? `TWA\u00a0${band},\u00a0${p}` : '';
+}
+
+/* ================================================================
+   Haupt-Renderer
+   ================================================================ */
 async function loadHegel() {
   const renderArea = document.getElementById('text-render');
-  const tocList = document.getElementById('toc-list');
+  const tocList    = document.getElementById('toc-list');
 
   try {
-    const response = await fetch('data/twa_band_5_v2.json?v=' + new Date().getTime());
-    const data = await response.json();
-    const pages = (data.pages || []).filter(p => !p.section_type || p.section_type === 'maintext');
+    // ── JSON laden ────────────────────────────────────────────────
+    // Versuche zuerst v2, dann den Standard-Namen
+    let data = null;
+    for (const fname of ['twa_band_5_v2.json', 'twa_band_5.json']) {
+      const r = await fetch(`data/${fname}?v=${Date.now()}`);
+      if (r.ok) { data = await r.json(); break; }
+    }
+    if (!data) throw new Error('Keine JSON-Datei gefunden (twa_band_5_v2.json / twa_band_5.json).');
 
-    renderArea.innerHTML = "";
-    tocList.innerHTML = "";
-    let tocHTML = "";
+    const band  = data.metadata?.band || '5';
+    const pages = (data.pages || []);
 
-    pages.forEach(page => {
-      const pageAnchor = `page-${page.page_book || page.id}`;
+    renderArea.innerHTML = '';
+    tocList.innerHTML    = '';
 
-      let pageHtml = `
-        <section class="page-unit" id="${pageAnchor}">
-          <div class="marginalie">${page.sigel || ''}</div>
-          <div class="content">`;
+    let renderedHtml = '';
+    let tocHtml      = '';
 
-      (page.blocks || []).forEach((block, index) => {
-        if (block.type === 'heading') {
+    // ── Seiten iterieren ──────────────────────────────────────────
+    pages.forEach((page, pageIdx) => {
+      const secType  = page.section_type || 'maintext';
+      const sigel    = buildSigel(page, band);
+      const anchorId = `page-${page.page_pdf || page.id || pageIdx}`;
+      const blocks   = page.blocks || [];
+
+      // Seitentrennlinie (außer nach der ersten Seite)
+      if (pageIdx > 0) {
+        renderedHtml += '<hr class="page-break-line">';
+      }
+
+      renderedHtml += `<section class="page-unit" id="${anchorId}">`;
+      if (sigel) {
+        renderedHtml += `<div class="marginalie">${sigel}</div>`;
+      }
+      renderedHtml += '<div class="content">';
+
+      // ── Blöcke sammeln und rendern ─────────────────────────────
+      const footnotes = [];
+      let   textBuf   = [];  // Puffer für aufeinanderfolgende Textblöcke
+
+      function flushText() {
+        if (!textBuf.length) return;
+        const combined = textBuf.join(' ').replace(/\s{2,}/g, ' ').trim();
+        if (combined) {
+          // Aufteilen in Sätze (grob: am Satzende) für schönere Absätze
+          // Wir behalten einen Absatz pro Block-Gruppe — das ist philologisch korrekter.
+          renderedHtml += `<p>${escHtml(combined)}</p>`;
+        }
+        textBuf = [];
+      }
+
+      blocks.forEach(block => {
+        const btype = block.type || 'unknown';
+        const txt   = blockText(block);
+
+        if (!txt) return;
+
+        // Seitenzahlen: ignorieren (nur für Sigel verwendet)
+        if (btype === 'page_number') return;
+
+        if (btype === 'heading') {
+          flushText();
           const lvl = block.level || 2;
-          const id = `heading-${page.page_book || page.id}-${index}`;
-          const tag = lvl <= 2 ? 'h2' : 'h3';
-          pageHtml += `<${tag} class="chapter-heading heading-l${lvl}" id="${id}">${block.content}</${tag}>`;
-          tocHTML += `<li class="toc-item-level-${lvl}"><a href="#${id}">${block.plain || block.content}</a></li>`;
-        } else if (block.type === 'footnote') {
-          pageHtml += `<div class="footnote-item">${block.content}</div>`;
+          const tag = lvl <= 2 ? 'h2' : lvl === 3 ? 'h3' : 'h4';
+          const id  = `heading-${page.page_pdf || page.id || pageIdx}-${block.id || ''}`;
+          renderedHtml += `<${tag} class="chapter-heading heading-l${lvl}" id="${id}">${escHtml(txt)}</${tag}>`;
+          // TOC-Eintrag
+          tocHtml += `<li class="toc-item-level-${lvl}"><a href="#${id}">${escHtml(txt)}</a></li>`;
+
+        } else if (btype === 'footnote') {
+          // Fußnoten sammeln, erst am Ende der Seite rendern
+          flushText();
+          footnotes.push(txt);
+
         } else {
-          pageHtml += `<p>${block.content}</p>`;
+          // Fließtext (main_text, unknown, paragraph, …)
+          textBuf.push(txt);
         }
       });
 
-      pageHtml += `</div></section>`;
-      renderArea.insertAdjacentHTML('beforeend', pageHtml);
+      flushText(); // letzten Textpuffer ausgeben
+
+      // Fußnoten am Seitenende
+      if (footnotes.length) {
+        renderedHtml += '<div class="footnote-container">';
+        footnotes.forEach(fn => {
+          renderedHtml += `<p class="footnote-item">${escHtml(fn)}</p>`;
+        });
+        renderedHtml += '</div>';
+      }
+
+      renderedHtml += '</div></section>';
     });
 
-    tocList.innerHTML = tocHTML;
+    renderArea.innerHTML  = renderedHtml;
+    tocList.innerHTML     = tocHtml || '<li style="color:#999;font-size:0.85rem">Keine Gliederung im Korpus.</li>';
+
     initScrollSpy();
-  } catch (error) {
-    renderArea.innerHTML = `<p style="color:red">Fehler beim Laden: ${error.message}</p>`;
+
+  } catch (err) {
+    renderArea.innerHTML = `
+      <div style="padding:20px;border:2px solid var(--accent);background:#fff8f8;color:var(--accent);border-radius:4px;">
+        <strong>Fehler beim Laden:</strong><br>${err.message}
+      </div>`;
+    console.error(err);
   }
 }
 
+/* ── XSS-Schutz ────────────────────────────────────────────────── */
+function escHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ── Scroll-Spy für aktiven TOC-Link ──────────────────────────── */
 function initScrollSpy() {
   const headings = document.querySelectorAll('.chapter-heading');
   const navLinks = document.querySelectorAll('#toc-list a');
+  if (!headings.length) return;
 
-  const observer = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      navLinks.forEach(link => link.classList.remove('active'));
+      navLinks.forEach(l => l.classList.remove('active'));
       const id = entry.target.getAttribute('id');
-      const activeLink = document.querySelector(`#toc-list a[href="#${id}"]`);
-      if (activeLink) {
-        activeLink.classList.add('active');
-        activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const active = document.querySelector(`#toc-list a[href="#${id}"]`);
+      if (active) {
+        active.classList.add('active');
+        active.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
-  }, { rootMargin: '-18% 0px -78% 0px' });
+  }, { rootMargin: '-15% 0px -80% 0px' });
 
-  headings.forEach(heading => observer.observe(heading));
+  headings.forEach(h => observer.observe(h));
 }
 
 loadHegel();
