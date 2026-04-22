@@ -268,6 +268,10 @@
       display: grid;
       gap: 14px;
     }
+    .summary-block {
+      display: grid;
+      gap: 10px;
+    }
     .summary-head {
       display: flex;
       flex-wrap: wrap;
@@ -313,6 +317,73 @@
       min-height: 38px;
       padding: 0 14px;
       background: rgba(252,251,249,0.88);
+    }
+    .facet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .facet-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(252,251,249,0.88);
+    }
+    .facet-card strong {
+      display: block;
+      font-family: var(--font-text);
+      font-size: 1.7rem;
+      line-height: 1;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+    .facet-card span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+    .work-breakdown {
+      display: grid;
+      gap: 10px;
+    }
+    .work-breakdown-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.74);
+    }
+    .work-breakdown-label {
+      min-width: 150px;
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .work-breakdown-bar {
+      position: relative;
+      flex: 1;
+      min-height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(142,32,32,0.08);
+    }
+    .work-breakdown-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(142,32,32,0.85), rgba(202,138,74,0.72));
+    }
+    .work-breakdown-value {
+      min-width: 54px;
+      text-align: right;
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text-muted);
     }
     .results-list {
       display: grid;
@@ -365,6 +436,29 @@
       color: var(--text-muted);
       font-size: 0.9rem;
       line-height: 1.55;
+    }
+    .result-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .result-meta-card {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.82);
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .result-meta-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-main);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--font-ui);
     }
     .result-heading {
       margin: 0;
@@ -502,6 +596,7 @@
         </div>
         <div class="toggle-grid">
           <label><input type="checkbox" id="include-headings" checked> Überschriften durchsuchen</label>
+          <label><input type="checkbox" id="include-paragraphs" checked> Fließtext durchsuchen</label>
           <label><input type="checkbox" id="include-frontmatter" checked> Paratexte durchsuchen</label>
           <label><input type="checkbox" id="include-toc" checked> Inhaltsverzeichnis durchsuchen</label>
           <label><input type="checkbox" id="include-footnotes"> Fußnoten durchsuchen</label>
@@ -560,6 +655,13 @@
               <option value="page">Nach Seitenfolge</option>
             </select>
           </label>
+          <label class="sort-field">
+            <span>Mehrwortsuche</span>
+            <select id="match-mode">
+              <option value="all">Alle Wörter</option>
+              <option value="any">Mindestens eines</option>
+            </select>
+          </label>
           <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
         </div>
         <p class="query-note">
@@ -602,10 +704,12 @@ const state = {
   exact: false,
   caseSensitive: false,
   includeHeadings: true,
+  includeParagraphs: true,
   includeFrontmatter: true,
   includeToc: true,
   includeFootnotes: false,
   sort: 'relevance',
+  matchMode: 'all',
   workFilter: 'all'
 };
 
@@ -705,21 +809,36 @@ function applyUrlState() {
   const query = params.get('q') || '';
   const exact = params.get('exact') === '1';
   const caseSensitive = params.get('case') === '1';
+  const paragraphs = params.get('paragraphs') !== '0';
+  const headings = params.get('headings') !== '0';
+  const frontmatter = params.get('frontmatter') !== '0';
+  const toc = params.get('toc') !== '0';
   const footnotes = params.get('footnotes') === '1';
   const sort = params.get('sort') || 'relevance';
+  const matchMode = params.get('match') === 'any' ? 'any' : 'all';
   const work = params.get('work') || 'all';
 
   document.getElementById('query-input').value = query;
   document.getElementById('exact-match').checked = exact;
   document.getElementById('case-sensitive').checked = caseSensitive;
+  document.getElementById('include-paragraphs').checked = paragraphs;
+  document.getElementById('include-headings').checked = headings;
+  document.getElementById('include-frontmatter').checked = frontmatter;
+  document.getElementById('include-toc').checked = toc;
   document.getElementById('include-footnotes').checked = footnotes;
   if (sort === 'page') document.getElementById('sort-order').value = 'page';
+  document.getElementById('match-mode').value = matchMode;
 
   state.query = query;
   state.exact = exact;
   state.caseSensitive = caseSensitive;
+  state.includeParagraphs = paragraphs;
+  state.includeHeadings = headings;
+  state.includeFrontmatter = frontmatter;
+  state.includeToc = toc;
   state.includeFootnotes = footnotes;
   state.sort = sort === 'page' ? 'page' : 'relevance';
+  state.matchMode = matchMode;
   state.workFilter = work;
 }
 
@@ -729,9 +848,14 @@ function syncUrl() {
   else params.delete('q');
   state.exact ? params.set('exact', '1') : params.delete('exact');
   state.caseSensitive ? params.set('case', '1') : params.delete('case');
+  state.includeParagraphs ? params.delete('paragraphs') : params.set('paragraphs', '0');
+  state.includeHeadings ? params.delete('headings') : params.set('headings', '0');
+  state.includeFrontmatter ? params.delete('frontmatter') : params.set('frontmatter', '0');
+  state.includeToc ? params.delete('toc') : params.set('toc', '0');
   state.includeFootnotes ? params.set('footnotes', '1') : params.delete('footnotes');
   state.workFilter !== 'all' ? params.set('work', state.workFilter) : params.delete('work');
   params.set('sort', state.sort);
+  state.matchMode !== 'all' ? params.set('match', state.matchMode) : params.delete('match');
   const queryString = params.toString();
   history.replaceState(null, '', queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname);
 }
@@ -780,11 +904,13 @@ function readControls() {
   state.query = document.getElementById('query-input').value.trim();
   state.exact = document.getElementById('exact-match').checked;
   state.caseSensitive = document.getElementById('case-sensitive').checked;
+  state.includeParagraphs = document.getElementById('include-paragraphs').checked;
   state.includeHeadings = document.getElementById('include-headings').checked;
   state.includeFrontmatter = document.getElementById('include-frontmatter').checked;
   state.includeToc = document.getElementById('include-toc').checked;
   state.includeFootnotes = document.getElementById('include-footnotes').checked;
   state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
+  state.matchMode = document.getElementById('match-mode').value === 'any' ? 'any' : 'all';
   state.workFilter = document.getElementById('work-filter').value || 'all';
   updatePageRangeState();
 }
@@ -836,6 +962,7 @@ function countOccurrences(haystack, needle) {
 }
 
 function entryIsInScope(entry) {
+  if (entry.label === 'paragraph' && !state.includeParagraphs) return false;
   if (entry.label === 'heading' && !state.includeHeadings) return false;
   if (entry.label === 'frontmatter' && !state.includeFrontmatter) return false;
   if (entry.label === 'toc_entry' && !state.includeToc) return false;
@@ -859,6 +986,7 @@ function scoreEntry(entry, query) {
   const needles = state.caseSensitive ? patterns : patterns.map(pattern => pattern.toLowerCase());
   const matchedIndexes = [];
   let occurrences = 0;
+  let matchedTerms = 0;
 
   if (state.exact) {
     const exactNeedle = needles[0];
@@ -866,25 +994,106 @@ function scoreEntry(entry, query) {
     if (exactIndex === -1) return null;
     matchedIndexes.push(exactIndex);
     occurrences = countOccurrences(sourceText, exactNeedle);
+    matchedTerms = 1;
   } else {
     for (const needle of needles) {
       const index = sourceText.indexOf(needle);
-      if (index === -1) return null;
+      if (index === -1) {
+        if (state.matchMode === 'all') return null;
+        continue;
+      }
+      matchedTerms += 1;
       matchedIndexes.push(index);
       occurrences += countOccurrences(sourceText, needle);
     }
+    if (!matchedIndexes.length) return null;
   }
 
-  let score = typeWeight(entry.label) + occurrences * 2;
+  let score = typeWeight(entry.label) + occurrences * 2 + matchedTerms * 6;
   if (matchedIndexes[0] === 0) score += 6;
   if (entry.page_book != null) score += 2;
   if (state.exact) score += 18;
+  if (!state.exact && state.matchMode === 'all' && matchedTerms === needles.length) score += 10;
 
   return {
     entry,
     score,
-    matchIndex: Math.min(...matchedIndexes)
+    matchIndex: Math.min(...matchedIndexes),
+    matchedTerms,
+    occurrences
   };
+}
+
+function buildResultProfile(results) {
+  const labels = ['paragraph', 'heading', 'footnote', 'frontmatter', 'toc_entry'];
+  const byLabel = Object.fromEntries(labels.map(label => [label, 0]));
+  const byWork = new Map();
+
+  for (const result of results) {
+    const { entry } = result;
+    byLabel[entry.label] = (byLabel[entry.label] || 0) + 1;
+    const current = byWork.get(entry.work_id) || {
+      work_id: entry.work_id,
+      work_title: entry.work_title,
+      sigel: entry.sigel,
+      count: 0
+    };
+    current.count += 1;
+    byWork.set(entry.work_id, current);
+  }
+
+  return {
+    byLabel,
+    byWork: Array.from(byWork.values()).sort((a, b) => b.count - a.count)
+  };
+}
+
+function renderFacetCards(results) {
+  const profile = buildResultProfile(results);
+  const cards = [
+    ['paragraph', 'Text'],
+    ['heading', 'Überschriften'],
+    ['footnote', 'Fußnoten'],
+    ['frontmatter', 'Paratexte'],
+    ['toc_entry', 'TOC']
+  ];
+
+  return `
+    <div class="summary-block">
+      <div class="side-title">Trefferprofil</div>
+      <div class="facet-grid">
+        ${cards.map(([label, text]) => `
+          <div class="facet-card">
+            <strong>${escapeHtml(profile.byLabel[label] || 0)}</strong>
+            <span>${escapeHtml(text)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderWorkBreakdown(results) {
+  const profile = buildResultProfile(results);
+  if (!profile.byWork.length) return '';
+
+  const maxCount = Math.max(...profile.byWork.map(item => item.count), 1);
+  return `
+    <div class="summary-block">
+      <div class="side-title">Werkverteilung</div>
+      <div class="work-breakdown">
+        ${profile.byWork.map(item => `
+          <div class="work-breakdown-row">
+            <div class="work-breakdown-label">${escapeHtml(item.sigel || item.work_title)}</div>
+            <div class="work-breakdown-bar">
+              <div class="work-breakdown-fill" style="width:${Math.max(8, (item.count / maxCount) * 100)}%"></div>
+            </div>
+            <div class="work-breakdown-value">${escapeHtml(item.count)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
 }
 
 function excerptAround(text, index) {
@@ -1006,15 +1215,19 @@ function renderSummary(results) {
       <div class="chip-row">
         <span class="section-chip">${state.sort === 'page' ? 'Seitenfolge' : 'Relevanzsortierung'}</span>
         <span class="section-chip">${state.exact ? 'Exakte Phrase' : 'Token-Suche'}</span>
+        <span class="section-chip">${state.exact ? 'Exakt' : (state.matchMode === 'all' ? 'Alle Wörter' : 'Beliebige Wörter')}</span>
         <span class="section-chip">${state.caseSensitive ? 'Case sensitive' : 'Case insensitive'}</span>
       </div>
     </div>
     <div class="chip-row">
+      <span class="section-chip">Fließtext ${state.includeParagraphs ? 'ein' : 'aus'}</span>
       <span class="section-chip">Überschriften ${state.includeHeadings ? 'ein' : 'aus'}</span>
       <span class="section-chip">Paratexte ${state.includeFrontmatter ? 'ein' : 'aus'}</span>
       <span class="section-chip">TOC ${state.includeToc ? 'ein' : 'aus'}</span>
       <span class="section-chip">Fußnoten ${state.includeFootnotes ? 'ein' : 'aus'}</span>
     </div>
+    ${renderFacetCards(results)}
+    ${work ? '' : renderWorkBreakdown(results)}
     ${renderSuggestionButtons(suggestions)}
   `;
 }
@@ -1079,6 +1292,7 @@ function renderResults() {
     const title = entry.label === 'heading' || entry.label === 'toc_entry'
       ? highlightText(entry.title || entry.text, state.query.trim())
       : escapeHtml(humanLabel(entry.label));
+    const contextTitle = entry.title ? highlightText(entry.title, state.query.trim()) : 'Kein übergeordneter Titel erkannt';
 
     return `
       <article class="result-card">
@@ -1098,6 +1312,8 @@ function renderResults() {
           <div class="chip-row">
             <span class="result-chip">${escapeHtml(entry.work_short_title || entry.work_title)}</span>
             <span class="result-chip">${escapeHtml(entry.page_kind || 'body')}</span>
+            <span class="result-chip">${result.matchedTerms} Suchterm${result.matchedTerms === 1 ? '' : 'e'}</span>
+            <span class="result-chip">${result.occurrences} Vorkommen</span>
             <span class="result-chip">Score ${escapeHtml(result.score)}</span>
           </div>
           <div class="result-context">
@@ -1106,6 +1322,20 @@ function renderResults() {
           <h3 class="result-heading">
             <a href="${targetHref}">${title}</a>
           </h3>
+          <div class="result-meta-grid">
+            <div class="result-meta-card">
+              <strong>Abschnitt</strong>
+              ${contextTitle}
+            </div>
+            <div class="result-meta-card">
+              <strong>Stelle</strong>
+              ${escapeHtml(entry.sigel)} · PDF ${escapeHtml(entry.page_pdf)}${entry.page_book != null ? ` · Druckseite ${escapeHtml(entry.page_book)}` : ''}
+            </div>
+            <div class="result-meta-card">
+              <strong>Textschicht</strong>
+              ${escapeHtml(humanLabel(entry.label))}${entry.level ? ` · Ebene ${escapeHtml(entry.level)}` : ''}${entry.page_ref != null ? ` · Ziel ${escapeHtml(entry.page_ref)}` : ''}
+            </div>
+          </div>
           <p class="result-snippet">${highlightText(excerpt, state.query.trim())}</p>
           <div class="result-links">
             <a class="result-link" href="${targetHref}">Im Lesetext öffnen</a>
@@ -1172,11 +1402,13 @@ function bindEvents() {
     document.getElementById('query-input').value = '';
     document.getElementById('exact-match').checked = false;
     document.getElementById('case-sensitive').checked = false;
+    document.getElementById('include-paragraphs').checked = true;
     document.getElementById('include-headings').checked = true;
     document.getElementById('include-frontmatter').checked = true;
     document.getElementById('include-toc').checked = true;
     document.getElementById('include-footnotes').checked = false;
     document.getElementById('sort-order').value = 'relevance';
+    document.getElementById('match-mode').value = 'all';
     readControls();
     renderResults();
   });
@@ -1192,11 +1424,13 @@ function bindEvents() {
   [
     'exact-match',
     'case-sensitive',
+    'include-paragraphs',
     'include-headings',
     'include-frontmatter',
     'include-toc',
     'include-footnotes',
     'sort-order',
+    'match-mode',
     'start-page',
     'end-page',
     'work-filter'
