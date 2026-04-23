@@ -4,8 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Impressum — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .legal-container {
+      max-width: 800px;
+      margin: 6rem auto;
+      padding: 0 5%;
+    }
+    .legal-container h1 {
+      font-size: 3.5rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .legal-container h2 {
+      font-size: 1.5rem;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .legal-container p {
+      font-size: 1.2rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      color: var(--text-main);
+    }
+  </style>
 </head>
 <body>
 <header class="site-header">
@@ -20,60 +45,64 @@
       <li><a href="search.html">Suche</a></li>
     </ul>
   </nav>
+  <div class="theme-controls">
+    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
+  </div>
 </header>
 
-<main class="legal-page">
+<main class="legal-container">
   <h1>Impressum</h1>
-
-  <section class="legal-section">
+  
+  <section>
     <h2>Angaben gemäß § 5 TMG</h2>
-    <p class="legal-placeholder">
+    <p>
       Giuliano Infantino<br>
-      Brüdergasse 29<br>
-      53111 Bonn<br>
-      Deutschland
+      [Deine Adresse / Institution]<br>
+      [PLZ Ort]
     </p>
   </section>
 
-  <section class="legal-section">
+  <section>
     <h2>Kontakt</h2>
-    <p class="legal-placeholder">
-      E-Mail: <a href="mailto:giulianoinfantino@icloud.com">giulianoinfantino[at]icloud.com</a>
+    <p>
+      E-Mail: [Deine E-Mail Adresse]<br>
+      Website: giulianoinfantino.de
     </p>
   </section>
 
-  <section class="legal-section">
-    <h2>Verantwortlich für den Inhalt</h2>
+  <section>
+    <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
     <p>
-      Verantwortlich für die Inhalte dieser Website ist Giuliano Infantino, Anschrift wie oben.
+      Giuliano Infantino<br>
+      [Deine Adresse]<br>
     </p>
   </section>
 
-  <section class="legal-section">
-    <h2>Hinweis zur Edition</h2>
+  <section>
+    <h2>Haftungsausschluss</h2>
     <p>
-      Diese Website ist eine digitale Arbeits- und Forschungsedition. Die bereitgestellten Texte, Metadaten und
-      Suchfunktionen dienen der wissenschaftlichen Erschließung und werden fortlaufend überprüft.
-    </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Haftung für Inhalte und Links</h2>
-    <p>
-      Die Inhalte dieser Website wurden mit Sorgfalt erstellt. Für Vollständigkeit, Richtigkeit und Aktualität kann
-      jedoch keine Gewähr übernommen werden. Externe Links wurden zum Zeitpunkt der Verlinkung geprüft; für spätere
-      Änderungen externer Inhalte sind ausschließlich deren Anbieter verantwortlich.
+      Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
     </p>
   </section>
 </main>
 
-<footer class="legal-footer">
-  <nav>
-    <a href="impressum.html">Impressum</a>
+<footer class="site-footer">
+  <div>Digitale Hegel-Edition · Arbeitsstand</div>
+  <div>
+    <a href="impressum.html">Impressum</a> · 
     <a href="datenschutz.html">Datenschutz</a>
-  </nav>
+  </div>
 </footer>
 
 <script src="assets/theme.js"></script>
+<script>
+  function cycleTheme() {
+    const themes = ['light', 'sepia', 'dark'];
+    const current = document.body.getAttribute('data-theme') || 'light';
+    const next = themes[(themes.indexOf(current) + 1) % themes.length];
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('hegel-theme', next);
+  }
+</script>
 </body>
 </html>
