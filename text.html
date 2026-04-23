@@ -10,62 +10,65 @@
 <body>
 
 <header class="site-header">
-  <a href="index.html" class="site-title-main">Hegel <span style="color:var(--accent-gold);">·</span> Werke</a>
+  <a href="index.html" class="site-title">
+    <span class="site-title-eyebrow">Digitale Edition</span>
+    <span class="site-title-main">Hegel · Werke</span>
+  </a>
   <nav class="sitenav">
-    <a href="index.html">Sammlung</a>
-    <a href="text.html" class="current">Lektüre</a>
-    <a href="search.html">Recherche</a>
-    <button class="theme-toggle" style="margin-left:2rem;" onclick="cycleTheme()">◐</button>
+    <ul>
+      <li><a href="index.html">Sammlung</a></li>
+      <li><a href="text.html" class="current">Lektüre</a></li>
+      <li><a href="search.html">Recherche</a></li>
+    </ul>
   </nav>
+  <div class="theme-controls">
+    <button class="theme-toggle" onclick="cycleTheme()">◐ Theme</button>
+  </div>
 </header>
 
 <div class="reader-layout" id="main-layout">
+
   <aside class="reader-sidebar">
-    <span class="small-caps" style="color:var(--accent-gold); display:block; margin-bottom:1rem;">Inhaltsverzeichnis</span>
-    <ul id="toc-list" class="toc-list">
-      <!-- Inhaltsverzeichnis wird hier geladen -->
-    </ul>
+    <span class="small-caps" style="color:var(--accent-gold); display:block; margin-bottom:1.2rem; font-size:0.68rem; letter-spacing:0.18em;">Inhaltsverzeichnis</span>
+    <ul id="toc-list" class="toc-list"></ul>
   </aside>
 
   <main class="text-content">
-    <div id="reader-summary" style="margin-bottom: 4rem;"></div>
+    <div id="reader-summary"></div>
 
-    <div class="reader-toolbar" style="padding: 1.5rem 0; background: var(--bg-paper); border-top: 1px solid var(--border-fine); border-bottom: 1px solid var(--border-fine); margin-bottom: 4rem;">
+    <div class="reader-toolbar">
       <div class="toolbar-group">
         <span class="small-caps">Band</span>
-        <select id="work-selector" class="small-caps" style="border:none; background:transparent; font-size:1rem; color:var(--accent-red);" onchange="switchWork(this.value)"></select>
+        <select id="work-selector" onchange="switchWork(this.value)"></select>
       </div>
-
       <div class="toolbar-group">
         <span class="small-caps">Gehe zu GW</span>
         <div class="jump-input-group">
-          <input type="text" id="jump-gw-page" placeholder="S." style="font-family:var(--font-serif);">
+          <input type="text" id="jump-gw-page" placeholder="S.">
         </div>
-        <button class="btn-classic" style="padding: 0.2rem 1rem;" onclick="handleJumpToPage()">→</button>
+        <button class="btn-classic" onclick="handleJumpToPage()">→</button>
       </div>
-
       <div class="toolbar-group">
         <button class="btn-classic" id="btn-sync" onclick="toggleSyncView()">Faksimile</button>
         <button class="btn-classic" onclick="copyCitation()">Zitieren</button>
       </div>
     </div>
 
-    <div id="reader-pages">
-      <!-- Buchseiten werden hier geladen -->
-    </div>
+    <div id="reader-pages"></div>
   </main>
 
-  <aside id="pdf-viewer-container" style="display:none; flex: 1; height: calc(100vh - 150px); position: sticky; top: 100px; border-left: 1px solid var(--border-fine);">
+  <aside id="pdf-viewer-container" style="display:none; flex:1; height:calc(100vh - 62px); position:sticky; top:62px; border-left:1px solid var(--border);">
     <iframe id="pdf-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
   </aside>
+
 </div>
 
 <footer class="site-footer">
-  <div class="small-caps">Digitale Hegel-Edition · Forschungsportal</div>
-  <div>
-    <a href="impressum.html" class="small-caps">Impressum</a>
-    <a href="datenschutz.html" class="small-caps" style="margin-left: 2rem;">Datenschutz</a>
-  </div>
+  <div>Digitale Hegel-Edition · Forschungsportal</div>
+  <nav>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+  </nav>
 </footer>
 
 <script src="assets/edition-data.js"></script>
@@ -73,18 +76,14 @@
 <script>
   const state = { corpus: null, selectedWork: null, syncView: false };
 
-  async function loadWork() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const workId = urlParams.get('work') || 'gw-21';
-    
+  function loadWork() {
+    const workId = new URLSearchParams(window.location.search).get('work') || 'gw-21';
     const script = document.createElement('script');
     script.src = `assets/work-${workId}.js?v=${Date.now()}`;
     script.onload = () => {
       if (window.HEGEL_WORK_DATA) {
         state.corpus = window.HEGEL_WORK_DATA;
-        if (window.HEGEL_EDITION) {
-          state.selectedWork = window.HEGEL_EDITION.works.find(w => w.work_id === workId);
-        }
+        state.selectedWork = window.HEGEL_EDITION?.works.find(w => w.work_id === workId) || null;
         renderAll();
       }
     };
@@ -92,28 +91,48 @@
   }
 
   function renderAll() {
-    const summary = document.getElementById('reader-summary');
-    summary.innerHTML = `<h2 style="font-size:3.5rem; margin:0;">${state.selectedWork?.title || state.corpus.metadata.title}</h2><p class="small-caps" style="color:var(--accent-gold); margin-top:0.5rem;">Gesammelte Werke · Band ${state.corpus.band}</p>`;
-    
-    const list = document.getElementById('toc-list');
-    list.innerHTML = (state.corpus.toc_printed || []).map(entry => `<li><a href="#page-${entry.page}">${entry.title}</a></li>`).join('');
-    
-    const container = document.getElementById('reader-pages');
-    container.innerHTML = state.corpus.pages.filter(p => p.page_kind !== 'toc').map(page => `
-      <article class="page-card" id="page-${page.page_pdf}">
-        <header class="page-header">
-          <span>${page.sigel || ''}</span>
-          <span>GW ${page.page_book || page.page_pdf}</span>
-        </header>
-        <div class="page-body">
-          ${(page.units || []).map(u => `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`).join('')}
-        </div>
-      </article>
-    `).join('');
+    const corpus = state.corpus;
 
-    const sel = document.getElementById('work-selector');
+    // Summary header
+    const title = state.selectedWork?.title || corpus.metadata.title;
+    document.title = title + ' — Hegel Digitale Edition';
+    document.getElementById('reader-summary').innerHTML = `
+      <h2>${title}</h2>
+      <span class="small-caps" style="color:var(--accent-gold); font-size:0.72rem; letter-spacing:0.18em;">
+        Gesammelte Werke · Band ${corpus.band}
+      </span>
+    `;
+
+    // TOC
+    document.getElementById('toc-list').innerHTML =
+      (corpus.toc_printed || []).map(e =>
+        `<li><a href="#page-${e.page}">${e.title}</a></li>`
+      ).join('');
+
+    // Pages
+    document.getElementById('reader-pages').innerHTML =
+      corpus.pages
+        .filter(p => p.page_kind !== 'toc')
+        .map(page => `
+          <article class="page-card" id="page-${page.page_pdf}">
+            <header class="page-header">
+              <span>${page.sigel || ''}</span>
+              <span>GW ${page.page_book || page.page_pdf}</span>
+            </header>
+            <div class="page-body">
+              ${(page.units || []).map(u =>
+                `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`
+              ).join('')}
+            </div>
+          </article>
+        `).join('');
+
+    // Work selector
     if (window.HEGEL_EDITION) {
-      sel.innerHTML = window.HEGEL_EDITION.works.map(w => `<option value="${w.work_id}" ${w.work_id === state.selectedWork?.work_id ? 'selected' : ''}>${w.siglum}</option>`).join('');
+      document.getElementById('work-selector').innerHTML =
+        window.HEGEL_EDITION.works.map(w =>
+          `<option value="${w.work_id}" ${w.work_id === state.selectedWork?.work_id ? 'selected' : ''}>${w.siglum}</option>`
+        ).join('');
     }
   }
 
@@ -121,33 +140,49 @@
 
   function handleJumpToPage() {
     const gw = document.getElementById('jump-gw-page').value.trim();
-    const page = state.corpus.pages.find(p => String(p.page_book) === gw);
-    if (page) window.location.hash = `page-${page.page_pdf}`;
+    const page = state.corpus?.pages.find(p => String(p.page_book) === gw);
+    if (page) {
+      window.location.hash = `page-${page.page_pdf}`;
+    } else {
+      document.getElementById('jump-gw-page').style.borderBottomColor = 'var(--accent)';
+      setTimeout(() => document.getElementById('jump-gw-page').style.borderBottomColor = '', 1500);
+    }
   }
 
   function toggleSyncView() {
     state.syncView = !state.syncView;
     const container = document.getElementById('pdf-viewer-container');
     const layout = document.getElementById('main-layout');
+    const btn = document.getElementById('btn-sync');
     if (state.syncView) {
       container.style.display = 'block';
       layout.style.gridTemplateColumns = '250px 1fr 1fr';
-      layout.style.maxWidth = '100%';
       document.getElementById('pdf-frame').src = `../${state.corpus.metadata.source_pdf}`;
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#fff';
     } else {
       container.style.display = 'none';
-      layout.style.gridTemplateColumns = '320px 1fr';
-      layout.style.maxWidth = '1400px';
+      layout.style.gridTemplateColumns = '';
+      document.getElementById('pdf-frame').src = '';
+      btn.style.background = '';
+      btn.style.color = '';
     }
   }
 
   function copyCitation() {
-    const citation = `Hegel, G.W.F.: ${state.selectedWork?.title || state.corpus.metadata.title}. In: Gesammelte Werke, Bd. ${state.corpus.band}.`;
-    navigator.clipboard.writeText(citation);
-    alert('Zitation kopiert.');
+    const title = state.selectedWork?.title || state.corpus?.metadata.title || '';
+    const band = state.corpus?.band || '';
+    const citation = `Hegel, G.W.F.: ${title}. In: Gesammelte Werke, Bd. ${band}. Hamburg: Meiner.`;
+    navigator.clipboard.writeText(citation).then(() => {
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = 'Kopiert';
+      setTimeout(() => btn.textContent = orig, 1800);
+    });
   }
 
   window.onload = loadWork;
 </script>
+
 </body>
 </html>

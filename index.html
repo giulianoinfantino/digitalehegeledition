@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hegel · Werke — Start</title>
+  <title>Hegel · Digitale Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-theme="light">
+<body>
 
 <header class="site-header">
   <a href="index.html" class="site-title">
@@ -16,37 +16,40 @@
   </a>
   <nav class="sitenav">
     <ul>
-      <li><a href="index.html" class="current">Start</a></li>
-      <li><a href="text.html">Text lesen</a></li>
-      <li><a href="search.html">Suche</a></li>
+      <li><a href="index.html" class="current">Sammlung</a></li>
+      <li><a href="text.html">Lektüre</a></li>
+      <li><a href="search.html">Recherche</a></li>
     </ul>
   </nav>
   <div class="theme-controls">
-    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
+    <button class="theme-toggle" onclick="cycleTheme()">◐ Theme</button>
   </div>
 </header>
 
 <main class="landing">
-  <section style="margin: 4rem 0; border-bottom: 1px solid var(--border); padding-bottom:4rem;">
-    <h1 style="font-size:clamp(3rem, 8vw, 6rem); line-height:0.9; margin-bottom:2rem;">Digitale<br>Hegel-Edition</h1>
-    <p style="font-size:1.5rem; color:var(--text-muted); max-width:800px; line-height:1.4;">
-      Eine historisch-kritische digitale Forschungsplattform für das Gesamtwerk von Georg Wilhelm Friedrich Hegel.
+
+  <section class="landing-hero">
+    <h1>Digitale<br>Hegel-Edition</h1>
+    <p>
+      Eine historisch-kritische digitale Forschungsplattform für das Gesamtwerk
+      von Georg Wilhelm Friedrich Hegel, basierend auf den Gesammelten Werken (GW).
     </p>
-    <div style="margin-top:3rem; display:flex; gap:1.5rem;">
+    <div class="landing-actions">
       <a href="text.html" class="btn-primary">Edition öffnen</a>
-      <a href="search.html" class="citation-btn" style="padding:12px 25px; border-radius:999px;">Volltextsuche</a>
+      <a href="search.html" class="citation-btn">Volltextsuche</a>
     </div>
   </section>
 
   <section class="feature-grid" id="works-grid">
-    <!-- Werke hier -->
+    <!-- Werke werden hier per JS gerendert -->
   </section>
+
 </main>
 
 <footer class="site-footer">
   <div>Digitale Hegel-Edition · Forschungsplattform</div>
   <nav>
-    <a href="impressum.html">Impressum</a> · 
+    <a href="impressum.html">Impressum</a>
     <a href="datenschutz.html">Datenschutz</a>
   </nav>
 </footer>
@@ -58,14 +61,18 @@
     const grid = document.getElementById('works-grid');
     grid.innerHTML = (edition.works || []).map(w => `
       <article class="feature-card">
-        <h3 style="font-family:var(--font-ui); text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em; color:var(--accent);">${w.siglum}</h3>
-        <h2 style="font-size:1.6rem; margin:1rem 0;">${w.title}</h2>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:2rem;">Band ${w.band} · GW-Edition</p>
+        <h3>${w.siglum}</h3>
+        <h2>${w.title}</h2>
+        <p>Band ${w.band} · GW-Edition · ${w.stats ? w.stats.pages + ' Seiten' : ''}</p>
         <a href="text.html?work=${w.work_id}" class="citation-btn">Lesen</a>
       </article>
     `).join('');
   }
-  window.onload = () => { if (window.HEGEL_EDITION) renderWorks(window.HEGEL_EDITION); };
+
+  window.onload = () => {
+    if (window.HEGEL_EDITION) renderWorks(window.HEGEL_EDITION);
+  };
 </script>
+
 </body>
 </html>
