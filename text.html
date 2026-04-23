@@ -1238,17 +1238,34 @@ async function fetchFirstAvailable(sources) {
   return null;
 }
 
+function getEmbeddedWork(workId) {
+  const store = window.HEGEL_WORK_DATA;
+  const cache = window.HEGEL_WORK_CACHE || {};
+  if (cache[workId]) return cache[workId];
+  if (!store) return null;
+  if (store[workId]) return store[workId];
+  if (store.metadata?.work_id === workId) return store;
+  return null;
+}
+
+function rememberEmbeddedWork(workId) {
+  const work = getEmbeddedWork(workId);
+  if (!work) return false;
+  window.HEGEL_WORK_CACHE = window.HEGEL_WORK_CACHE || {};
+  window.HEGEL_WORK_CACHE[workId] = work;
+  return true;
+}
+
 function ensureEmbeddedWorkScript(workId) {
   return new Promise(resolve => {
-    window.HEGEL_WORK_DATA = window.HEGEL_WORK_DATA || {};
-    if (window.HEGEL_WORK_DATA[workId]) {
+    if (rememberEmbeddedWork(workId)) {
       resolve(true);
       return;
     }
 
     const existing = document.querySelector(`script[data-work-script="${workId}"]`);
     if (existing) {
-      existing.addEventListener('load', () => resolve(Boolean(window.HEGEL_WORK_DATA[workId])), { once: true });
+      existing.addEventListener('load', () => resolve(rememberEmbeddedWork(workId)), { once: true });
       existing.addEventListener('error', () => resolve(false), { once: true });
       return;
     }
@@ -1256,7 +1273,7 @@ function ensureEmbeddedWorkScript(workId) {
     const script = document.createElement('script');
     script.src = `assets/work-${workId}.js`;
     script.dataset.workScript = workId;
-    script.onload = () => resolve(Boolean(window.HEGEL_WORK_DATA[workId]));
+    script.onload = () => resolve(rememberEmbeddedWork(workId));
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
@@ -1732,8 +1749,9 @@ function setCorpus(raw, sourceLabel) {
 async function loadSelectedWork() {
   if (state.selectedWork?.work_id) {
     const embeddedLoaded = await ensureEmbeddedWorkScript(state.selectedWork.work_id);
-    if (embeddedLoaded && window.HEGEL_WORK_DATA?.[state.selectedWork.work_id]) {
-      setCorpus(window.HEGEL_WORK_DATA[state.selectedWork.work_id], `${state.selectedWork.title} · eingebettet`);
+    const embeddedWork = getEmbeddedWork(state.selectedWork.work_id);
+    if (embeddedLoaded && embeddedWork) {
+      setCorpus(embeddedWork, `${state.selectedWork.title} · eingebettet`);
       return true;
     }
   }
