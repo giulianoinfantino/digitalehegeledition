@@ -4,37 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Datenschutz — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
-  <style>
-    .legal-container {
-      max-width: 800px;
-      margin: 6rem auto;
-      padding: 0 5%;
-    }
-    .legal-container h1 {
-      font-size: 3.5rem;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
-    }
-    .legal-container h2 {
-      font-size: 1.5rem;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-    .legal-container p, .legal-container li {
-      font-size: 1.2rem;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-      color: var(--text-main);
-    }
-    .legal-container ul {
-      margin-bottom: 1.5rem;
-      padding-left: 2rem;
-    }
-  </style>
 </head>
 <body>
 <header class="site-header">
@@ -47,68 +18,60 @@
       <li><a href="index.html">Start</a></li>
       <li><a href="text.html">Text lesen</a></li>
       <li><a href="search.html">Suche</a></li>
+      <li><a href="datenschutz.html" class="current">Datenschutz</a></li>
     </ul>
   </nav>
-  <div class="theme-controls">
-    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
-  </div>
 </header>
 
 <main class="legal-container">
-  <h1>Datenschutzerklärung</h1>
-  
-  <section>
-    <h2>1. Datenschutz auf einen Blick</h2>
+  <div class="legal-kicker">Datenschutzhinweise</div>
+  <h1>Datenschutz</h1>
+  <p class="legal-lead">Diese Hinweise beschreiben in knapper Form, welche Daten beim Besuch dieses Webauftritts verarbeitet werden und an wen Sie sich bei Datenschutzfragen wenden können.</p>
+
+  <section class="legal-section">
+    <h2>1. Verantwortliche Stelle</h2>
     <p>
-      Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.
+      Giuliano Infantino<br>
+      Brüdergasse 29<br>
+      53111 Bonn<br>
+      E-Mail: <a href="mailto:giulianoinfantino@icloud.com">giulianoinfantino[at]icloud.com</a>
     </p>
   </section>
 
-  <section>
-    <h2>2. Datenerfassung auf dieser Website</h2>
-    <p>
-      <strong>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</strong><br>
-      Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen.
-    </p>
-    <p>
-      <strong>Wie erfassen wir Ihre Daten?</strong><br>
-      Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z. B. um Daten handeln, die Sie in ein Kontaktformular eingeben. Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst.
-    </p>
+  <section class="legal-section">
+    <h2>2. Zugriffsdaten</h2>
+    <p>Beim Aufruf der Website können durch den Hosting-Anbieter technisch notwendige Server-Log-Daten verarbeitet werden. Dazu können insbesondere IP-Adresse, Datum und Uhrzeit des Zugriffs, Browsertyp, Betriebssystem und angeforderte Datei gehören.</p>
   </section>
 
-  <section>
-    <h2>3. Bereitstellung der Website (Server-Log-Files)</h2>
-    <p>
-      Der Provider der Seiten erhebt und speichert automatisch Informationen in so genannten Server-Log-Files, die Ihr Browser automatisch an uns übermittelt. Dies sind:
-    </p>
-    <ul>
-      <li>Browsertyp und Browserversion</li>
-      <li>verwendetes Betriebssystem</li>
-      <li>Referrer URL</li>
-      <li>Hostname des zugreifenden Rechners</li>
-      <li>Uhrzeit der Serveranfrage</li>
-      <li>IP-Adresse</li>
-    </ul>
+  <section class="legal-section">
+    <h2>3. Zweck der Verarbeitung</h2>
+    <p>Die Verarbeitung erfolgt zur Bereitstellung, Stabilität und Sicherheit des Webauftritts sowie zur technischen Fehleranalyse.</p>
+  </section>
+
+  <section class="legal-section">
+    <h2>4. Lokale Einstellungen</h2>
+    <p>Für die Darstellung der Website kann im Browser eine lokale Theme-Einstellung gespeichert werden. Diese Speicherung erfolgt ausschließlich lokal auf Ihrem Gerät und dient nur der Anzeigepräferenz.</p>
+  </section>
+
+  <section class="legal-section">
+    <h2>5. Ihre Rechte</h2>
+    <p>Sie haben im Rahmen der gesetzlichen Bestimmungen insbesondere das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung sowie Beschwerde bei einer Datenschutzaufsichtsbehörde.</p>
+  </section>
+
+  <section class="legal-section">
+    <h2>6. Kontakt</h2>
+    <p>Bei Fragen zum Datenschutz wenden Sie sich bitte an <a href="mailto:giulianoinfantino@icloud.com">giulianoinfantino[at]icloud.com</a>.</p>
   </section>
 </main>
 
 <footer class="site-footer">
-  <div>Digitale Hegel-Edition · Arbeitsstand</div>
+  <div>Digitale Hegel-Edition · GW-Arbeitsstand</div>
   <div>
-    <a href="impressum.html">Impressum</a> · 
+    <a href="impressum.html">Impressum</a> ·
     <a href="datenschutz.html">Datenschutz</a>
   </div>
 </footer>
 
 <script src="assets/theme.js"></script>
-<script>
-  function cycleTheme() {
-    const themes = ['light', 'sepia', 'dark'];
-    const current = document.body.getAttribute('data-theme') || 'light';
-    const next = themes[(themes.indexOf(current) + 1) % themes.length];
-    document.body.setAttribute('data-theme', next);
-    localStorage.setItem('hegel-theme', next);
-  }
-</script>
 </body>
 </html>

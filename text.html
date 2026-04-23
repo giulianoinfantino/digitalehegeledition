@@ -788,6 +788,27 @@
 
 <script src="assets/theme.js"></script>
 <script src="assets/edition-data.js"></script>
+<script src="assets/work-gw-11.js"></script>
+<script>
+  window.HEGEL_WORK_CACHE = window.HEGEL_WORK_CACHE || {};
+  if (window.HEGEL_WORK_DATA?.metadata?.work_id) {
+    window.HEGEL_WORK_CACHE[window.HEGEL_WORK_DATA.metadata.work_id] = window.HEGEL_WORK_DATA;
+  }
+</script>
+<script src="assets/work-gw-12.js"></script>
+<script>
+  window.HEGEL_WORK_CACHE = window.HEGEL_WORK_CACHE || {};
+  if (window.HEGEL_WORK_DATA?.metadata?.work_id) {
+    window.HEGEL_WORK_CACHE[window.HEGEL_WORK_DATA.metadata.work_id] = window.HEGEL_WORK_DATA;
+  }
+</script>
+<script src="assets/work-gw-21.js"></script>
+<script>
+  window.HEGEL_WORK_CACHE = window.HEGEL_WORK_CACHE || {};
+  if (window.HEGEL_WORK_DATA?.metadata?.work_id) {
+    window.HEGEL_WORK_CACHE[window.HEGEL_WORK_DATA.metadata.work_id] = window.HEGEL_WORK_DATA;
+  }
+</script>
 <script>
 const state = {
   edition: null,
@@ -1572,13 +1593,13 @@ function renderPage(page) {
   const mainUnits = units.filter(unit => unit.label !== 'footnote' && unit.label !== 'page_number');
   const gwPage = page.gw_page || '';
   const oaPage = page.oa_page || '';
-  const pageNumberLabel = page.page_book || '';
+  const locatorLabel = [gwPage ? `GW ${gwPage}` : '', oaPage ? `OA ${oaPage}` : ''].filter(Boolean).join(' · ') || 'Textstelle';
 
   const flow = mainUnits.length
     ? `${mainUnits.map(unit => renderUnit(unit, page)).join('')}${renderFootnotes(footnotes)}`
     : `
       <div class="empty-page-placeholder">
-        <p>Seite ${escapeHtml(page.page_pdf)}${page.page_book ? ` · GW ${escapeHtml(page.page_book)}` : ''}</p>
+        <p>${escapeHtml(locatorLabel)}</p>
         <small>Kein Textinhalt auf dieser Seite extrahiert.</small>
       </div>
     `;
@@ -1590,7 +1611,6 @@ function renderPage(page) {
         <div class="page-meta">
           ${gwPage ? `GW ${escapeHtml(gwPage)}<br>` : ''}
           ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
-          ${pageNumberLabel ? `Seitenzahl ${escapeHtml(pageNumberLabel)}<br>` : ''}
           ${escapeHtml(String(mainUnits.length))} Units
         </div>
         <div class="page-kind-chip">${escapeHtml(page.page_kind || 'body')}</div>

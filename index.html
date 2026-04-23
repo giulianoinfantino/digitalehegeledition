@@ -727,6 +727,63 @@
     body[data-theme="dark"] .site-footer {
       border-color: var(--reader-rule);
     }
+    .eyebrow,
+    .btn,
+    .hero-panel,
+    .meta-item,
+    .stat-card,
+    .feature-card,
+    .workflow-card,
+    .pipeline-step {
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .eyebrow {
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .btn {
+      min-height: 42px;
+      padding: 0 0 6px;
+      justify-content: flex-start;
+      border: none;
+      border-bottom: 1px solid var(--reader-rule);
+      background: transparent;
+    }
+    .btn:hover {
+      transform: none;
+      border-color: var(--reader-accent-soft);
+      box-shadow: none;
+    }
+    .btn-primary,
+    .btn-secondary {
+      background: transparent;
+    }
+    .hero-panel,
+    .feature-card,
+    .workflow-card,
+    .pipeline-step {
+      padding-left: 18px;
+      border-left: 1px solid var(--reader-rule);
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+      background: transparent;
+    }
+    .meta-item,
+    .stat-card {
+      padding: 14px 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      background: transparent;
+    }
+    .pipeline-step:hover,
+    .pipeline-node:hover {
+      transform: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>

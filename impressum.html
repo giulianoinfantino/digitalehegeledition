@@ -4,33 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Impressum — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
-  <style>
-    .legal-container {
-      max-width: 800px;
-      margin: 6rem auto;
-      padding: 0 5%;
-    }
-    .legal-container h1 {
-      font-size: 3.5rem;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
-    }
-    .legal-container h2 {
-      font-size: 1.5rem;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-    .legal-container p {
-      font-size: 1.2rem;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-      color: var(--text-main);
-    }
-  </style>
 </head>
 <body>
 <header class="site-header">
@@ -43,66 +18,61 @@
       <li><a href="index.html">Start</a></li>
       <li><a href="text.html">Text lesen</a></li>
       <li><a href="search.html">Suche</a></li>
+      <li><a href="impressum.html" class="current">Impressum</a></li>
     </ul>
   </nav>
-  <div class="theme-controls">
-    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
-  </div>
 </header>
 
 <main class="legal-container">
+  <div class="legal-kicker">Rechtliche Angaben</div>
   <h1>Impressum</h1>
-  
-  <section>
+  <p class="legal-lead">Die Digitale Hegel Edition ist ein editorisches Forschungsprojekt im Aufbau. Die folgenden Angaben betreffen den derzeitigen Webauftritt.</p>
+
+  <section class="legal-section">
     <h2>Angaben gemäß § 5 TMG</h2>
     <p>
       Giuliano Infantino<br>
-      [Deine Adresse / Institution]<br>
-      [PLZ Ort]
+      Brüdergasse 29<br>
+      53111 Bonn
     </p>
   </section>
 
-  <section>
+  <section class="legal-section">
     <h2>Kontakt</h2>
     <p>
-      E-Mail: [Deine E-Mail Adresse]<br>
-      Website: giulianoinfantino.de
+      E-Mail: <a href="mailto:giulianoinfantino@icloud.com">giulianoinfantino[at]icloud.com</a><br>
+      Website: <a href="https://giulianoinfantino.de">giulianoinfantino.de</a>
     </p>
   </section>
 
-  <section>
-    <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+  <section class="legal-section">
+    <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
     <p>
       Giuliano Infantino<br>
-      [Deine Adresse]<br>
+      Brüdergasse 29<br>
+      53111 Bonn
     </p>
   </section>
 
-  <section>
-    <h2>Haftungsausschluss</h2>
-    <p>
-      Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
-    </p>
+  <section class="legal-section">
+    <h2>Haftung für Inhalte</h2>
+    <p>Die Inhalte dieser Website werden mit größtmöglicher Sorgfalt erstellt. Eine Gewähr für Richtigkeit, Vollständigkeit und Aktualität kann dennoch nicht übernommen werden.</p>
+  </section>
+
+  <section class="legal-section">
+    <h2>Urheberrecht und Edition</h2>
+    <p>Diese Website dient der Entwicklung und Darstellung einer digitalen wissenschaftlichen Hegel-Edition. Maßgeblich sind die jeweils im Projekt ausgewiesenen editorischen und rechtlichen Auswahlentscheidungen zu den bereitgestellten Texten.</p>
   </section>
 </main>
 
 <footer class="site-footer">
-  <div>Digitale Hegel-Edition · Arbeitsstand</div>
+  <div>Digitale Hegel-Edition · GW-Arbeitsstand</div>
   <div>
-    <a href="impressum.html">Impressum</a> · 
+    <a href="impressum.html">Impressum</a> ·
     <a href="datenschutz.html">Datenschutz</a>
   </div>
 </footer>
 
 <script src="assets/theme.js"></script>
-<script>
-  function cycleTheme() {
-    const themes = ['light', 'sepia', 'dark'];
-    const current = document.body.getAttribute('data-theme') || 'light';
-    const next = themes[(themes.indexOf(current) + 1) % themes.length];
-    document.body.setAttribute('data-theme', next);
-    localStorage.setItem('hegel-theme', next);
-  }
-</script>
 </body>
 </html>
