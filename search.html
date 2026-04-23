@@ -1356,6 +1356,16 @@
 <script src="assets/search-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
+
+  // Wir fügen ein Live-Zähler Event hinzu
+  document.getElementById('search-input').addEventListener('input', () => {
+    const query = document.getElementById('search-input').value.trim();
+    if (query.length > 2) {
+      const status = document.getElementById('search-status');
+      status.textContent = 'Tippen Sie Enter zum Suchen...';
+    }
+  });
+
 const state = {
   edition: null,
   works: [],
