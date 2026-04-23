@@ -811,6 +811,102 @@
       font-size: 1.8rem;
       line-height: 1.08;
     }
+    html:has(body[data-theme="dark"]) {
+      background: #120f0d;
+    }
+    body[data-theme="dark"] {
+      --reader-paper: #17120f;
+      --reader-ink: #f4eadc;
+      --reader-muted: #d0c1ae;
+      --reader-rule: rgba(222, 205, 182, 0.20);
+      --reader-accent-soft: #e0a086;
+      --bg-color: #17120f;
+      --text-main: #f4eadc;
+      --text-muted: #d0c1ae;
+      --border: rgba(222, 205, 182, 0.20);
+      --accent: #e0a086;
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(18, 15, 13, 0.92);
+      border-bottom-color: var(--reader-rule);
+    }
+    body[data-theme="dark"] .site-title-main,
+    body[data-theme="dark"] .search-intro h1,
+    body[data-theme="dark"] .summary-count,
+    body[data-theme="dark"] .summary-title,
+    body[data-theme="dark"] .result-title,
+    body[data-theme="dark"] .result-heading,
+    body[data-theme="dark"] .result-sigel,
+    body[data-theme="dark"] .stat-tile strong,
+    body[data-theme="dark"] .facet-card strong,
+    body[data-theme="dark"] .source-status strong,
+    body[data-theme="dark"] .range-field input,
+    body[data-theme="dark"] .range-field select,
+    body[data-theme="dark"] .sort-field select,
+    body[data-theme="dark"] .query-input {
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .site-title-eyebrow,
+    body[data-theme="dark"] .sitenav a,
+    body[data-theme="dark"] .search-kicker,
+    body[data-theme="dark"] .search-intro p,
+    body[data-theme="dark"] .side-title,
+    body[data-theme="dark"] .source-status,
+    body[data-theme="dark"] .results-summary p,
+    body[data-theme="dark"] .result-context,
+    body[data-theme="dark"] .result-meta,
+    body[data-theme="dark"] .result-rail-meta,
+    body[data-theme="dark"] .result-meta-card,
+    body[data-theme="dark"] .stat-tile span,
+    body[data-theme="dark"] .facet-card,
+    body[data-theme="dark"] .facet-card span,
+    body[data-theme="dark"] .work-breakdown-value,
+    body[data-theme="dark"] .work-breakdown-label,
+    body[data-theme="dark"] .range-field span,
+    body[data-theme="dark"] .sort-field span,
+    body[data-theme="dark"] .empty-state {
+      color: var(--reader-muted);
+    }
+    body[data-theme="dark"] .sitenav a.current,
+    body[data-theme="dark"] .sitenav a:hover,
+    body[data-theme="dark"] .search-btn,
+    body[data-theme="dark"] .search-btn:visited,
+    body[data-theme="dark"] .search-btn.primary,
+    body[data-theme="dark"] .suggestion-chip:hover,
+    body[data-theme="dark"] .section-chip,
+    body[data-theme="dark"] .result-chip {
+      color: var(--reader-accent-soft);
+    }
+    body[data-theme="dark"] .side-card,
+    body[data-theme="dark"] .query-card,
+    body[data-theme="dark"] .results-summary,
+    body[data-theme="dark"] .result-card,
+    body[data-theme="dark"] .empty-state,
+    body[data-theme="dark"] .stat-tile,
+    body[data-theme="dark"] .facet-card,
+    body[data-theme="dark"] .work-breakdown-row,
+    body[data-theme="dark"] .result-meta-card,
+    body[data-theme="dark"] .search-btn,
+    body[data-theme="dark"] .suggestion-chip,
+    body[data-theme="dark"] .source-status {
+      background: transparent;
+      border-color: var(--reader-rule);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] .query-input,
+    body[data-theme="dark"] select,
+    body[data-theme="dark"] input {
+      background: transparent;
+      border-color: var(--reader-rule);
+    }
+    body[data-theme="dark"] mark {
+      background: rgba(224, 160, 134, 0.22);
+      color: var(--reader-ink);
+    }
   </style>
 </head>
 <body>

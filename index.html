@@ -483,6 +483,81 @@
     .quote-box {
       border-left: 1px solid var(--reader-rule);
     }
+    html:has(body[data-theme="dark"]) {
+      background: #120f0d;
+    }
+    body[data-theme="dark"] {
+      --reader-paper: #17120f;
+      --reader-ink: #f4eadc;
+      --reader-muted: #d0c1ae;
+      --reader-rule: rgba(222, 205, 182, 0.20);
+      --reader-accent-soft: #e0a086;
+      --bg-color: #17120f;
+      --text-main: #f4eadc;
+      --text-muted: #d0c1ae;
+      --border: rgba(222, 205, 182, 0.20);
+      --accent: #e0a086;
+      background:
+        linear-gradient(90deg, rgba(126, 96, 63, 0.08) 0%, transparent 20%, transparent 80%, rgba(126, 96, 63, 0.06) 100%),
+        linear-gradient(180deg, #1d1713 0%, #120f0d 100%);
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .site-header {
+      background: rgba(18, 15, 13, 0.92);
+      border-bottom-color: var(--reader-rule);
+    }
+    body[data-theme="dark"] .site-title-main,
+    body[data-theme="dark"] .hero h1,
+    body[data-theme="dark"] .edition-title,
+    body[data-theme="dark"] .section-header h2,
+    body[data-theme="dark"] .workflow-card h3,
+    body[data-theme="dark"] .feature-card h3,
+    body[data-theme="dark"] .feature-card .work-title,
+    body[data-theme="dark"] .meta-value,
+    body[data-theme="dark"] .stat-number,
+    body[data-theme="dark"] .feature-card .meta-list strong {
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .site-title-eyebrow,
+    body[data-theme="dark"] .sitenav a,
+    body[data-theme="dark"] .eyebrow,
+    body[data-theme="dark"] .panel-kicker,
+    body[data-theme="dark"] .meta-label,
+    body[data-theme="dark"] .stat-label,
+    body[data-theme="dark"] .hero-lead,
+    body[data-theme="dark"] .hero-note,
+    body[data-theme="dark"] .section-header p,
+    body[data-theme="dark"] .feature-card p,
+    body[data-theme="dark"] .feature-card .meta-list,
+    body[data-theme="dark"] .workflow-card li,
+    body[data-theme="dark"] .quote-box,
+    body[data-theme="dark"] .site-footer,
+    body[data-theme="dark"] #data-status {
+      color: var(--reader-muted);
+    }
+    body[data-theme="dark"] .sitenav a.current,
+    body[data-theme="dark"] .sitenav a:hover,
+    body[data-theme="dark"] .btn,
+    body[data-theme="dark"] .btn:visited,
+    body[data-theme="dark"] .btn-primary,
+    body[data-theme="dark"] .btn-secondary,
+    body[data-theme="dark"] .btn:hover {
+      color: var(--reader-accent-soft);
+    }
+    body[data-theme="dark"] .hero-panel,
+    body[data-theme="dark"] .meta-item,
+    body[data-theme="dark"] .stat-card,
+    body[data-theme="dark"] .feature-card,
+    body[data-theme="dark"] .workflow-card {
+      background: transparent;
+      border-color: var(--reader-rule);
+      box-shadow: none;
+    }
+    body[data-theme="dark"] .hero,
+    body[data-theme="dark"] .stats-strip,
+    body[data-theme="dark"] .site-footer {
+      border-color: var(--reader-rule);
+    }
   </style>
 </head>
 <body>
