@@ -511,20 +511,40 @@ body {
 }
 
 /* ── Diplomatic View ─────────────────────────────────────── */
-.page-body--dipl .type-paragraph {
+
+/* Widen the card by reducing horizontal padding; page-header tracks the same value */
+.page-card:has(.page-body--dipl) {
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+.page-card:has(.page-body--dipl) .page-header {
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+
+/* Smaller, denser type — closer to the printed GW point size */
+.page-body--dipl .type-paragraph,
+.page-body--dipl .type-frontmatter {
+  font-size: 1.1rem;
+  line-height: 1.95;
   text-indent: 0;
   hyphens: none;
   text-align: left;
-  line-height: 2.0;
 }
+
+/* Each original line as its own block line — no wrapping within a line */
 .dipl-line {
   display: block;
+  white-space: nowrap;
+  overflow: visible;
 }
-/* Subtle rule between units in diplomatic mode to mark line-group boundaries */
+
+/* Subtle left rule marks unit boundaries */
 .page-body--dipl .text-unit.dipl-mode {
   border-left: 2px solid var(--border);
   padding-left: 0.9em;
   margin-left: -1.1em;
+  overflow-x: auto;
 }
 
 /* ── Search Page ─────────────────────────────────────────── */
