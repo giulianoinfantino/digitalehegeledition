@@ -353,6 +353,37 @@
       font-size: 0.92rem;
       line-height: 1.6;
     }
+    .operator-help {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .operator-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .operator-card {
+      border: 1px solid var(--border);
+      background: rgba(252,251,249,0.74);
+      padding: 12px 14px;
+    }
+    .operator-card code {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .operator-card span {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
     .results-summary {
       display: grid;
       gap: 14px;
@@ -626,6 +657,9 @@
       .stat-grid {
         grid-template-columns: 1fr;
       }
+      .operator-grid {
+        grid-template-columns: 1fr;
+      }
       .site-header {
         gap: 16px;
         align-items: flex-start;
@@ -802,6 +836,10 @@
     .query-row {
       gap: 18px;
     }
+    .operator-card {
+      background: transparent;
+      border-radius: 0;
+    }
     .result-card {
       padding: 0 0 26px;
       border-bottom: 1px solid var(--reader-rule);
@@ -892,10 +930,17 @@
     body[data-theme="dark"] .result-meta-card,
     body[data-theme="dark"] .search-btn,
     body[data-theme="dark"] .suggestion-chip,
-    body[data-theme="dark"] .source-status {
+    body[data-theme="dark"] .source-status,
+    body[data-theme="dark"] .operator-card {
       background: transparent;
       border-color: var(--reader-rule);
       box-shadow: none;
+    }
+    body[data-theme="dark"] .operator-card code {
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .operator-card span {
+      color: var(--reader-muted);
     }
     body[data-theme="dark"] .query-input,
     body[data-theme="dark"] select,
@@ -996,7 +1041,7 @@
         <div class="query-row">
           <label>
             <span class="side-title">Anfrage</span>
-            <input class="query-input" id="query-input" type="search" placeholder="z. B. Sein, Werden, Vorrede, Begriff der Logik">
+            <input class="query-input" id="query-input" type="search" placeholder='z. B. "reine Quantität" AND Begriff NOT Urteil'>
           </label>
           <button class="search-btn primary" id="run-search" type="button">Suche starten</button>
         </div>
@@ -1018,9 +1063,20 @@
           <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
         </div>
         <p class="query-note">
-          Die Suche arbeitet direkt gegen den aggregierten Editionsindex. Du kannst die gesamte Edition oder
-          gezielt ein einzelnes Werk durchsuchen; Treffer springen in die passende PDF-Seite des Readers.
+          Wissenschaftliche Query-Sprache: Boolesche Operatoren, Klammern, Phrasen, Feldfilter und Proximity-Suche.
+          Ohne explizite Operatoren gilt weiterhin die gewählte Mehrwortlogik.
         </p>
+        <div class="operator-help" aria-label="Suchsyntax">
+          <div class="side-title">Operatoren und Feldfilter</div>
+          <div class="operator-grid">
+            <div class="operator-card"><code>AND · OR · NOT</code><span>Boolesche Verknüpfung mit Klammern: <em>(Sein OR Werden) AND Anfang</em>.</span></div>
+            <div class="operator-card"><code>"exakte Phrase"</code><span>Phrasensuche für feste Wendungen und terminologische Formeln.</span></div>
+            <div class="operator-card"><code>NEAR/12</code><span>Proximity: <em>Begriff NEAR/12 Urteil</em> findet Nähe im selben Textblock.</span></div>
+            <div class="operator-card"><code>work:gw-12 · band:12</code><span>Werk- oder Bandfilter direkt in der Anfrage.</span></div>
+            <div class="operator-card"><code>type:heading</code><span>Textschichten: <em>text</em>, <em>heading</em>, <em>footnote</em>, <em>toc</em>, <em>paratext</em>.</span></div>
+            <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche für GW-, OA- oder PDF-Seiten.</span></div>
+          </div>
+        </div>
       </section>
 
       <section class="results-summary" id="results-summary">
@@ -1277,9 +1333,271 @@ function updateStats() {
   document.getElementById('stat-footnotes').textContent = ((work ? work.stats.footnotes : editionStats.footnotes) || 0).toLocaleString('de-DE');
 }
 
+function normalizeForSearch(value) {
+  return state.caseSensitive ? String(value || '') : String(value || '').toLowerCase();
+}
+
+function tokenizeQuery(query) {
+  const tokens = [];
+  let i = 0;
+  while (i < query.length) {
+    const ch = query[i];
+    if (/\s/.test(ch)) {
+      i += 1;
+      continue;
+    }
+    if (ch === '(' || ch === ')') {
+      tokens.push({ type: ch, value: ch });
+      i += 1;
+      continue;
+    }
+    if (ch === '"') {
+      let value = '';
+      i += 1;
+      while (i < query.length) {
+        if (query[i] === '"' && query[i - 1] !== '\\') break;
+        value += query[i];
+        i += 1;
+      }
+      if (query[i] === '"') i += 1;
+      tokens.push({ type: 'TERM', value: value.replace(/\\"/g, '"'), phrase: true });
+      continue;
+    }
+    let value = '';
+    while (i < query.length && !/\s|\(|\)/.test(query[i])) {
+      value += query[i];
+      i += 1;
+    }
+    const upper = value.toUpperCase();
+    if (['AND', 'OR', 'NOT'].includes(upper)) tokens.push({ type: upper, value: upper });
+    else if (/^NEAR\/\d+$/i.test(value)) tokens.push({ type: 'NEAR', value: upper, distance: Number(value.split('/')[1]) || 12 });
+    else tokens.push({ type: 'TERM', value, phrase: false });
+  }
+  return tokens;
+}
+
+function hasExplicitOperators(tokens) {
+  return tokens.some(token => ['AND', 'OR', 'NOT', 'NEAR', '(', ')'].includes(token.type));
+}
+
+function splitFieldToken(raw) {
+  const match = String(raw || '').match(/^([a-zA-Z_]+):(.*)$/);
+  if (!match) return null;
+  return { field: match[1].toLowerCase(), value: match[2] };
+}
+
+function parseRange(value) {
+  const nums = String(value || '').match(/\d+/g);
+  if (!nums?.length) return null;
+  const first = Number(nums[0]);
+  const second = Number(nums[1] || nums[0]);
+  return { min: Math.min(first, second), max: Math.max(first, second) };
+}
+
+function parseQuery(query) {
+  const rawTokens = tokenizeQuery(query);
+  if (!rawTokens.length) return { ast: null, terms: [], explicit: false };
+
+  const explicit = hasExplicitOperators(rawTokens);
+  if (state.exact && !explicit && !splitFieldToken(query.trim())) {
+    return {
+      ast: { type: 'term', value: query.trim(), phrase: true },
+      terms: [query.trim()],
+      explicit: false
+    };
+  }
+  const tokens = explicit
+    ? rawTokens
+    : rawTokens.flatMap((token, index) => index === 0 ? [token] : [{ type: state.matchMode === 'any' ? 'OR' : 'AND', value: state.matchMode === 'any' ? 'OR' : 'AND' }, token]);
+  let pos = 0;
+  const terms = [];
+
+  function peek() {
+    return tokens[pos];
+  }
+  function consume(type) {
+    if (type && peek()?.type !== type) return null;
+    return tokens[pos++] || null;
+  }
+  function parsePrimary() {
+    const token = peek();
+    if (!token) return null;
+    if (token.type === '(') {
+      consume('(');
+      const node = parseOr();
+      if (!consume(')')) throw new Error('Schließende Klammer fehlt.');
+      return node;
+    }
+    if (token.type === 'TERM') {
+      consume('TERM');
+      const field = splitFieldToken(token.value);
+      let node;
+      if (field) {
+        let fieldValue = field.value;
+        if (!fieldValue && peek()?.type === 'TERM') fieldValue = consume('TERM').value;
+        node = { type: 'field', field: field.field, value: fieldValue, phrase: token.phrase };
+        if (['title', 'text'].includes(field.field) && fieldValue) terms.push(fieldValue);
+      } else {
+        node = { type: 'term', value: token.value, phrase: token.phrase || state.exact };
+        terms.push(token.value);
+      }
+      return node;
+    }
+    throw new Error(`Unerwarteter Operator: ${token.value}`);
+  }
+  function parseNot() {
+    if (peek()?.type === 'NOT') {
+      consume('NOT');
+      return { type: 'not', child: parseNot() };
+    }
+    return parsePrimary();
+  }
+  function parseNear() {
+    let left = parseNot();
+    while (peek()?.type === 'NEAR') {
+      const op = consume('NEAR');
+      const right = parseNot();
+      left = { type: 'near', left, right, distance: op.distance || 12 };
+    }
+    return left;
+  }
+  function parseAnd() {
+    let left = parseNear();
+    while (peek()?.type === 'AND') {
+      consume('AND');
+      const right = parseNear();
+      left = { type: 'and', left, right };
+    }
+    return left;
+  }
+  function parseOr() {
+    let left = parseAnd();
+    while (peek()?.type === 'OR') {
+      consume('OR');
+      const right = parseAnd();
+      left = { type: 'or', left, right };
+    }
+    return left;
+  }
+
+  const ast = parseOr();
+  if (pos < tokens.length) throw new Error(`Nicht verstandener Rest der Anfrage: ${tokens.slice(pos).map(token => token.value).join(' ')}`);
+  return { ast, terms: [...new Set(terms.filter(Boolean))], explicit };
+}
+
+function wildcardPattern(value) {
+  const escaped = escapeRegExp(value).replace(/\\\*/g, '.*');
+  return new RegExp(escaped, state.caseSensitive ? 'g' : 'gi');
+}
+
+function findTerm(entry, value, field = 'text') {
+  const raw = field === 'title' ? entry.title : `${entry.title ? `${entry.title} ` : ''}${entry.text}`;
+  const source = String(raw || '');
+  const haystack = normalizeForSearch(source);
+  const needle = normalizeForSearch(value);
+  if (!needle) return { ok: false, indexes: [], occurrences: 0, terms: [] };
+  if (needle.includes('*')) {
+    const regex = wildcardPattern(value);
+    const indexes = [];
+    let match = regex.exec(source);
+    while (match) {
+      indexes.push(match.index);
+      if (match.index === regex.lastIndex) regex.lastIndex += 1;
+      match = regex.exec(source);
+    }
+    return { ok: indexes.length > 0, indexes, occurrences: indexes.length, terms: [value] };
+  }
+  const indexes = [];
+  let offset = 0;
+  while (offset < haystack.length) {
+    const index = haystack.indexOf(needle, offset);
+    if (index === -1) break;
+    indexes.push(index);
+    offset = index + Math.max(needle.length, 1);
+  }
+  return { ok: indexes.length > 0, indexes, occurrences: indexes.length, terms: [value] };
+}
+
+function mergeEval(ok, parts) {
+  const indexes = parts.flatMap(part => part.indexes || []);
+  const terms = parts.flatMap(part => part.terms || []);
+  const occurrences = parts.reduce((sum, part) => sum + (part.occurrences || 0), 0);
+  return { ok, indexes, occurrences, terms };
+}
+
+function fieldMatches(entry, field, value) {
+  const normalizedValue = normalizeForSearch(value);
+  const typeAliases = {
+    text: 'paragraph',
+    paragraph: 'paragraph',
+    heading: 'heading',
+    title: 'heading',
+    footnote: 'footnote',
+    toc: 'toc_entry',
+    paratext: 'frontmatter',
+    frontmatter: 'frontmatter'
+  };
+  if (['work', 'work_id'].includes(field)) return normalizeForSearch(entry.work_id) === normalizedValue;
+  if (field === 'band') return normalizeForSearch(entry.band) === normalizedValue || normalizeForSearch(entry.sigel).includes(`gw ${normalizedValue}`);
+  if (['type', 'label', 'layer'].includes(field)) return entry.label === (typeAliases[normalizedValue] || normalizedValue);
+  if (field === 'kind') return normalizeForSearch(entry.page_kind) === normalizedValue;
+  if (['gw', 'oa', 'page', 'pdf'].includes(field)) {
+    const range = parseRange(value);
+    if (!range) return false;
+    const source = field === 'gw' ? entry.gw_page : field === 'oa' ? entry.oa_page : entry.page_pdf;
+    const nums = String(source ?? '').match(/\d+/g)?.map(Number) || [];
+    return nums.some(num => num >= range.min && num <= range.max);
+  }
+  if (field === 'title') return findTerm(entry, value, 'title').ok;
+  if (field === 'text') return findTerm(entry, value, 'text').ok;
+  return false;
+}
+
+function evaluateAst(node, entry) {
+  if (!node) return { ok: false, indexes: [], occurrences: 0, terms: [] };
+  if (node.type === 'term') return findTerm(entry, node.value);
+  if (node.type === 'field') {
+    const ok = fieldMatches(entry, node.field, node.value);
+    const termHit = ['title', 'text'].includes(node.field) ? findTerm(entry, node.value, node.field) : { indexes: [], occurrences: 0, terms: [] };
+    return { ok, indexes: termHit.indexes, occurrences: termHit.occurrences, terms: termHit.terms };
+  }
+  if (node.type === 'not') {
+    const child = evaluateAst(node.child, entry);
+    return { ok: !child.ok, indexes: [], occurrences: 0, terms: [] };
+  }
+  if (node.type === 'and') {
+    const left = evaluateAst(node.left, entry);
+    if (!left.ok) return mergeEval(false, [left]);
+    const right = evaluateAst(node.right, entry);
+    return mergeEval(left.ok && right.ok, [left, right]);
+  }
+  if (node.type === 'or') {
+    const left = evaluateAst(node.left, entry);
+    const right = evaluateAst(node.right, entry);
+    return mergeEval(left.ok || right.ok, [left, right].filter(part => part.ok));
+  }
+  if (node.type === 'near') {
+    const left = evaluateAst(node.left, entry);
+    const right = evaluateAst(node.right, entry);
+    const ok = left.ok && right.ok && left.indexes.some(a => right.indexes.some(b => Math.abs(a - b) <= node.distance * 8));
+    return mergeEval(ok, [left, right]);
+  }
+  return { ok: false, indexes: [], occurrences: 0, terms: [] };
+}
+
+function getQueryProfile(query) {
+  try {
+    const parsed = parseQuery(query);
+    state.queryError = '';
+    return parsed;
+  } catch (error) {
+    state.queryError = error.message || 'Die Anfrage konnte nicht gelesen werden.';
+    return { ast: null, terms: [], explicit: false };
+  }
+}
+
 function getPatterns(query) {
-  if (state.exact) return query ? [query] : [];
-  return query.split(/\s+/).map(part => part.trim()).filter(Boolean);
+  return getQueryProfile(query).terms;
 }
 
 function countOccurrences(haystack, needle) {
@@ -1307,41 +1625,21 @@ function entryIsInScope(entry) {
 }
 
 function scoreEntry(entry, query) {
-  const patterns = getPatterns(query);
-  if (!patterns.length) return null;
+  const profile = getQueryProfile(query);
+  if (!profile.ast) return null;
+  const evaluated = evaluateAst(profile.ast, entry);
+  if (!evaluated.ok) return null;
 
-  const sourceText = state.caseSensitive ? entry.text : entry.text.toLowerCase();
-  const needles = state.caseSensitive ? patterns : patterns.map(pattern => pattern.toLowerCase());
-  const matchedIndexes = [];
-  let occurrences = 0;
-  let matchedTerms = 0;
-
-  if (state.exact) {
-    const exactNeedle = needles[0];
-    const exactIndex = sourceText.indexOf(exactNeedle);
-    if (exactIndex === -1) return null;
-    matchedIndexes.push(exactIndex);
-    occurrences = countOccurrences(sourceText, exactNeedle);
-    matchedTerms = 1;
-  } else {
-    for (const needle of needles) {
-      const index = sourceText.indexOf(needle);
-      if (index === -1) {
-        if (state.matchMode === 'all') return null;
-        continue;
-      }
-      matchedTerms += 1;
-      matchedIndexes.push(index);
-      occurrences += countOccurrences(sourceText, needle);
-    }
-    if (!matchedIndexes.length) return null;
-  }
+  const matchedIndexes = evaluated.indexes.length ? evaluated.indexes : [0];
+  const occurrences = evaluated.occurrences || 1;
+  const matchedTerms = new Set(evaluated.terms).size || 1;
 
   let score = typeWeight(entry.label) + occurrences * 2 + matchedTerms * 6;
   if (matchedIndexes[0] === 0) score += 6;
   if (entry.page_book != null) score += 2;
   if (state.exact) score += 18;
-  if (!state.exact && state.matchMode === 'all' && matchedTerms === needles.length) score += 10;
+  if (profile.explicit) score += 8;
+  if (!state.exact && state.matchMode === 'all' && matchedTerms === profile.terms.length) score += 10;
 
   return {
     entry,
