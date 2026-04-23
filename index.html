@@ -328,6 +328,63 @@
       color: var(--text-muted);
       font-size: 0.92rem;
     }
+    
+    .pipeline-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 900px;
+      margin: 3rem 0;
+    }
+    .pipeline-node {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 2rem;
+      padding: 2rem;
+      border-left: 2px solid var(--border);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .pipeline-node:hover {
+      background: rgba(120, 53, 15, 0.03);
+      border-left-color: var(--accent);
+    }
+    .node-number {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      opacity: 0.5;
+      padding-top: 0.2rem;
+    }
+    .node-content h3 {
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem;
+      font-family: var(--font-text);
+      font-weight: 600;
+    }
+    .node-content p {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .pipeline-node.highlight {
+      background: rgba(120, 53, 15, 0.05);
+      border-left-width: 4px;
+    }
+    .pipeline-node::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 2.4rem;
+      width: 10px;
+      height: 10px;
+      background: var(--bg-color);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+
     .pipeline-container {
       display: flex;
       align-items: flex-start;
@@ -367,7 +424,64 @@
       user-select: none;
     }
     @media (max-width: 900px) {
-      .pipeline-container {
+      
+    .pipeline-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 900px;
+      margin: 3rem 0;
+    }
+    .pipeline-node {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 2rem;
+      padding: 2rem;
+      border-left: 2px solid var(--border);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .pipeline-node:hover {
+      background: rgba(120, 53, 15, 0.03);
+      border-left-color: var(--accent);
+    }
+    .node-number {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      opacity: 0.5;
+      padding-top: 0.2rem;
+    }
+    .node-content h3 {
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem;
+      font-family: var(--font-text);
+      font-weight: 600;
+    }
+    .node-content p {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .pipeline-node.highlight {
+      background: rgba(120, 53, 15, 0.05);
+      border-left-width: 4px;
+    }
+    .pipeline-node::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 2.4rem;
+      width: 10px;
+      height: 10px;
+      background: var(--bg-color);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+
+    .pipeline-container {
         flex-direction: column;
         align-items: stretch;
       }
@@ -702,39 +816,57 @@
     </article>
   </section>
 
+  
   <section class="section workflow-pipeline">
     <div class="section-header">
-      <h2>Der Digitale Hegel-Pipeline</h2>
+      <h2>Die digitale Rekonstruktions-Pipeline</h2>
       <p>
-        Vom gedruckten Band zur interaktiven Forschungsplattform: So werden die Hegel-Texte digital rekonstruiert.
+        Hegels Texte stellen extreme Anforderungen an die digitale Erfassung. Unser Workflow transformiert statische PDF-Scans in eine semantisch strukturierte Forschungsdatenbank.
       </p>
     </div>
-    <div class="pipeline-container">
-      <div class="pipeline-step">
-        <div class="step-icon">📄</div>
-        <h3>1. Extraktion</h3>
-        <p>Präzises Einlesen der PDF-Layouts, Erkennung von Schriftgrößen und Koordinaten.</p>
+    <div class="pipeline-flow">
+      <div class="pipeline-node">
+        <div class="node-number">01</div>
+        <div class="node-content">
+          <h3>Layout-Analyse & Ingestion</h3>
+          <p>Präzises Einlesen der PDF-Koordinaten. Identifikation von Grundschrift, Marginalien und Fußnotenbereichen mittels statistischer Font-Analyse.</p>
+        </div>
       </div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-step">
-        <div class="step-icon">🧩</div>
-        <h3>2. Rekonstruktion</h3>
-        <p>Sperrsatz-Heilung, Zusammenführung von Worttrennungen und seitenübergreifende Fußnoten-Logik.</p>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node">
+        <div class="node-number">02</div>
+        <div class="node-content">
+          <h3>Semantische Heilung</h3>
+          <p>Rekonstruktion von <em>Sperrsatz</em> (S p e r r u n g), Auflösung historischer Ligaturen und automatisches De-Hyphening von Worttrennungen.</p>
+        </div>
       </div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-step">
-        <div class="step-icon">✨</div>
-        <h3>3. Refinement</h3>
-        <p>Automatische Bereinigung von OCR-Rauschen und Validierung der Inhaltsverzeichnisse.</p>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node">
+        <div class="node-number">03</div>
+        <div class="node-content">
+          <h3>Cross-Page Merging</h3>
+          <p>Intelligente Verknüpfung von Absätzen und Fußnoten, die über Seitenumbrüche hinweggehen. Die logische Einheit des Textes wird über die physische Seite gehoben.</p>
+        </div>
       </div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-step">
-        <div class="step-icon">🏛️</div>
-        <h3>4. Edition</h3>
-        <p>Bereitstellung als performante, durchsuchbare Weboberfläche mit stabilen Zitier-Referenzen.</p>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node">
+        <div class="node-number">04</div>
+        <div class="node-content">
+          <h3>Sanitization & Refinement</h3>
+          <p>Filterung von OCR-Rauschen und Artefakten. Bereinigung der Inhaltsverzeichnisse und Validierung der GW/OA-Referenzanker.</p>
+        </div>
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-node highlight">
+        <div class="node-number">05</div>
+        <div class="node-content">
+          <h3>Digitaler Editionsraum</h3>
+          <p>Bereitstellung als hochperformante Web-Assets. Sofortige Volltextsuche und responsive Lesefassung für alle Endgeräte.</p>
+        </div>
       </div>
     </div>
   </section>
+
 
   <section class="section" id="works-section">
     <div class="section-header">
