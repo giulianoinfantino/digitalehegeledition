@@ -510,6 +510,23 @@ body {
   margin-top: 0;
 }
 
+/* ── Diplomatic View ─────────────────────────────────────── */
+.page-body--dipl .type-paragraph {
+  text-indent: 0;
+  hyphens: none;
+  text-align: left;
+  line-height: 2.0;
+}
+.dipl-line {
+  display: block;
+}
+/* Subtle rule between units in diplomatic mode to mark line-group boundaries */
+.page-body--dipl .text-unit.dipl-mode {
+  border-left: 2px solid var(--border);
+  padding-left: 0.9em;
+  margin-left: -1.1em;
+}
+
 /* ── Search Page ─────────────────────────────────────────── */
 .search-hero {
   padding: 5rem 0 3rem;
