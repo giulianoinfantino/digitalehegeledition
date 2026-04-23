@@ -696,6 +696,30 @@
       border-color: var(--reader-rule);
       box-shadow: none;
     }
+  
+    .reader-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+      padding: 0 5% 4rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .reader-sidebar {
+      position: sticky;
+      top: 6rem;
+      height: calc(100vh - 8rem);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      padding-right: 2rem;
+      padding-top: 2rem;
+    }
+    .reader-sidebar .side-card, 
+    .reader-sidebar .query-card,
+    .reader-sidebar .source-status {
+      display: none !important;
+    }
+
   </style>
 </head>
 <body>
@@ -711,136 +735,55 @@
       <li><a href="search.html">Suche</a></li>
     </ul>
   </nav>
+  <div class="theme-controls">
+    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
+  </div>
 </header>
 
-<main class="reader-main">
-  <section class="reader-intro">
-    <div class="reader-kicker">Direkt aus dem Extraktor</div>
-    <h1>Lesetext der digitalen Edition</h1>
-    <p>
-      Diese Lesefassung ist auf die <em>Gesammelten Werke</em> zugeschnitten: mit editorischer Seitenführung,
-      ruhigem Satzbild und direktem Zugriff auf die wissenschaftlich relevanten Stellenangaben in <strong>GW</strong>
-      und <strong>OA</strong>.
-    </p>
-  </section>
+<div class="reader-layout">
+  <aside class="reader-sidebar">
+    <h3 class="toc-title">Inhalt</h3>
+    <ul id="toc-list" class="toc-list">
+      <!-- Nur das Inhaltsverzeichnis erscheint hier -->
+    </ul>
+  </aside>
 
-  <div class="reader-layout">
-    <aside class="reader-sidebar">
-      <section class="side-card">
-        <h2 class="side-title">Werk</h2>
-        <div class="range-field">
-          <span>Werk</span>
-          <label>
-            <select id="work-select">
-              <option value="">Werkliste wird geladen…</option>
-            </select>
-          </label>
-        </div>
-        <div class="source-status" id="edition-status">
-          Editionskatalog wird geladen…
-        </div>
-      </section>
+  <main class="text-content">
+    <div id="reader-summary"></div>
 
-      <section class="side-card">
-        <h2 class="side-title">Quelle</h2>
-        <div class="picker-row">
-          <button class="reader-btn" id="reload-source" type="button">Aktuelles Werk neu laden</button>
+    <div class="reader-toolbar">
+      <div class="toolbar-group">
+        <span class="toolbar-label">Gehe zu Seite</span>
+        <div class="jump-input-group">
+          <input type="text" id="jump-gw-page" placeholder="GW" title="GW Seitennummer">
+          <input type="text" id="jump-oa-page" placeholder="OA" title="OA Seitennummer">
         </div>
-        <div class="source-status" id="source-status">
-          Werkdatei wird geladen…
-        </div>
-      </section>
-
-      <section class="side-card">
-        <h2 class="side-title">Lesemodus</h2>
-        <div class="mode-row">
-          <button class="mode-btn is-active" id="mode-normalized" type="button">Normalisiert</button>
-          <button class="mode-btn" id="mode-raw" type="button">Rohtext</button>
-        </div>
-        <div class="checklist">
-          <label><input type="checkbox" id="toggle-footnotes" checked> Fußnoten anzeigen</label>
-          <label><input type="checkbox" id="toggle-tags"> Struktur-Tags anzeigen</label>
-        </div>
-      </section>
-
-      <section class="side-card">
-        <h2 class="side-title">Editionswerkzeuge</h2>
-        <div class="tool-grid">
-          <div class="jump-grid">
-            <div class="range-field">
-              <span>GW-Seite</span>
-              <label><input type="text" id="jump-gw-page" placeholder="z. B. 147"></label>
-            </div>
-            <div class="range-field">
-              <span>OA-Seite</span>
-              <label><input type="text" id="jump-oa-page" placeholder="z. B. 226"></label>
-            </div>
-          </div>
-          <button class="reader-btn ghost" id="jump-to-page" type="button">Zur Stelle springen</button>
-          <div class="source-status" id="jump-status">
-            Navigiere direkt nach <strong>GW</strong>- oder <strong>OA</strong>-Seite.
-          </div>
-        </div>
-      </section>
-
-      <section class="side-card">
-        <h2 class="side-title">Korpusdaten</h2>
-        <div class="stat-grid">
-          <div class="stat-tile">
-            <strong id="stat-pages">—</strong>
-            <span>Seiten</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-toc">—</strong>
-            <span>TOC-Einträge</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-headings">—</strong>
-            <span>Überschriften</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-footnotes">—</strong>
-            <span>Fußnoten</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="side-card">
-        <h2 class="side-title" id="toc-title">Werkgliederung</h2>
-        <ul class="toc-list" id="toc-list">
-          <li>Warte auf JSON…</li>
-        </ul>
-      </section>
-    </aside>
-
-    <section class="reader-view">
-      <div class="reader-summary" id="reader-summary">
-        <div class="summary-head">
-          <div>
-            <h2 class="summary-title">Noch kein Korpus geladen</h2>
-            <p class="summary-subtitle">
-              Sobald Editionskatalog und Werkdatei geladen sind, erscheint hier der ausgewählte Band direkt als
-              Lesefassung.
-            </p>
-          </div>
-        </div>
+        <button class="theme-toggle" onclick="handleJumpToPage()">Springen</button>
       </div>
 
-      <div class="reader-pages" id="reader-pages">
-        <div class="empty-state">
-          <strong>Warte auf Daten.</strong><br>
-          Sobald das Korpus geladen ist, wird hier der Extraktor-Output direkt als digitale Lesefassung gerendert.
-        </div>
+      <div class="toolbar-stats">
+        <span>Seiten: <strong id="stat-pages">—</strong></span>
+        <span>Überschriften: <strong id="stat-headings">—</strong></span>
+        <span>Fußnoten: <strong id="stat-footnotes">—</strong></span>
       </div>
-    </section>
-  </div>
-</main>
 
-<footer class="legal-footer">
-  <nav>
-    <a href="impressum.html">Impressum</a>
+      <div class="toolbar-group">
+        <button class="theme-toggle" id="toggle-footnotes" onclick="toggleFootnotes()">Fußnoten</button>
+      </div>
+    </div>
+
+    <div id="reader-pages">
+      <!-- Text-Seiten werden hier geladen -->
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div>Digitale Hegel-Edition · Forschungsplattform</div>
+  <div>
+    <a href="impressum.html">Impressum</a> · 
     <a href="datenschutz.html">Datenschutz</a>
-  </nav>
+  </div>
 </footer>
 
 <script src="assets/theme.js"></script>
