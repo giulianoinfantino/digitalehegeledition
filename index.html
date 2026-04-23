@@ -925,6 +925,14 @@
   </section>
 
 
+  
+  <section class="section" id="history-section" style="display:none;">
+    <div class="section-header">
+      <h2>Zuletzt gelesen</h2>
+    </div>
+    <div class="feature-grid" id="history-grid"></div>
+  </section>
+
   <section class="section" id="works-section">
     <div class="section-header">
       <h2>Werke der Edition</h2>
@@ -1100,6 +1108,21 @@
       status.textContent = 'Editionskatalog nicht geladen: ' + error.message;
     }
   }
+
+  
+  function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('hegel-history') || '[]');
+    if (history.length === 0) return;
+    document.getElementById('history-section').style.display = 'block';
+    const grid = document.getElementById('history-grid');
+    grid.innerHTML = history.map(workId => {
+      const work = window.HEGEL_EDITION?.works.find(w => w.work_id === workId);
+      if (!work) return '';
+      return `<article class="feature-card"><h3>${work.siglum}</h3><p>${work.title}</p><a href="text.html?work=${workId}" class="btn-primary">Weiterlesen</a></article>`;
+    }).join('');
+  }
+  const oldPopulate = populateEdition;
+  populateEdition = async function() { await oldPopulate(); renderHistory(); };
 
   populateEdition();
 </script>

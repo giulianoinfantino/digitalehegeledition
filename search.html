@@ -1334,6 +1334,15 @@
     <label style="cursor:pointer; display: flex; align-items: center; gap: 0.4rem; color: var(--text-muted);">
       <input type="checkbox" id="check-case" onchange="handleSearch()"> Groß/Klein
     </label>
+  
+  <div class="search-options-row" style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; font-family: var(--font-ui); font-size: 0.75rem; text-transform: uppercase;">
+    <div class="filter-group">
+      <span>Nähe (NEAR):</span>
+      <input type="range" id="near-dist" min="2" max="50" value="12" onchange="handleSearch()" style="width: 80px; accent-color: var(--accent);">
+      <span id="near-val">12</span>
+    </div>
+    <button class="citation-btn" onclick="exportResults('csv')">CSV Export</button>
+    <button class="citation-btn" onclick="exportResults('bibtex')">BibTeX</button>
   </div>
 
   <div id="search-status" class="search-results-info">Bereit für die Suche.</div>
@@ -1365,6 +1374,37 @@
       status.textContent = 'Tippen Sie Enter zum Suchen...';
     }
   });
+
+
+  function exportResults(format) {
+    if (!state.lastResults || state.lastResults.length === 0) return alert('Keine Ergebnisse zum Exportieren.');
+    
+    let output = '';
+    if (format === 'csv') {
+      output = 'Work;Page;Text\n' + state.lastResults.map(r => `"${r.entry.sigel}";"${r.entry.page_pdf}";"${r.entry.text.substring(0,100)}..."`).join('\n');
+    } else {
+      output = state.lastResults.map(r => `@incollection{hegel_${r.entry.work_id}_${r.entry.page_pdf},\n  author={Hegel, G.W.F.},\n  title={${r.entry.work_title}},\n  pages={${r.entry.page_pdf}},\n  year={1831}\n}`).join('\n\n');
+    }
+    
+    const blob = new Blob([output], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hegel_search_results.${format === 'csv' ? 'csv' : 'bib'}`;
+    a.click();
+  }
+
+  // Update near value display
+  document.getElementById('near-dist')?.addEventListener('input', (e) => {
+    document.getElementById('near-val').textContent = e.target.value;
+  });
+
+  // Track results for export
+  const oldRenderResults = renderResults;
+  renderResults = function(results) {
+    state.lastResults = results;
+    oldRenderResults(results);
+  };
 
 const state = {
   edition: null,
