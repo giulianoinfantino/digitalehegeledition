@@ -347,6 +347,28 @@
       align-items: end;
       margin-top: 14px;
     }
+    .advanced-search {
+      margin-top: 18px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .advanced-search summary {
+      cursor: pointer;
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .advanced-search summary::marker {
+      color: var(--accent);
+    }
+    .advanced-body {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
     .query-note {
       margin: 10px 0 0;
       color: var(--text-muted);
@@ -383,6 +405,28 @@
       color: var(--text-muted);
       font-size: 0.9rem;
       line-height: 1.45;
+    }
+    .example-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .example-chip {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 8px 10px;
+      text-transform: uppercase;
+    }
+    .example-chip:hover {
+      color: var(--accent);
+      border-color: var(--accent);
     }
     .results-summary {
       display: grid;
@@ -557,6 +601,14 @@
       font-size: 0.9rem;
       line-height: 1.55;
     }
+    .result-citation {
+      color: var(--accent);
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
     .result-meta-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -655,6 +707,9 @@
       }
       .range-grid,
       .stat-grid {
+        grid-template-columns: 1fr;
+      }
+      .operator-grid {
         grid-template-columns: 1fr;
       }
       .operator-grid {
@@ -836,6 +891,12 @@
     .query-row {
       gap: 18px;
     }
+    .advanced-search,
+    .operator-card,
+    .example-chip {
+      background: transparent;
+      border-radius: 0;
+    }
     .operator-card {
       background: transparent;
       border-radius: 0;
@@ -942,6 +1003,21 @@
     body[data-theme="dark"] .operator-card span {
       color: var(--reader-muted);
     }
+    body[data-theme="dark"] .advanced-search,
+    body[data-theme="dark"] .example-chip {
+      border-color: var(--reader-rule);
+    }
+    body[data-theme="dark"] .advanced-search summary {
+      color: var(--reader-ink);
+    }
+    body[data-theme="dark"] .example-chip {
+      color: var(--reader-muted);
+      background: transparent;
+    }
+    body[data-theme="dark"] .example-chip:hover,
+    body[data-theme="dark"] .result-citation {
+      color: var(--reader-accent-soft);
+    }
     body[data-theme="dark"] .query-input,
     body[data-theme="dark"] select,
     body[data-theme="dark"] input {
@@ -1045,38 +1121,53 @@
           </label>
           <button class="search-btn primary" id="run-search" type="button">Suche starten</button>
         </div>
-        <div class="query-tools">
-          <label class="sort-field">
-            <span>Sortierung</span>
-            <select id="sort-order">
-              <option value="relevance">Nach Relevanz</option>
-              <option value="page">Nach Seitenfolge</option>
-            </select>
-          </label>
-          <label class="sort-field">
-            <span>Mehrwortsuche</span>
-            <select id="match-mode">
-              <option value="all">Alle Wörter</option>
-              <option value="any">Mindestens eines</option>
-            </select>
-          </label>
-          <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
-        </div>
         <p class="query-note">
           Wissenschaftliche Query-Sprache: Boolesche Operatoren, Klammern, Phrasen, Feldfilter und Proximity-Suche.
           Ohne explizite Operatoren gilt weiterhin die gewählte Mehrwortlogik.
         </p>
-        <div class="operator-help" aria-label="Suchsyntax">
-          <div class="side-title">Operatoren und Feldfilter</div>
-          <div class="operator-grid">
-            <div class="operator-card"><code>AND · OR · NOT</code><span>Boolesche Verknüpfung mit Klammern: <em>(Sein OR Werden) AND Anfang</em>.</span></div>
-            <div class="operator-card"><code>"exakte Phrase"</code><span>Phrasensuche für feste Wendungen und terminologische Formeln.</span></div>
-            <div class="operator-card"><code>NEAR/12</code><span>Proximity: <em>Begriff NEAR/12 Urteil</em> findet Nähe im selben Textblock.</span></div>
-            <div class="operator-card"><code>work:gw-12 · band:12</code><span>Werk- oder Bandfilter direkt in der Anfrage.</span></div>
-            <div class="operator-card"><code>type:heading</code><span>Textschichten: <em>text</em>, <em>heading</em>, <em>footnote</em>, <em>toc</em>, <em>paratext</em>.</span></div>
-            <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche für GW-, OA- oder PDF-Seiten.</span></div>
+        <details class="advanced-search">
+          <summary>Erweiterte Suche und Syntax</summary>
+          <div class="advanced-body">
+            <div class="query-tools">
+              <label class="sort-field">
+                <span>Sortierung</span>
+                <select id="sort-order">
+                  <option value="relevance">Nach Relevanz</option>
+                  <option value="page">Nach Seitenfolge</option>
+                </select>
+              </label>
+              <label class="sort-field">
+                <span>Mehrwortsuche ohne Operatoren</span>
+                <select id="match-mode">
+                  <option value="all">Alle Wörter</option>
+                  <option value="any">Mindestens eines</option>
+                </select>
+              </label>
+              <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
+            </div>
+            <div>
+              <div class="side-title" style="margin-bottom:10px;">Beispielanfragen</div>
+              <div class="example-row">
+                <button class="example-chip" type="button" data-example='"reine Quantität"'>Phrase</button>
+                <button class="example-chip" type="button" data-example='(Sein OR Werden) AND Anfang'>Boolean</button>
+                <button class="example-chip" type="button" data-example='Begriff NEAR/12 Urteil'>Nähe</button>
+                <button class="example-chip" type="button" data-example='type:heading Logik'>Überschriften</button>
+                <button class="example-chip" type="button" data-example='work:gw-12 gw:30-80 Begriff'>GW-Bereich</button>
+              </div>
+            </div>
+            <div class="operator-help" aria-label="Suchsyntax">
+              <div class="side-title">Operatoren und Feldfilter</div>
+              <div class="operator-grid">
+                <div class="operator-card"><code>AND · OR · NOT</code><span>Boolesche Verknüpfung mit Klammern: <em>(Sein OR Werden) AND Anfang</em>.</span></div>
+                <div class="operator-card"><code>"exakte Phrase"</code><span>Phrasensuche für feste Wendungen und terminologische Formeln.</span></div>
+                <div class="operator-card"><code>NEAR/12</code><span>Proximity: <em>Begriff NEAR/12 Urteil</em> findet Nähe im selben Textblock.</span></div>
+                <div class="operator-card"><code>work:gw-12 · band:12</code><span>Werk- oder Bandfilter direkt in der Anfrage.</span></div>
+                <div class="operator-card"><code>type:heading</code><span>Textschichten: <em>text</em>, <em>heading</em>, <em>footnote</em>, <em>toc</em>, <em>paratext</em>.</span></div>
+                <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche für GW-, OA- oder PDF-Seiten.</span></div>
+              </div>
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <section class="results-summary" id="results-summary">
@@ -1388,6 +1479,27 @@ function hasExplicitOperators(tokens) {
   return tokens.some(token => ['AND', 'OR', 'NOT', 'NEAR', '(', ')'].includes(token.type));
 }
 
+function insertImplicitAnd(tokens) {
+  const out = [];
+  const endsExpression = token => token && (token.type === 'TERM' || token.type === ')');
+  const startsExpression = token => token && (token.type === 'TERM' || token.type === '(' || token.type === 'NOT');
+  tokens.forEach((token, index) => {
+    const previous = out[out.length - 1];
+    if (
+      index > 0
+      && endsExpression(previous)
+      && startsExpression(token)
+      && previous.type !== 'AND'
+      && previous.type !== 'OR'
+      && previous.type !== 'NEAR'
+    ) {
+      out.push({ type: 'AND', value: 'AND', implicit: true });
+    }
+    out.push(token);
+  });
+  return out;
+}
+
 function splitFieldToken(raw) {
   const match = String(raw || '').match(/^([a-zA-Z_]+):(.*)$/);
   if (!match) return null;
@@ -1415,7 +1527,7 @@ function parseQuery(query) {
     };
   }
   const tokens = explicit
-    ? rawTokens
+    ? insertImplicitAnd(rawTokens)
     : rawTokens.flatMap((token, index) => index === 0 ? [token] : [{ type: state.matchMode === 'any' ? 'OR' : 'AND', value: state.matchMode === 'any' ? 'OR' : 'AND' }, token]);
   let pos = 0;
   const terms = [];
@@ -1633,7 +1745,7 @@ function entryIsInScope(entry) {
 }
 
 function scoreEntry(entry, query) {
-  const profile = getQueryProfile(query);
+  const profile = arguments[2] || getQueryProfile(query);
   if (!profile.ast) return null;
   const evaluated = evaluateAst(profile.ast, entry);
   if (!evaluated.ok) return null;
@@ -1656,6 +1768,24 @@ function scoreEntry(entry, query) {
     matchedTerms,
     occurrences
   };
+}
+
+function formatCitation(entry) {
+  const parts = [entry.work_short_title || entry.work_title || 'Hegel'];
+  if (entry.gw_page != null) parts.push(`GW ${entry.gw_page}`);
+  if (entry.oa_page != null) parts.push(`OA ${entry.oa_page}`);
+  if (entry.page_pdf != null) parts.push(`PDF ${entry.page_pdf}`);
+  return parts.join(' · ');
+}
+
+function renderQueryMode(profile) {
+  if (!state.query.trim()) return '';
+  const chips = [];
+  chips.push(profile?.explicit ? 'Boolesche Suche' : (state.exact ? 'Exakte Phrase' : 'Token-Suche'));
+  chips.push(state.sort === 'page' ? 'Seitenfolge' : 'Relevanzsortierung');
+  chips.push(state.caseSensitive ? 'Groß/Kleinschreibung' : 'ohne Groß/Kleinschreibung');
+  if (profile?.terms?.length) chips.push(`${profile.terms.length} Term${profile.terms.length === 1 ? '' : 'e'}`);
+  return chips.map(chip => `<span class="section-chip">${escapeHtml(chip)}</span>`).join('');
 }
 
 function buildResultProfile(results) {
@@ -1777,9 +1907,11 @@ function renderSuggestionButtons(suggestions) {
 
 function getResults() {
   if (!state.query.trim()) return [];
+  const profile = getQueryProfile(state.query.trim());
+  if (!profile.ast) return [];
   const results = state.entries
     .filter(entryIsInScope)
-    .map(entry => scoreEntry(entry, state.query.trim()))
+    .map(entry => scoreEntry(entry, state.query.trim(), profile))
     .filter(Boolean);
 
   results.sort((a, b) => {
@@ -1800,6 +1932,7 @@ function renderSummary(results) {
   const summary = document.getElementById('results-summary');
   const work = currentWork();
   const suggestions = buildSuggestions();
+  const profile = state.query.trim() && !state.queryError ? getQueryProfile(state.query.trim()) : null;
 
   if (!state.edition) {
     summary.innerHTML = `
@@ -1865,10 +1998,7 @@ function renderSummary(results) {
         </p>
       </div>
       <div class="chip-row">
-        <span class="section-chip">${state.sort === 'page' ? 'Seitenfolge' : 'Relevanzsortierung'}</span>
-        <span class="section-chip">${state.exact ? 'Exakte Phrase' : 'Token-Suche'}</span>
-        <span class="section-chip">${state.exact ? 'Exakt' : (state.matchMode === 'all' ? 'Alle Wörter' : 'Beliebige Wörter')}</span>
-        <span class="section-chip">${state.caseSensitive ? 'Case sensitive' : 'Case insensitive'}</span>
+        ${renderQueryMode(profile)}
       </div>
     </div>
     <div class="chip-row">
@@ -1890,6 +2020,17 @@ function bindSuggestionButtons() {
       const suggestion = button.dataset.suggestion || '';
       document.getElementById('query-input').value = suggestion;
       state.query = suggestion;
+      renderResults();
+    });
+  });
+}
+
+function bindExampleButtons() {
+  document.querySelectorAll('[data-example]').forEach(button => {
+    button.addEventListener('click', () => {
+      const example = button.dataset.example || '';
+      document.getElementById('query-input').value = example;
+      readControls();
       renderResults();
     });
   });
@@ -1941,6 +2082,7 @@ function renderResults() {
     const entry = result.entry;
     const targetHref = `text.html?work=${encodeURIComponent(entry.work_id)}#page-${entry.page_pdf}`;
     const excerpt = excerptAround(entry.text, result.matchIndex);
+    const citation = formatCitation(entry);
     const title = entry.label === 'heading' || entry.label === 'toc_entry'
       ? highlightText(entry.title || entry.text, state.query.trim())
       : escapeHtml(humanLabel(entry.label));
@@ -1963,11 +2105,11 @@ function renderResults() {
         <div class="result-body">
           <div class="chip-row">
             <span class="result-chip">${escapeHtml(entry.work_short_title || entry.work_title)}</span>
-            <span class="result-chip">${escapeHtml(entry.page_kind || 'body')}</span>
+            <span class="result-chip">${escapeHtml(humanLabel(entry.label))}</span>
             <span class="result-chip">${result.matchedTerms} Suchterm${result.matchedTerms === 1 ? '' : 'e'}</span>
             <span class="result-chip">${result.occurrences} Vorkommen</span>
-            <span class="result-chip">Score ${escapeHtml(result.score)}</span>
           </div>
+          <div class="result-citation">${escapeHtml(citation)}</div>
           <div class="result-context">
             ${entry.title && entry.label !== 'toc_entry' ? `Titelkontext: <strong>${escapeHtml(entry.title)}</strong>` : `Werk: <strong>${escapeHtml(entry.work_title)}</strong>`}
           </div>
@@ -1981,7 +2123,7 @@ function renderResults() {
             </div>
             <div class="result-meta-card">
               <strong>Stelle</strong>
-              ${escapeHtml(entry.sigel)}${entry.gw_page != null ? ` · GW ${escapeHtml(entry.gw_page)}` : ''}${entry.oa_page != null ? ` · OA ${escapeHtml(entry.oa_page)}` : ''}
+              ${escapeHtml(citation)}
             </div>
             <div class="result-meta-card">
               <strong>Textschicht</strong>
@@ -2092,6 +2234,7 @@ function bindEvents() {
   });
 
   document.getElementById('reload-source').addEventListener('click', handleAutoReload);
+  bindExampleButtons();
 }
 
 applyUrlState();
