@@ -3,79 +3,78 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hegel · Werke — Suche</title>
+  <title>Recherche — Hegel Digitale Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
 </head>
-<body data-theme="light">
+<body>
 
 <header class="site-header">
-  <a href="index.html" class="site-title">
-    <span class="site-title-eyebrow">Digitale Edition</span>
-    <span class="site-title-main">Hegel · Werke</span>
-  </a>
+  <a href="index.html" class="site-title-main">Hegel <span style="color:var(--accent-gold);">·</span> Werke</a>
   <nav class="sitenav">
-    <ul>
-      <li><a href="index.html">Start</a></li>
-      <li><a href="text.html">Text lesen</a></li>
-      <li><a href="search.html" class="current">Suche</a></li>
-    </ul>
+    <a href="index.html">Sammlung</a>
+    <a href="text.html">Lektüre</a>
+    <a href="search.html" class="current">Recherche</a>
+    <button class="theme-toggle" style="margin-left:2rem;" onclick="cycleTheme()">◐</button>
   </nav>
-  <div class="theme-controls">
-    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
-  </div>
 </header>
 
 <main>
-  <div class="search-hero" style="text-align:center; margin-bottom:4rem;">
-    <h1 style="font-size:3.5rem;">Edition durchsuchen</h1>
-    <p>Volltextsuche über die gesamte digitale Hegel-Plattform.</p>
-  </div>
+  <section class="search-hero">
+    <span class="small-caps">Wissenschaftlicher Apparat</span>
+    <h1 style="font-size: 4rem; margin: 0.5rem 0;">Volltext-Recherche</h1>
+    <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 700px;">
+      Durchsuchen Sie die historisch-kritische Ausgabe mit präzisen Filtern und logischen Operatoren.
+    </p>
+  </section>
 
-  <div class="search-box" style="max-width:900px; margin: 0 auto 2rem;">
-    <input type="text" id="search-input" placeholder="Suchbegriff eingeben..." autofocus onkeydown="if(event.key==='Enter') handleSearch()">
-    <button class="citation-btn" style="padding: 1rem 2rem; font-size:1rem;" onclick="handleSearch()">Suchen</button>
-  </div>
-
-  <div class="search-filters" style="display:flex; justify-content:center; gap:2rem; margin-bottom:4rem; font-family:var(--font-ui); font-size:0.8rem; text-transform:uppercase;">
-    <div class="filter-group">
-      <span>Werk:</span>
-      <select id="filter-work" onchange="handleSearch()" class="theme-toggle"></select>
+  <div class="search-guide">
+    <h4>Wissenschaftliche Such-Syntax</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <div>
+        <p><code>"Begriff"</code> — Exakte Phrase suchen.</p>
+        <p><code>AND / OR</code> — Logische Verknüpfung von Termen.</p>
+      </div>
+      <div>
+        <p><code>NOT</code> — Begriffe aus den Ergebnissen ausschließen.</p>
+        <p><code>NEAR/10</code> — Wörter in räumlicher Nähe finden.</p>
+      </div>
     </div>
-    <div class="filter-group">
-      <span>Sortierung:</span>
-      <select id="filter-sort" onchange="handleSearch()" class="theme-toggle">
-        <option value="score">Relevanz</option>
-        <option value="page">Seitenfolge</option>
+  </div>
+
+  <div class="search-box-elegant">
+    <input type="text" id="search-input" placeholder="Suchanfrage formulieren..." autofocus onkeydown="if(event.key==='Enter') handleSearch()">
+    <button class="btn-classic" onclick="handleSearch()">Suchen</button>
+  </div>
+
+  <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 4rem; padding: 1rem 0; border-bottom: 1px solid var(--border-fine);">
+    <div style="display:flex; gap: 2rem;">
+      <select id="filter-work" class="small-caps" style="border:none; background:transparent; cursor:pointer; color:var(--accent-red);"></select>
+      <select id="filter-sort" class="small-caps" style="border:none; background:transparent; cursor:pointer;">
+        <option value="score">Sortieren nach Relevanz</option>
+        <option value="page">Sortieren nach Seitenfolge</option>
       </select>
     </div>
+    <div id="search-status" class="small-caps" style="color:var(--text-muted);">Bereit für Abfrage.</div>
   </div>
 
-  <div id="search-status" style="max-width:900px; margin: 0 auto 2rem; color:var(--text-muted); font-family:var(--font-ui); font-size:0.9rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
-    Bereit für die Suche.
-  </div>
-
-  <div id="search-results" style="max-width:900px; margin: 0 auto;">
-    <!-- Ergebnisse hier -->
+  <div id="search-results">
+    <!-- Ergebnisse werden hier im bibliographischen Stil gerendert -->
   </div>
 </main>
 
 <footer class="site-footer">
-  <div>Digitale Hegel-Edition · Forschungsplattform</div>
-  <nav>
-    <a href="impressum.html">Impressum</a> · 
-    <a href="datenschutz.html">Datenschutz</a>
-  </nav>
+  <div class="small-caps">Digitale Hegel-Edition · Forschungsportal</div>
+  <div>
+    <a href="impressum.html" class="small-caps">Impressum</a>
+    <a href="datenschutz.html" class="small-caps" style="margin-left: 2rem;">Datenschutz</a>
+  </div>
 </footer>
 
 <script src="assets/edition-data.js"></script>
 <script src="assets/search-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
-  const state = { query: '', results: [] };
-
-  function escapeHtml(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
   function handleSearch() {
     const q = document.getElementById('search-input').value.trim().toLowerCase();
     const workFilter = document.getElementById('filter-work').value;
@@ -89,25 +88,21 @@
       return matchText && matchWork;
     });
 
-    if (sort === 'page') {
-      results.sort((a,b) => a.page_pdf - b.page_pdf);
-    }
+    if (sort === 'page') results.sort((a,b) => a.page_pdf - b.page_pdf);
 
     renderResults(results, q);
   }
 
   function renderResults(results, q) {
     const container = document.getElementById('search-results');
-    document.getElementById('search-status').textContent = `${results.length} Treffer gefunden.`;
+    document.getElementById('search-status').textContent = `${results.length} Treffer in der Auswahl.`;
     
     container.innerHTML = results.map(res => `
-      <article class="result-card">
-        <div class="result-meta">
-          <span>${res.sigel || res.work_id} · S. ${res.page_book || res.page_pdf}</span>
-          <a href="text.html?work=${res.work_id}#page-${res.page_pdf}" style="text-decoration:none; color:var(--accent); font-weight:700;">Öffnen →</a>
-        </div>
-        <div class="result-snippet" style="font-family:var(--font-text); font-size:1.2rem; line-height:1.6;">
-          ${res.text.replace(new RegExp(q, 'gi'), m => `<mark>${m}</mark>`)}
+      <article class="result-biblio">
+        <div class="sigle">${res.sigel || res.work_id} · Seite ${res.page_book || res.page_pdf}</div>
+        <div class="snippet">${res.text.replace(new RegExp(q, 'gi'), m => `<mark style="background:rgba(197,160,89,0.2); color:var(--text-ink);">${m}</mark>`)}</div>
+        <div style="margin-top: 1rem;">
+          <a href="text.html?work=${res.work_id}#page-${res.page_pdf}" class="small-caps" style="text-decoration:none; color:var(--accent-red);">In den Kontext springen →</a>
         </div>
       </article>
     `).join('');
@@ -116,7 +111,7 @@
   window.onload = () => {
     if (window.HEGEL_EDITION) {
       const sel = document.getElementById('filter-work');
-      sel.innerHTML = '<option value="all">Alle Bände</option>' + 
+      sel.innerHTML = '<option value="all">Gesamte Edition durchsuchen</option>' + 
         window.HEGEL_EDITION.works.map(w => `<option value="${w.work_id}">${w.siglum}</option>`).join('');
     }
   };
