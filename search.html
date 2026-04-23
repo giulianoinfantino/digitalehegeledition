@@ -10,100 +10,188 @@
 <body>
 
 <header class="site-header">
-  <a href="index.html" class="site-title-main">Hegel <span style="color:var(--accent-gold);">·</span> Werke</a>
+  <a href="index.html" class="site-title">
+    <span class="site-title-eyebrow">Digitale Edition</span>
+    <span class="site-title-main">Hegel · Werke</span>
+  </a>
   <nav class="sitenav">
-    <a href="index.html">Sammlung</a>
-    <a href="text.html">Lektüre</a>
-    <a href="search.html" class="current">Recherche</a>
-    <button class="theme-toggle" style="margin-left:2rem;" onclick="cycleTheme()">◐</button>
+    <ul>
+      <li><a href="index.html">Sammlung</a></li>
+      <li><a href="text.html">Lektüre</a></li>
+      <li><a href="search.html" class="current">Recherche</a></li>
+    </ul>
   </nav>
+  <div class="theme-controls">
+    <button class="theme-toggle" onclick="cycleTheme()">◐ Theme</button>
+  </div>
 </header>
 
 <main>
+
   <section class="search-hero">
-    <span class="small-caps">Wissenschaftlicher Apparat</span>
-    <h1 style="font-size: 4rem; margin: 0.5rem 0;">Volltext-Recherche</h1>
-    <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 700px;">
-      Durchsuchen Sie die historisch-kritische Ausgabe mit präzisen Filtern und logischen Operatoren.
-    </p>
+    <span class="search-eyebrow">Wissenschaftlicher Apparat</span>
+    <h1>Volltext-Recherche</h1>
+    <p>Durchsuchen Sie die historisch-kritische Ausgabe mit logischen Operatoren und Nähe-Suche.</p>
   </section>
 
   <div class="search-guide">
-    <h4>Wissenschaftliche Such-Syntax</h4>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <h4>Suchanfragen</h4>
+    <div class="search-guide-grid">
       <div>
-        <p><code>"Begriff"</code> — Exakte Phrase suchen.</p>
-        <p><code>AND / OR</code> — Logische Verknüpfung von Termen.</p>
+        <p><code>"Begriff an sich"</code> — Exakte Phrase</p>
+        <p><code>Begriff AND Geist</code> — Beide Terme</p>
       </div>
       <div>
-        <p><code>NOT</code> — Begriffe aus den Ergebnissen ausschließen.</p>
-        <p><code>NEAR/10</code> — Wörter in räumlicher Nähe finden.</p>
+        <p><code>Begriff OR Geist</code> — Mindestens einer</p>
+        <p><code>NOT Verstand</code> — Begriff ausschließen</p>
+      </div>
+      <div>
+        <p><code>Geist NEAR/10 Natur</code> — Innerhalb von 10 Wörtern</p>
       </div>
     </div>
   </div>
 
   <div class="search-box-elegant">
-    <input type="text" id="search-input" placeholder="Suchanfrage formulieren..." autofocus onkeydown="if(event.key==='Enter') handleSearch()">
+    <input type="text" id="search-input" placeholder="Suchanfrage formulieren …" autofocus
+           onkeydown="if(event.key==='Enter') handleSearch()">
     <button class="btn-classic" onclick="handleSearch()">Suchen</button>
   </div>
 
-  <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 4rem; padding: 1rem 0; border-bottom: 1px solid var(--border-fine);">
-    <div style="display:flex; gap: 2rem;">
-      <select id="filter-work" class="small-caps" style="border:none; background:transparent; cursor:pointer; color:var(--accent-red);"></select>
-      <select id="filter-sort" class="small-caps" style="border:none; background:transparent; cursor:pointer;">
-        <option value="score">Sortieren nach Relevanz</option>
-        <option value="page">Sortieren nach Seitenfolge</option>
+  <div class="search-filters">
+    <div style="display:flex; gap:2rem; align-items:center;">
+      <select id="filter-work"></select>
+      <select id="filter-sort">
+        <option value="score">Nach Relevanz</option>
+        <option value="page">Nach Seitenfolge</option>
       </select>
     </div>
-    <div id="search-status" class="small-caps" style="color:var(--text-muted);">Bereit für Abfrage.</div>
+    <div id="search-status">Bereit für Abfrage.</div>
   </div>
 
-  <div id="search-results">
-    <!-- Ergebnisse werden hier im bibliographischen Stil gerendert -->
-  </div>
+  <div id="search-results"></div>
+
 </main>
 
 <footer class="site-footer">
-  <div class="small-caps">Digitale Hegel-Edition · Forschungsportal</div>
-  <div>
-    <a href="impressum.html" class="small-caps">Impressum</a>
-    <a href="datenschutz.html" class="small-caps" style="margin-left: 2rem;">Datenschutz</a>
-  </div>
+  <div>Digitale Hegel-Edition · Forschungsportal</div>
+  <nav>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+  </nav>
 </footer>
 
 <script src="assets/edition-data.js"></script>
 <script src="assets/search-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
-  function handleSearch() {
-    const q = document.getElementById('search-input').value.trim().toLowerCase();
-    const workFilter = document.getElementById('filter-work').value;
-    const sort = document.getElementById('filter-sort').value;
-    
-    if (!window.HEGEL_SEARCH_INDEX) return;
-    
-    let results = window.HEGEL_SEARCH_INDEX.filter(entry => {
-      const matchText = (entry.text || '').toLowerCase().includes(q);
-      const matchWork = workFilter === 'all' || entry.work_id === workFilter;
-      return matchText && matchWork;
-    });
+  // ── Such-Engine ────────────────────────────────────────────
+  function evaluateQuery(text, rawQuery) {
+    const q = rawQuery.trim();
+    if (!q) return false;
 
-    if (sort === 'page') results.sort((a,b) => a.page_pdf - b.page_pdf);
+    // OR (niedrigste Priorität) — außerhalb von Anführungszeichen teilen
+    const orParts = splitOutsideQuotes(q, / OR /i);
+    if (orParts.length > 1) return orParts.some(p => evaluateQuery(text, p));
 
-    renderResults(results, q);
+    // AND
+    const andParts = splitOutsideQuotes(q, / AND /i);
+    if (andParts.length > 1) return andParts.every(p => evaluateQuery(text, p));
+
+    // NEAR/n  (z. B.  Geist NEAR/10 Natur)
+    const nearM = q.match(/^(.+?)\s+NEAR\/(\d+)\s+(.+)$/i);
+    if (nearM) return checkNear(text, nearM[1].trim(), nearM[3].trim(), +nearM[2]);
+
+    // NOT (Präfix)
+    if (/^NOT\s+/i.test(q)) return !evaluateQuery(text, q.replace(/^NOT\s+/i, ''));
+
+    // Exakte Phrase in Anführungszeichen
+    if (q.startsWith('"') && q.endsWith('"')) return text.includes(q.slice(1, -1).toLowerCase());
+
+    // Implizites AND bei mehreren Termen
+    const terms = q.split(/\s+/).filter(Boolean);
+    if (terms.length > 1) return terms.every(t => text.includes(t));
+
+    return text.includes(q);
   }
 
-  function renderResults(results, q) {
+  function splitOutsideQuotes(s, sep) {
+    const parts = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] === '"') { inQ = !inQ; cur += s[i]; continue; }
+      if (!inQ) {
+        const m = s.slice(i).match(sep);
+        if (m && m.index === 0) { parts.push(cur); cur = ''; i += m[0].length - 1; continue; }
+      }
+      cur += s[i];
+    }
+    if (cur) parts.push(cur);
+    return parts;
+  }
+
+  function checkNear(text, t1, t2, dist) {
+    const words = text.split(/\s+/);
+    const clean = t => t.replace(/^"|"$/g, '').toLowerCase();
+    const c1 = clean(t1), c2 = clean(t2);
+    const pos1 = [], pos2 = [];
+    words.forEach((w, i) => { if (w.includes(c1)) pos1.push(i); if (w.includes(c2)) pos2.push(i); });
+    return pos1.some(a => pos2.some(b => Math.abs(a - b) <= dist));
+  }
+
+  function extractHighlightTerms(q) {
+    const stripped = q.replace(/\bAND\b|\bOR\b|\bNOT\b|\bNEAR\/\d+\b/gi, ' ');
+    const terms = [];
+    const re = /"([^"]+)"|([^\s"]+)/g;
+    let m;
+    while ((m = re.exec(stripped)) !== null) {
+      const t = (m[1] || m[2] || '').trim().toLowerCase();
+      if (t) terms.push(t);
+    }
+    return [...new Set(terms)];
+  }
+
+  function highlightText(text, terms) {
+    if (!terms.length) return text;
+    const pattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    return text.replace(new RegExp(`(${pattern})`, 'gi'), '<mark>$1</mark>');
+  }
+
+  // ── UI ─────────────────────────────────────────────────────
+  function handleSearch() {
+    const raw = document.getElementById('search-input').value.trim();
+    const workFilter = document.getElementById('filter-work').value;
+    const sort = document.getElementById('filter-sort').value;
+    const status = document.getElementById('search-status');
     const container = document.getElementById('search-results');
-    document.getElementById('search-status').textContent = `${results.length} Treffer in der Auswahl.`;
-    
+
+    if (!window.HEGEL_SEARCH_INDEX) {
+      status.textContent = 'Suchindex nicht geladen.';
+      return;
+    }
+    if (!raw) { container.innerHTML = ''; status.textContent = 'Bereit für Abfrage.'; return; }
+
+    const query = raw.toLowerCase();
+    const terms = extractHighlightTerms(query);
+
+    let results = window.HEGEL_SEARCH_INDEX.filter(entry => {
+      const text = (entry.text || '').toLowerCase();
+      const matchWork = workFilter === 'all' || entry.work_id === workFilter;
+      return matchWork && evaluateQuery(text, query);
+    });
+
+    if (sort === 'page') results.sort((a, b) => (a.page_pdf || 0) - (b.page_pdf || 0));
+
+    status.textContent = results.length
+      ? `${results.length} ${results.length === 1 ? 'Treffer' : 'Treffer'}`
+      : 'Keine Treffer gefunden.';
+
     container.innerHTML = results.map(res => `
       <article class="result-biblio">
-        <div class="sigle">${res.sigel || res.work_id} · Seite ${res.page_book || res.page_pdf}</div>
-        <div class="snippet">${res.text.replace(new RegExp(q, 'gi'), m => `<mark style="background:rgba(197,160,89,0.2); color:var(--text-ink);">${m}</mark>`)}</div>
-        <div style="margin-top: 1rem;">
-          <a href="text.html?work=${res.work_id}#page-${res.page_pdf}" class="small-caps" style="text-decoration:none; color:var(--accent-red);">In den Kontext springen →</a>
-        </div>
+        <div class="sigle">${res.sigel || res.work_id} · GW ${res.page_book || res.page_pdf}</div>
+        <div class="snippet">${highlightText(res.text, terms)}</div>
+        <a class="result-link" href="text.html?work=${res.work_id}#page-${res.page_pdf}">
+          In den Kontext springen →
+        </a>
       </article>
     `).join('');
   }
@@ -111,10 +199,13 @@
   window.onload = () => {
     if (window.HEGEL_EDITION) {
       const sel = document.getElementById('filter-work');
-      sel.innerHTML = '<option value="all">Gesamte Edition durchsuchen</option>' + 
-        window.HEGEL_EDITION.works.map(w => `<option value="${w.work_id}">${w.siglum}</option>`).join('');
+      sel.innerHTML = '<option value="all">Gesamte Edition</option>' +
+        window.HEGEL_EDITION.works.map(w =>
+          `<option value="${w.work_id}">${w.siglum} — ${w.title}</option>`
+        ).join('');
     }
   };
 </script>
+
 </body>
 </html>
