@@ -616,6 +616,10 @@
           <span class="meta-label">Status</span>
           <span class="meta-value" id="meta-default-work">Edition wird geladen…</span>
         </div>
+        <div class="meta-item">
+          <span class="meta-label">QA</span>
+          <span class="meta-value" id="meta-qa-status">Prüfung ausstehend</span>
+        </div>
       </div>
       <div class="quote-box">
         Ziel ist ein kohärenter digitaler Editionsraum: mehrere GW-Bände, klare Werkübersicht,
@@ -695,6 +699,7 @@
 </main>
 
 <script src="assets/edition-data.js"></script>
+<script src="assets/qa-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
   const EDITION_SOURCES = [
@@ -772,6 +777,19 @@
       const stats = edition.metadata?.stats || {};
       const works = edition.works || [];
       const defaultWork = works.find(work => work.work_id === edition.metadata?.default_work_id) || works[0];
+      const qaReport = window.HEGEL_QA_REPORT || null;
+      const qaProblems = qaReport
+        ? (qaReport.asset_issues?.length || 0) + (qaReport.works || []).reduce((sum, work) => {
+            const workStats = work.stats || {};
+            return sum
+              + (workStats.duplicate_groups || 0)
+              + (workStats.toc_link_issues || 0)
+              + (workStats.pagination_issues || 0)
+              + (workStats.excluded_section_hits || 0)
+              + (workStats.duplicate_pdf_pages || 0)
+              + (workStats.missing_reference_pages || 0);
+          }, 0)
+        : null;
 
       document.getElementById('stat-works').textContent = (edition.metadata?.works_count || works.length || 0).toLocaleString('de-DE');
       document.getElementById('stat-pages').textContent = (stats.pages_total || 0).toLocaleString('de-DE');
@@ -783,6 +801,9 @@
       document.getElementById('meta-default-work').textContent = defaultWork
         ? `Default: ${defaultWork.title}`
         : 'fortlaufend überarbeitet';
+      document.getElementById('meta-qa-status').textContent = qaReport
+        ? (qaProblems === 0 ? 'grün geprüft' : `${qaProblems} offene Punkte`)
+        : 'kein QA-Bericht geladen';
 
       renderWorks(edition);
       status.textContent = `Editionskatalog erfolgreich geladen · ${source.label}`;
@@ -791,6 +812,7 @@
       document.getElementById('stat-pages').textContent = '—';
       document.getElementById('stat-blocks').textContent = '—';
       document.getElementById('stat-notes').textContent = '—';
+      document.getElementById('meta-qa-status').textContent = 'nicht geladen';
       document.getElementById('works-grid').innerHTML = `
         <article class="feature-card">
           <h3>Werkliste konnte nicht geladen werden</h3>
