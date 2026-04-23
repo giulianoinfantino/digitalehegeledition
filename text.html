@@ -58,6 +58,14 @@
     <div id="reader-summary"></div>
 
     <div class="reader-toolbar">
+      
+      <div class="toolbar-group">
+        <span class="toolbar-label">Band</span>
+        <select id="work-selector" class="theme-toggle" style="text-transform: none; font-family: var(--font-text); font-size: 1rem; padding: 0 0.5rem;" onchange="switchWork(this.value)">
+          <option value="">Lade Werke...</option>
+        </select>
+      </div>
+
       <div class="toolbar-group">
         <span class="toolbar-label">Gehe zu Seite</span>
         <div class="jump-input-group">
@@ -212,6 +220,33 @@
     document.body.setAttribute('data-theme', next);
     localStorage.setItem('hegel-theme', next);
   }
+
+  
+  function populateWorkSelector() {
+    const selector = document.getElementById('work-selector');
+    if (!window.HEGEL_EDITION || !window.HEGEL_EDITION.works) return;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentWorkId = urlParams.get('work') || 'gw-21';
+    
+    selector.innerHTML = window.HEGEL_EDITION.works.map(work => `
+      <option value="${work.work_id}" ${work.work_id === currentWorkId ? 'selected' : ''}>
+        ${work.siglum || work.work_id} · ${work.title}
+      </option>
+    `).join('');
+  }
+
+  function switchWork(workId) {
+    if (!workId) return;
+    window.location.href = `text.html?work=${workId}`;
+  }
+
+  // Update setCorpus to also trigger population
+  const originalSetCorpus = setCorpus;
+  setCorpus = function(data, workId) {
+    originalSetCorpus(data, workId);
+    populateWorkSelector();
+  };
 
   window.onload = loadWork;
 </script>
