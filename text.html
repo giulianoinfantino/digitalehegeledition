@@ -1624,15 +1624,37 @@ function renderFootnotes(footnotes) {
 }
 
 function renderPage(page) {
-  const mainUnits = page.units.filter(unit => !['footnote', 'page_number'].includes(unit.label));
-  const footnotes = page.units.filter(unit => unit.label === 'footnote');
-  const pageNumberUnit = page.units.find(unit => unit.label === 'page_number');
-  const pageNumberLabel = pageNumberUnit?.annotations?.[0]?.page_number_display || pageNumberUnit?.text_normalized || null;
-  const gwPage = page.gw_page || mainUnits[0]?.metadata?.gw_page || null;
-  const oaPage = page.oa_page || mainUnits[0]?.metadata?.oa_page || null;
+  const units = page.units || [];
+  const hasContent = units.length > 0;
+  
+  let contentHtml = '';
+  if (!hasContent) {
+    contentHtml = `
+      <div class="empty-page-placeholder">
+        <p>Seite ${page.page_pdf} [${page.page_book || 'PDF'}]</p>
+        <small>Kein Textinhalt auf dieser Seite extrahiert.</small>
+      </div>
+    `;
+  } else {
+    contentHtml = units.map(unit => {
+      const cls = `text-unit type-${unit.type}`;
+      const level = unit.level ? `data-level="${unit.level}"` : '';
+      return `<div id="${unit.unit_id || ''}" class="${cls}" ${level}>${unit.text_normalized}</div>`;
+    }).join('');
+  }
 
   return `
-    <article class="page-card page-${escapeHtml(page.page_kind)}" id="page-${page.page_pdf}">
+    <article class="page-card" id="page-${page.page_pdf}">
+      <header class="page-header">
+        <span class="page-sigel">${page.sigel || ''}</span>
+        <span class="page-meta">PDF ${page.page_pdf} ${page.page_book ? `· GW ${page.page_book}` : ''}</span>
+      </header>
+      <div class="page-body">
+        ${contentHtml}
+      </div>
+    </article>
+  `;
+}" id="page-${page.page_pdf}">
       <aside class="page-rail">
         <div class="page-sigel">${escapeHtml(resolveSigel(page))}</div>
         <div class="page-meta">
@@ -1669,12 +1691,10 @@ function syncVisiblePage() {
 }
 
 function shouldRenderReaderPage(page, selectedSeries) {
-  if (selectedSeries !== 'GW') return true;
+  // We want to render ALMOST everything to keep the TOC working
+  if (page.page_kind === 'toc' && page.page_pdf > 40) return true; 
   if (page.page_kind === 'toc') return false;
-  if (page.page_kind === 'frontmatter' && !page.gw_page) return false;
-
-  const visibleUnits = (page.units || []).filter(unit => !['footnote', 'page_number'].includes(unit.label));
-  return visibleUnits.length > 0;
+  return true;
 }
 
 function renderPages() {
