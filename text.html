@@ -1568,49 +1568,35 @@ function renderFootnotes(footnotes) {
 
 function renderPage(page) {
   const units = page.units || [];
-  const hasContent = units.length > 0;
-  
-  let contentHtml = '';
-  if (!hasContent) {
-    contentHtml = `
+  const footnotes = units.filter(unit => unit.label === 'footnote');
+  const mainUnits = units.filter(unit => unit.label !== 'footnote' && unit.label !== 'page_number');
+  const gwPage = page.gw_page || '';
+  const oaPage = page.oa_page || '';
+  const pageNumberLabel = page.page_book || '';
+
+  const flow = mainUnits.length
+    ? `${mainUnits.map(unit => renderUnit(unit, page)).join('')}${renderFootnotes(footnotes)}`
+    : `
       <div class="empty-page-placeholder">
-        <p>Seite ${page.page_pdf} [${page.page_book || 'PDF'}]</p>
+        <p>Seite ${escapeHtml(page.page_pdf)}${page.page_book ? ` · GW ${escapeHtml(page.page_book)}` : ''}</p>
         <small>Kein Textinhalt auf dieser Seite extrahiert.</small>
       </div>
     `;
-  } else {
-    contentHtml = units.map(unit => {
-      const cls = `text-unit type-${unit.type}`;
-      const level = unit.level ? `data-level="${unit.level}"` : '';
-      return `<div id="${unit.unit_id || ''}" class="${cls}" ${level}>${unit.text_normalized}</div>`;
-    }).join('');
-  }
 
   return `
     <article class="page-card" id="page-${page.page_pdf}">
-      <header class="page-header">
-        <span class="page-sigel">${page.sigel || ''}</span>
-        <span class="page-meta">PDF ${page.page_pdf} ${page.page_book ? `· GW ${page.page_book}` : ''}</span>
-      </header>
-      <div class="page-body">
-        ${contentHtml}
-      </div>
-    </article>
-  `;
-}" id="page-${page.page_pdf}">
       <aside class="page-rail">
         <div class="page-sigel">${escapeHtml(resolveSigel(page))}</div>
         <div class="page-meta">
           ${gwPage ? `GW ${escapeHtml(gwPage)}<br>` : ''}
           ${oaPage ? `OA ${escapeHtml(oaPage)}<br>` : ''}
-          ${pageNumberLabel ? `Seitenzahl-Token ${escapeHtml(pageNumberLabel)}<br>` : ''}
-          ${page.units.length} Units
+          ${pageNumberLabel ? `Seitenzahl ${escapeHtml(pageNumberLabel)}<br>` : ''}
+          ${escapeHtml(String(mainUnits.length))} Units
         </div>
         <div class="page-kind-chip">${escapeHtml(page.page_kind || 'body')}</div>
       </aside>
       <div class="page-flow">
-        ${mainUnits.map(unit => renderUnit(unit, page)).join('')}
-        ${renderFootnotes(footnotes)}
+        ${flow}
       </div>
     </article>
   `;
@@ -1634,8 +1620,6 @@ function syncVisiblePage() {
 }
 
 function shouldRenderReaderPage(page, selectedSeries) {
-  // We want to render ALMOST everything to keep the TOC working
-  if (page.page_kind === 'toc' && page.page_pdf > 40) return true; 
   if (page.page_kind === 'toc') return false;
   return true;
 }
