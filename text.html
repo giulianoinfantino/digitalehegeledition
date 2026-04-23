@@ -50,6 +50,7 @@
       </div>
       <div class="toolbar-group">
         <button class="btn-classic" id="btn-sync" onclick="toggleSyncView()">Faksimile</button>
+        <button class="btn-classic" id="btn-dipl" onclick="toggleDiplomaticView()">Diplomatisch</button>
         <button class="btn-classic" onclick="copyCitation()">Zitieren</button>
       </div>
     </div>
@@ -74,7 +75,7 @@
 <script src="assets/edition-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
-  const state = { corpus: null, selectedWork: null, syncView: false };
+  const state = { corpus: null, selectedWork: null, syncView: false, diplomaticMode: false };
 
   function loadWork() {
     const workId = new URLSearchParams(window.location.search).get('work') || 'gw-12';
@@ -110,22 +111,7 @@
       ).join('');
 
     // Pages
-    document.getElementById('reader-pages').innerHTML =
-      corpus.pages
-        .filter(p => p.page_kind !== 'toc')
-        .map(page => `
-          <article class="page-card" id="page-${page.page_pdf}">
-            <header class="page-header">
-              <span>${page.sigel || ''}</span>
-              <span>GW ${page.page_book || page.page_pdf}</span>
-            </header>
-            <div class="page-body">
-              ${(page.units || []).map(u =>
-                `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`
-              ).join('')}
-            </div>
-          </article>
-        `).join('');
+    renderPages();
 
     // Work selector
     if (window.HEGEL_EDITION) {
@@ -134,6 +120,46 @@
           `<option value="${w.work_id}" ${w.work_id === state.selectedWork?.work_id ? 'selected' : ''}>${w.siglum}</option>`
         ).join('');
     }
+  }
+
+  function renderUnit(u) {
+    const type = u.type || u.label || '';
+    const level = u.level || '';
+    if (state.diplomaticMode && u.lines && u.lines.length > 1) {
+      const body = u.lines
+        .map(l => `<span class="dipl-line">${l}</span>`)
+        .join('');
+      return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${body}</div>`;
+    }
+    return `<div class="text-unit type-${type}" data-level="${level}">${u.text_normalized || u.text || ''}</div>`;
+  }
+
+  function renderPages() {
+    document.getElementById('reader-pages').innerHTML =
+      (state.corpus.pages || [])
+        .filter(p => p.page_kind !== 'toc')
+        .map(page => `
+          <article class="page-card" id="page-${page.page_pdf}">
+            <header class="page-header">
+              <span>${page.sigel || ''}</span>
+              <span>GW ${page.page_book || page.page_pdf}</span>
+            </header>
+            <div class="page-body${state.diplomaticMode ? ' page-body--dipl' : ''}">
+              ${(page.units || []).map(renderUnit).join('')}
+            </div>
+          </article>
+        `).join('');
+  }
+
+  function toggleDiplomaticView() {
+    state.diplomaticMode = !state.diplomaticMode;
+    renderPages();
+    const btn = document.getElementById('btn-dipl');
+    btn.style.background = state.diplomaticMode ? 'var(--accent)' : '';
+    btn.style.color = state.diplomaticMode ? '#fff' : '';
+    // Restore scroll position to current visible page after re-render
+    const hash = window.location.hash;
+    if (hash) setTimeout(() => document.querySelector(hash)?.scrollIntoView(), 0);
   }
 
   function switchWork(id) { if (id) window.location.href = `text.html?work=${id}`; }
