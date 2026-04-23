@@ -2163,12 +2163,15 @@ function setEditionData(edition, entries, sourceLabel) {
 async function handleAutoReload() {
   setSourceStatus('Lade Editionskatalog und Suchindex…');
 
-  const editionPayload = window.HEGEL_EDITION_DATA
-    ? { data: window.HEGEL_EDITION_DATA, source: { label: 'Eingebettete Editionsdaten' } }
+  const embeddedEdition = window.HEGEL_EDITION_DATA || window.HEGEL_EDITION;
+  const embeddedSearch = window.HEGEL_SEARCH_DATA || window.HEGEL_SEARCH_INDEX;
+
+  const editionPayload = embeddedEdition
+    ? { data: embeddedEdition, source: { label: 'Eingebettete Editionsdaten' } }
     : await fetchFirstAvailable(EDITION_SOURCES);
 
-  const searchPayload = window.HEGEL_SEARCH_DATA
-    ? { data: window.HEGEL_SEARCH_DATA, source: { label: 'Eingebetteter Editionsindex' } }
+  const searchPayload = embeddedSearch
+    ? { data: embeddedSearch, source: { label: 'Eingebetteter Editionsindex' } }
     : await fetchFirstAvailable(SEARCH_SOURCES);
 
   if (!editionPayload || !searchPayload) {

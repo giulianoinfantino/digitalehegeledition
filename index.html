@@ -711,8 +711,9 @@
   }
 
   async function loadEdition() {
-    if (window.HEGEL_EDITION_DATA) {
-      return { edition: window.HEGEL_EDITION_DATA, source: { label: 'Eingebettete Editionsdaten' } };
+    const embeddedEdition = window.HEGEL_EDITION_DATA || window.HEGEL_EDITION;
+    if (embeddedEdition) {
+      return { edition: embeddedEdition, source: { label: 'Eingebettete Editionsdaten' } };
     }
     for (const source of EDITION_SOURCES) {
       try {

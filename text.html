@@ -1782,8 +1782,9 @@ async function loadSelectedWork() {
 }
 
 async function initializeEdition() {
-  if (window.HEGEL_EDITION_DATA) {
-    state.edition = window.HEGEL_EDITION_DATA;
+  const embeddedEdition = window.HEGEL_EDITION_DATA || window.HEGEL_EDITION;
+  if (embeddedEdition) {
+    state.edition = embeddedEdition;
   } else {
     const editionPayload = await fetchFirstAvailable(EDITION_SOURCES);
     if (!editionPayload) {
@@ -1807,7 +1808,7 @@ async function initializeEdition() {
   }
 
   renderWorkOptions();
-  if (window.HEGEL_EDITION_DATA) {
+  if (embeddedEdition) {
     setEditionStatus(
       `<strong>Geladen:</strong> Eingebettete Editionsdaten<br>${escapeHtml(String(state.works.length))} Werke in der Edition.`,
       'is-ready'
