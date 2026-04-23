@@ -618,8 +618,8 @@
         </div>
       </div>
       <div class="quote-box">
-        Ziel ist nicht bloß, einzelne PDF-Seiten sichtbar zu machen, sondern aus mehreren Bänden einen kohärenten
-        digitalen Editionsraum mit Werkübersicht, Navigierbarkeit und gemeinsamer Suche zu bauen.
+        Ziel ist ein kohärenter digitaler Editionsraum: mehrere GW-Bände, klare Werkübersicht,
+        stabile GW/OA-Referenzen, Lesefassung und gemeinsame Suche.
       </div>
     </aside>
   </section>
@@ -743,7 +743,7 @@
 
     grid.innerHTML = works.map(work => `
       <article class="feature-card">
-        <h3>${escapeHtml(work.siglum || `TWA ${work.band || '—'}`)}</h3>
+        <h3>${escapeHtml(work.siglum || `${work.series || 'GW'} ${work.band || work.volume_number || '—'}`)}</h3>
         <div class="work-title">${escapeHtml(work.title)}</div>
         <p>
           ${escapeHtml(String(work.stats.pages_total || 0))} Seiten ·

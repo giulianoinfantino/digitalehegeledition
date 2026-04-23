@@ -15,7 +15,7 @@
       --accent: #d09a82;
     }
     .search-main {
-      max-width: 1380px;
+      max-width: 1180px;
       margin: 0 auto;
     }
     .search-intro {
@@ -70,8 +70,8 @@
     .result-card,
     .empty-state {
       border: 1px solid var(--border);
-      border-radius: 22px;
-      background: rgba(255,255,255,0.78);
+      border-radius: 0;
+      background: transparent;
       box-shadow: 0 16px 34px rgba(26,26,26,0.04);
     }
     .side-card,
@@ -218,7 +218,7 @@
       padding: 0 16px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: white;
+      background: transparent;
       color: var(--text-main);
       font-family: var(--font-ui);
       font-size: 0.94rem;
@@ -1028,6 +1028,248 @@
       background: rgba(224, 160, 134, 0.22);
       color: var(--reader-ink);
     }
+
+    /* Final scholarly search layout: flat, typographic, no card UI. */
+    .search-main {
+      max-width: min(1180px, calc(100vw - 48px));
+    }
+    .search-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(260px, 0.9fr);
+      gap: clamp(24px, 5vw, 72px);
+      align-items: end;
+      margin-bottom: 34px;
+    }
+    .search-intro .search-kicker {
+      grid-column: 1 / -1;
+      margin-bottom: -8px;
+    }
+    .search-intro h1 {
+      max-width: 10ch;
+      margin: 0;
+    }
+    .search-intro p {
+      max-width: 40rem;
+      margin: 0 0 0.35rem;
+    }
+    .search-layout {
+      display: block;
+    }
+    .search-sidebar {
+      position: static;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.2fr);
+      gap: 24px;
+      max-height: none;
+      overflow: visible;
+      padding: 0 0 24px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .result-card,
+    .empty-state,
+    .source-status,
+    .operator-card,
+    .facet-card,
+    .work-breakdown-row,
+    .result-meta-card,
+    .stat-tile {
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .side-card,
+    .query-card,
+    .results-summary,
+    .empty-state {
+      padding: 0 !important;
+      border: 0 !important;
+    }
+    .query-card {
+      padding-bottom: 26px !important;
+      border-bottom: 1px solid var(--reader-rule) !important;
+    }
+    .query-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+    }
+    .query-input {
+      min-height: 64px;
+      padding: 8px 0 10px;
+      font-family: var(--font-text);
+      font-size: clamp(1.4rem, 2.5vw, 2.05rem);
+      letter-spacing: -0.01em;
+      border: 0;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .query-input::placeholder {
+      color: color-mix(in srgb, var(--reader-muted) 72%, transparent);
+    }
+    .search-btn,
+    .search-btn.primary,
+    .example-chip,
+    .section-chip,
+    .result-kind,
+    .result-link {
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .search-btn,
+    .search-btn.primary {
+      align-self: end;
+      min-height: auto;
+      padding: 0 0 10px;
+      border: 0;
+      border-bottom: 1px solid currentColor;
+      color: var(--reader-accent-soft) !important;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .query-note {
+      max-width: 52rem;
+      margin-top: 14px;
+      font-family: var(--font-text);
+      font-size: 1.02rem;
+    }
+    .advanced-search {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--reader-rule);
+    }
+    .advanced-body {
+      gap: 18px;
+    }
+    .operator-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 28px;
+    }
+    .operator-card {
+      padding: 0 0 10px !important;
+      border: 0 !important;
+      border-bottom: 1px solid var(--reader-rule) !important;
+    }
+    .operator-card code {
+      display: inline;
+      margin-right: 0.5rem;
+    }
+    .operator-card span {
+      display: inline;
+    }
+    .example-row {
+      gap: 16px 20px;
+    }
+    .example-chip {
+      padding: 0 0 4px;
+      border: 0;
+      border-bottom: 1px solid var(--reader-rule);
+    }
+    .results-summary {
+      padding: 0 0 18px !important;
+      border-bottom: 1px solid var(--reader-rule) !important;
+    }
+    .summary-title {
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+    }
+    .chip-row {
+      gap: 12px;
+    }
+    .section-chip {
+      padding: 0;
+      border: 0;
+      color: var(--reader-muted);
+      letter-spacing: 0.12em;
+    }
+    .results-list {
+      gap: 0;
+    }
+    .result-card {
+      grid-template-columns: minmax(150px, 0.22fr) minmax(0, 1fr);
+      gap: clamp(20px, 4vw, 48px);
+      padding: 28px 0 !important;
+      border: 0 !important;
+      border-bottom: 1px solid var(--reader-rule) !important;
+    }
+    .result-card:last-child {
+      border-bottom: 0 !important;
+    }
+    .result-rail {
+      padding-right: 0;
+      border-right: 0;
+      gap: 8px;
+    }
+    .result-kind {
+      padding: 0;
+      border: 0;
+      color: var(--reader-muted);
+    }
+    .result-sigel {
+      font-size: 1.45rem;
+      color: var(--reader-accent-soft);
+    }
+    .result-rail-meta {
+      font-family: var(--font-text);
+    }
+    .result-body {
+      gap: 10px;
+    }
+    .result-citation {
+      color: var(--reader-muted);
+      letter-spacing: 0.12em;
+    }
+    .result-heading {
+      font-family: var(--font-text);
+      font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+      font-weight: 400;
+    }
+    .result-snippet {
+      max-width: 68rem;
+      font-size: clamp(1.22rem, 2vw, 1.48rem);
+      line-height: 1.62;
+    }
+    .result-context {
+      font-family: var(--font-text);
+      font-size: 0.98rem;
+    }
+    .result-link {
+      color: var(--reader-accent-soft);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    mark {
+      border-radius: 0;
+    }
+    @media (max-width: 900px) {
+      .search-main {
+        max-width: calc(100vw - 32px);
+      }
+      .search-intro,
+      .search-sidebar,
+      .query-row,
+      .query-tools,
+      .result-card {
+        grid-template-columns: 1fr;
+      }
+      .search-sidebar {
+        gap: 18px;
+      }
+      .operator-grid {
+        grid-template-columns: 1fr;
+      }
+      .result-rail {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--reader-rule);
+      }
+    }
   </style>
 </head>
 <body>
@@ -1050,19 +1292,15 @@
     <div class="search-kicker">Scholarly Search</div>
     <h1>Synoptische Volltextsuche im Extraktor-Korpus</h1>
     <p>
-      Diese Suchansicht indexiert den aktuellen Extraktor-Output direkt im Browser. Damit siehst du sofort,
-      wie gut die neue Strukturierung als wissenschaftliche Suchoberfläche funktioniert: mit Treffern aus
-      Fließtext, Überschriften, Paratext und Inhaltsverzeichnis, jeweils rückverlinkt in die Lesefassung.
+      Eine reduzierte Konkordanzsuche über die publizierten GW-Bände. Sie arbeitet mit Boolescher Syntax,
+      Phrasen, Nähe-Suche und Feldfiltern, ohne die Lesefassung mit technischen PDF-Angaben zu überfrachten.
     </p>
   </section>
 
   <div class="search-layout">
     <aside class="search-sidebar">
       <section class="side-card">
-        <h2 class="side-title">Edition</h2>
-        <div class="picker-row">
-          <button class="search-btn" id="reload-source" type="button">Edition neu laden</button>
-        </div>
+        <h2 class="side-title">Korpus</h2>
         <div class="source-status" id="source-status">
           Editionskatalog und Suchindex werden geladen…
         </div>
@@ -1081,33 +1319,13 @@
         <div class="toggle-grid">
           <label><input type="checkbox" id="include-headings" checked> Überschriften durchsuchen</label>
           <label><input type="checkbox" id="include-paragraphs" checked> Fließtext durchsuchen</label>
+        </div>
+        <div class="visually-hidden-controls" aria-hidden="true">
           <label><input type="checkbox" id="include-frontmatter" checked> Paratexte durchsuchen</label>
           <label><input type="checkbox" id="include-toc" checked> Inhaltsverzeichnis durchsuchen</label>
           <label><input type="checkbox" id="include-footnotes"> Fußnoten durchsuchen</label>
           <label><input type="checkbox" id="exact-match"> Exakte Phrase</label>
           <label><input type="checkbox" id="case-sensitive"> Groß/Kleinschreibung beachten</label>
-        </div>
-      </section>
-
-      <section class="side-card">
-        <h2 class="side-title">Edition auf einen Blick</h2>
-        <div class="stat-grid">
-          <div class="stat-tile">
-            <strong id="stat-works">—</strong>
-            <span>Werke</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-pages">—</strong>
-            <span>Seiten</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-entries">—</strong>
-            <span>Suchstellen</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="stat-footnotes">—</strong>
-            <span>Fußnoten</span>
-          </div>
         </div>
       </section>
     </aside>
@@ -1122,8 +1340,7 @@
           <button class="search-btn primary" id="run-search" type="button">Suche starten</button>
         </div>
         <p class="query-note">
-          Wissenschaftliche Query-Sprache: Boolesche Operatoren, Klammern, Phrasen, Feldfilter und Proximity-Suche.
-          Ohne explizite Operatoren gilt weiterhin die gewählte Mehrwortlogik.
+          Boolesche Operatoren, Phrasen, Feldfilter und Nähe-Suche sind direkt im Suchfeld möglich.
         </p>
         <details class="advanced-search">
           <summary>Erweiterte Suche und Syntax</summary>
@@ -1163,7 +1380,7 @@
                 <div class="operator-card"><code>NEAR/12</code><span>Proximity: <em>Begriff NEAR/12 Urteil</em> findet Nähe im selben Textblock.</span></div>
                 <div class="operator-card"><code>work:gw-12 · band:12</code><span>Werk- oder Bandfilter direkt in der Anfrage.</span></div>
                 <div class="operator-card"><code>type:heading</code><span>Textschichten: <em>text</em>, <em>heading</em>, <em>footnote</em>, <em>toc</em>, <em>paratext</em>.</span></div>
-                <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche für GW-, OA- oder PDF-Seiten.</span></div>
+                <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche der GW- oder Originalausgabe.</span></div>
               </div>
             </div>
           </div>
@@ -1174,9 +1391,7 @@
         <div class="summary-head">
           <div>
             <h2 class="summary-title">Noch kein Korpus geladen</h2>
-            <p class="summary-subtitle">
-              Sobald der Extraktor-Export geladen ist, wird hier eine suchbare wissenschaftliche Ansicht erzeugt.
-            </p>
+            <p class="summary-subtitle">Edition laden, Suchfrage stellen, Treffer im Lesetext prüfen.</p>
           </div>
         </div>
       </section>
@@ -1426,10 +1641,17 @@ function updateStats() {
   const editionStats = state.edition?.metadata?.stats || {};
   const work = currentWork();
 
-  document.getElementById('stat-works').textContent = (work ? 1 : (state.edition?.metadata?.works_count || state.works.length || 0)).toLocaleString('de-DE');
-  document.getElementById('stat-pages').textContent = ((work ? work.stats.pages_total : editionStats.pages_total) || 0).toLocaleString('de-DE');
-  document.getElementById('stat-entries').textContent = ((work ? work.stats.search_entries : state.entries.length) || 0).toLocaleString('de-DE');
-  document.getElementById('stat-footnotes').textContent = ((work ? work.stats.footnotes : editionStats.footnotes) || 0).toLocaleString('de-DE');
+  const stats = {
+    'stat-works': (work ? 1 : (state.edition?.metadata?.works_count || state.works.length || 0)).toLocaleString('de-DE'),
+    'stat-pages': ((work ? work.stats.pages_total : editionStats.pages_total) || 0).toLocaleString('de-DE'),
+    'stat-entries': ((work ? work.stats.search_entries : state.entries.length) || 0).toLocaleString('de-DE'),
+    'stat-footnotes': ((work ? work.stats.footnotes : editionStats.footnotes) || 0).toLocaleString('de-DE')
+  };
+
+  Object.entries(stats).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  });
 }
 
 function normalizeForSearch(value) {
@@ -1774,7 +1996,6 @@ function formatCitation(entry) {
   const parts = [entry.work_short_title || entry.work_title || 'Hegel'];
   if (entry.gw_page != null) parts.push(`GW ${entry.gw_page}`);
   if (entry.oa_page != null) parts.push(`OA ${entry.oa_page}`);
-  if (entry.page_pdf != null) parts.push(`PDF ${entry.page_pdf}`);
   return parts.join(' · ');
 }
 
@@ -1892,17 +2113,7 @@ function highlightText(text, query) {
 }
 
 function renderSuggestionButtons(suggestions) {
-  if (!suggestions.length) return '';
-  return `
-    <div>
-      <div class="side-title" style="margin-bottom:10px;">Anregungen</div>
-      <div class="suggestions">
-        ${suggestions.map(suggestion => `
-          <button class="suggestion-chip" type="button" data-suggestion="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>
-        `).join('')}
-      </div>
-    </div>
-  `;
+  return '';
 }
 
 function getResults() {
@@ -1954,8 +2165,7 @@ function renderSummary(results) {
         <div>
           <h2 class="summary-title">${work ? escapeHtml(work.title) : 'Gesamte Edition'} bereit zur Recherche</h2>
           <p class="summary-subtitle">
-            Die Suche arbeitet aktuell auf <strong>${work ? escapeHtml(work.title) : 'allen geladenen Werken'}</strong>
-            und nutzt den aggregierten Editionsindex aus <strong>${escapeHtml(state.sourceLabel)}</strong>.
+            Aktiver Suchraum: <strong>${work ? escapeHtml(work.title) : 'alle geladenen Werke'}</strong>.
           </p>
         </div>
         <div class="chip-row">
@@ -1994,23 +2204,13 @@ function renderSummary(results) {
         <h2 class="summary-title">${results.length} Treffer zu „${escapeHtml(state.query.trim())}“</h2>
         <p class="summary-subtitle">
           ${work ? `Gefiltert auf ${escapeHtml(work.title)}.` : `Treffer in ${workHits} Werk(en).`}
-          Die Liste bleibt über <strong>${escapeHtml(state.sourceLabel)}</strong> mit den jeweiligen Reader-Seiten verknüpft.
+          Sortierung: ${state.sort === 'page' ? 'Seitenfolge' : 'Relevanz'}.
         </p>
       </div>
       <div class="chip-row">
         ${renderQueryMode(profile)}
       </div>
     </div>
-    <div class="chip-row">
-      <span class="section-chip">Fließtext ${state.includeParagraphs ? 'ein' : 'aus'}</span>
-      <span class="section-chip">Überschriften ${state.includeHeadings ? 'ein' : 'aus'}</span>
-      <span class="section-chip">Paratexte ${state.includeFrontmatter ? 'ein' : 'aus'}</span>
-      <span class="section-chip">TOC ${state.includeToc ? 'ein' : 'aus'}</span>
-      <span class="section-chip">Fußnoten ${state.includeFootnotes ? 'ein' : 'aus'}</span>
-    </div>
-    ${renderFacetCards(results)}
-    ${work ? '' : renderWorkBreakdown(results)}
-    ${renderSuggestionButtons(suggestions)}
   `;
 }
 
@@ -2086,7 +2286,6 @@ function renderResults() {
     const title = entry.label === 'heading' || entry.label === 'toc_entry'
       ? highlightText(entry.title || entry.text, state.query.trim())
       : escapeHtml(humanLabel(entry.label));
-    const contextTitle = entry.title ? highlightText(entry.title, state.query.trim()) : 'Kein übergeordneter Titel erkannt';
 
     return `
       <article class="result-card">
@@ -2098,39 +2297,19 @@ function renderResults() {
             ${entry.gw_page != null ? `GW ${escapeHtml(entry.gw_page)}<br>` : ''}
             ${entry.oa_page != null ? `OA ${escapeHtml(entry.oa_page)}<br>` : ''}
             ${entry.page_ref != null ? `TOC-Ziel ${escapeHtml(entry.page_ref)}<br>` : ''}
-            ${entry.level ? `Ebene ${escapeHtml(entry.level)}<br>` : ''}
-            ${escapeHtml(entry.page_kind || 'body')}
+            ${entry.level ? `Ebene ${escapeHtml(entry.level)}` : ''}
           </div>
         </aside>
         <div class="result-body">
-          <div class="chip-row">
-            <span class="result-chip">${escapeHtml(entry.work_short_title || entry.work_title)}</span>
-            <span class="result-chip">${escapeHtml(humanLabel(entry.label))}</span>
-            <span class="result-chip">${result.matchedTerms} Suchterm${result.matchedTerms === 1 ? '' : 'e'}</span>
-            <span class="result-chip">${result.occurrences} Vorkommen</span>
-          </div>
           <div class="result-citation">${escapeHtml(citation)}</div>
-          <div class="result-context">
-            ${entry.title && entry.label !== 'toc_entry' ? `Titelkontext: <strong>${escapeHtml(entry.title)}</strong>` : `Werk: <strong>${escapeHtml(entry.work_title)}</strong>`}
-          </div>
           <h3 class="result-heading">
             <a href="${targetHref}">${title}</a>
           </h3>
-          <div class="result-meta-grid">
-            <div class="result-meta-card">
-              <strong>Abschnitt</strong>
-              ${contextTitle}
-            </div>
-            <div class="result-meta-card">
-              <strong>Stelle</strong>
-              ${escapeHtml(citation)}
-            </div>
-            <div class="result-meta-card">
-              <strong>Textschicht</strong>
-              ${escapeHtml(humanLabel(entry.label))}${entry.level ? ` · Ebene ${escapeHtml(entry.level)}` : ''}${entry.page_ref != null ? ` · Ziel ${escapeHtml(entry.page_ref)}` : ''}
-            </div>
-          </div>
           <p class="result-snippet">${highlightText(excerpt, state.query.trim())}</p>
+          <div class="result-context">
+            ${entry.title && entry.label !== 'toc_entry' ? `Abschnitt: <strong>${escapeHtml(entry.title)}</strong>` : `Werk: <strong>${escapeHtml(entry.work_title)}</strong>`}
+            · ${result.occurrences} Vorkommen
+          </div>
           <div class="result-links">
             <a class="result-link" href="${targetHref}">Im Lesetext öffnen</a>
           </div>
@@ -2230,13 +2409,15 @@ function bindEvents() {
     'match-mode',
     'work-filter'
   ].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
+    const control = document.getElementById(id);
+    if (!control) return;
+    control.addEventListener('change', () => {
       readControls();
       renderResults();
     });
   });
 
-  document.getElementById('reload-source').addEventListener('click', handleAutoReload);
+  document.getElementById('reload-source')?.addEventListener('click', handleAutoReload);
   bindExampleButtons();
 }
 

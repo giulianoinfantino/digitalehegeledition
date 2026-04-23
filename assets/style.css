@@ -37,7 +37,7 @@ main { padding: 50px 5%; max-width: 1200px; margin: 0 auto; min-height: 80vh; }
 .toc li { margin-bottom: 10px; }
 .toc a { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; transition: color 0.2s; }
 .toc a:hover { color: var(--accent); }
-.search-input { width: 100%; padding: 15px 20px; font-size: 1.2rem; font-family: var(--font-ui); border: 1px solid var(--border); border-radius: 4px; background: white; margin-bottom: 40px; box-sizing: border-box; }
+.search-input { width: 100%; padding: 15px 0; font-size: 1.2rem; font-family: var(--font-ui); border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; margin-bottom: 40px; box-sizing: border-box; color: var(--text-main); }
 .search-input:focus { outline: none; border-color: var(--accent); }
 .search-result { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
 mark { background: rgba(142, 32, 32, 0.15); color: var(--text-main); padding: 0 3px; }
@@ -325,4 +325,61 @@ body[data-theme="dark"] .legal-footer a {
 body[data-theme="dark"] .legal-section a:hover,
 body[data-theme="dark"] .legal-footer a:hover {
   color: var(--accent);
+}
+
+/* Global editorial surface: no rounded white product cards. */
+main [class*="card"],
+main [class*="panel"],
+main [class*="tile"],
+main [class*="box"],
+main [class*="status"],
+main [class*="summary"],
+main [class*="result"],
+main [class*="feature"],
+main [class*="work"] {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+main [class*="card"],
+main [class*="panel"],
+main [class*="tile"],
+main [class*="box"],
+main [class*="status"],
+main [class*="summary"],
+main [class*="feature"] {
+  background: transparent !important;
+}
+
+.btn,
+.search-btn,
+.suggestion-chip,
+.section-chip,
+.result-chip,
+.result-kind,
+.theme-toggle,
+.theme-btn,
+button {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.btn-primary,
+.search-btn.primary {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+.btn-secondary,
+.search-btn,
+.suggestion-chip,
+.section-chip,
+.result-chip,
+.result-kind {
+  background: transparent !important;
+}
+
+.visually-hidden-controls {
+  display: none !important;
 }
