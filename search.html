@@ -1100,6 +1100,13 @@
   </div>
 </main>
 
+<footer class="legal-footer">
+  <nav>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+  </nav>
+</footer>
+
 <script src="assets/edition-data.js"></script>
 <script src="assets/search-data.js"></script>
 <script src="assets/theme.js"></script>
@@ -1111,6 +1118,7 @@ const state = {
   entries: [],
   sourceLabel: '',
   query: '',
+  queryError: '',
   exact: false,
   caseSensitive: false,
   includeHeadings: true,
@@ -1828,6 +1836,24 @@ function renderSummary(results) {
     return;
   }
 
+  if (state.queryError) {
+    summary.innerHTML = `
+      <div class="summary-head">
+        <div>
+          <h2 class="summary-title">Anfrage nicht lesbar</h2>
+          <p class="summary-subtitle">
+            ${escapeHtml(state.queryError)} Prüfe Klammern, Operatoren oder Feldfilter.
+          </p>
+        </div>
+        <div class="chip-row">
+          <span class="section-chip">Syntaxfehler</span>
+          <span class="section-chip">AND · OR · NOT · NEAR/n</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   const workHits = new Set(results.map(result => result.entry.work_id)).size;
   summary.innerHTML = `
     <div class="summary-head">
@@ -1903,8 +1929,8 @@ function renderResults() {
   if (!results.length) {
     container.innerHTML = `
       <div class="empty-state">
-        <strong>Keine Treffer gefunden.</strong><br>
-        Versuche eine offenere Suche, wechsle den Werkfilter oder aktiviere zusätzliche Textschichten.
+        <strong>${state.queryError ? 'Anfrage nicht lesbar.' : 'Keine Treffer gefunden.'}</strong><br>
+        ${state.queryError ? escapeHtml(state.queryError) : 'Versuche eine offenere Suche, wechsle den Werkfilter oder aktiviere zusätzliche Textschichten.'}
       </div>
     `;
     bindSuggestionButtons();
