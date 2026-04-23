@@ -1,138 +1,104 @@
+
 :root {
+  --bg-desktop: #f2efea;
   --bg-paper: #fdfcf8;
-  --bg-sidebar: #f7f5f0;
   --text-ink: #1a1a1a;
-  --text-muted: #5a5a5a;
-  --accent-red: #721c24;
-  --accent-gold: #c5a059;
-  --border-fine: rgba(0, 0, 0, 0.08);
+  --text-muted: #6b665e;
+  --accent-red: #8b2323;
+  --accent-gold: #b08d57;
+  --border-ink: rgba(26, 26, 26, 0.1);
   --font-serif: 'EB Garamond', serif;
   --font-sans: 'Inter Tight', sans-serif;
-  --shadow-subtle: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
 
-html { scroll-behavior: smooth; }
-body { 
-  margin: 0; 
-  background-color: var(--bg-paper); 
-  color: var(--text-ink); 
-  font-family: var(--font-serif); 
+body {
+  margin: 0;
+  background-color: var(--bg-desktop);
+  color: var(--text-ink);
+  font-family: var(--font-serif);
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.7;
 }
 
-/* Typography Scale */
-h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; color: var(--text-ink); }
-.small-caps { font-family: var(--font-sans); font-variant: all-small-caps; letter-spacing: 0.1em; font-weight: 600; font-size: 0.85rem; }
-
-/* Header: Elegant & Minimal */
+/* --- Navigation & Header --- */
 .site-header {
-  padding: 1.5rem 5%;
-  border-bottom: 1px solid var(--border-fine);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(253, 252, 248, 0.98);
-  backdrop-filter: blur(5px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  background: rgba(253, 252, 248, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 5%;
+  border-bottom: 1px solid var(--border-ink);
+  position: sticky; top: 0; z-index: 1000;
+  display: flex; justify-content: space-between; align-items: center;
 }
-.site-title-main { font-size: 1.6rem; font-family: var(--font-serif); text-decoration: none; color: var(--text-ink); }
-.sitenav a { 
-  font-family: var(--font-sans); 
-  font-variant: all-small-caps; 
-  text-decoration: none; 
-  color: var(--text-muted); 
-  margin-left: 2rem; 
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  transition: color 0.3s;
+.site-title-main { font-size: 1.8rem; text-decoration: none; color: var(--text-ink); font-weight: 500; }
+.sitenav a {
+  font-family: var(--font-sans); font-variant: all-small-caps; text-decoration: none;
+  color: var(--text-muted); margin-left: 2.5rem; font-weight: 600; letter-spacing: 0.1em;
+  transition: color 0.3s; font-size: 0.95rem;
 }
 .sitenav a:hover, .sitenav a.current { color: var(--accent-red); }
 
-/* Layout: Central Content */
-main { max-width: 1400px; margin: 0 auto; padding: 4rem 5%; }
+/* --- Reader Layout --- */
+.reader-layout { display: grid; grid-template-columns: 320px 1fr; gap: 4rem; padding: 4rem 5%; max-width: 1600px; margin: 0 auto; }
+.reader-sidebar { position: sticky; top: 8rem; height: calc(100vh - 12rem); overflow-y: auto; padding-right: 2rem; border-right: 1px solid var(--border-ink); }
 
-/* The Page as an Object */
+.toc-list { list-style: none; padding: 0; }
+.toc-list li { margin-bottom: 0.5rem; }
+.toc-list a {
+  display: block; padding: 0.3rem 0; text-decoration: none; color: var(--text-muted);
+  font-size: 1.1rem; transition: color 0.2s;
+}
+.toc-list a:hover { color: var(--accent-red); }
+
+/* --- Die Buchseite (Page Card) --- */
 .page-card {
-  background: white;
+  background-color: var(--bg-paper);
+  padding: 8rem 10rem;
   margin-bottom: 6rem;
-  padding: 6rem 8rem;
-  box-shadow: var(--shadow-subtle);
-  border: 1px solid var(--border-fine);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-ink);
   position: relative;
+  max-width: 850px;
+  margin-left: auto; margin-right: auto;
 }
 .page-header {
-  position: absolute;
-  top: 3rem;
-  left: 0;
-  width: 100%;
-  padding: 0 8rem;
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
+  position: absolute; top: 4rem; left: 0; width: 100%; padding: 0 10rem;
+  display: flex; justify-content: space-between; box-sizing: border-box;
+  font-family: var(--font-sans); font-variant: all-small-caps; font-size: 0.8rem;
+  color: var(--accent-gold); letter-spacing: 0.15em; font-weight: 700;
 }
 
-/* Sidebar & TOC */
-.reader-layout { display: grid; grid-template-columns: 320px 1fr; gap: 6rem; }
-.reader-sidebar { position: sticky; top: 8rem; height: calc(100vh - 10rem); overflow-y: auto; }
-.toc-list { list-style: none; padding: 0; border-left: 1px solid var(--border-fine); }
-.toc-list a { 
-  display: block; 
-  padding: 0.4rem 1.5rem; 
-  text-decoration: none; 
-  color: var(--text-muted); 
-  font-size: 1.1rem;
-  transition: all 0.2s;
+/* --- Text-Gattungen (JSON Integration) --- */
+.text-unit { margin-bottom: 1.8rem; position: relative; }
+.type-paragraph { font-size: 1.45rem; text-align: justify; hyphens: auto; }
+.type-heading[data-level="1"] { font-size: 2.8rem; text-align: center; margin-top: 5rem; margin-bottom: 4rem; line-height: 1.1; }
+.type-heading[data-level="2"] { font-size: 2rem; margin-top: 4rem; color: var(--accent-red); border-bottom: 1px solid var(--accent-gold); padding-bottom: 0.5rem; }
+.type-heading[data-level="3"] { font-size: 1.5rem; font-style: italic; margin-top: 3rem; }
+
+.type-footnote {
+  font-size: 1.1rem; line-height: 1.6; color: var(--text-muted);
+  padding-top: 1rem; border-top: 1px solid var(--accent-gold); width: 40%;
+  margin-top: 3rem; text-align: justify;
 }
-.toc-list a:hover, .toc-list a.is-active { color: var(--accent-red); border-left: 2px solid var(--accent-red); margin-left: -1px; }
+/* Wenn mehrere Fußnoten folgen, nur die erste mit Linie */
+.type-footnote + .type-footnote { border-top: none; padding-top: 0; margin-top: -1rem; }
 
-/* Text Content */
-.text-content { max-width: 800px; }
-.text-unit.type-paragraph { font-size: 1.45rem; text-align: justify; margin-bottom: 2rem; }
-.text-unit.type-heading[data-level="1"] { font-size: 2.8rem; margin: 4rem 0 3rem; text-align: center; }
-.text-unit.type-heading[data-level="2"] { font-size: 1.8rem; margin: 3rem 0 2rem; color: var(--accent-red); }
+/* --- Toolbar & UI --- */
+.reader-toolbar {
+  display: flex; justify-content: center; gap: 3rem; margin-bottom: 5rem;
+  padding-bottom: 2rem; border-bottom: 1px solid var(--border-ink);
+}
+.toolbar-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.toolbar-label { font-family: var(--font-sans); font-variant: all-small-caps; font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); }
 
-/* Buttons: Classic */
+/* Buttons */
 .btn-classic {
-  background: transparent;
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
-  padding: 0.6rem 1.5rem;
-  font-family: var(--font-sans);
-  font-variant: all-small-caps;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
+  background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);
+  padding: 0.5rem 1.5rem; font-family: var(--font-sans); font-variant: all-small-caps;
+  font-weight: 700; cursor: pointer; transition: 0.3s;
 }
 .btn-classic:hover { background: var(--accent-red); color: white; }
 
-/* Search Dashboard */
-.search-hero { margin-bottom: 6rem; border-bottom: 1px solid var(--accent-gold); padding-bottom: 2rem; }
-.search-box-elegant { display: flex; align-items: center; border-bottom: 2px solid var(--text-ink); margin: 2rem 0; }
-.search-box-elegant input { 
-  flex: 1; border: none; background: transparent; padding: 1.5rem; 
-  font-size: 2rem; font-family: var(--font-serif); font-style: italic; color: var(--text-ink);
-}
-.search-box-elegant input:focus { outline: none; }
-
-/* Search Guide */
-.search-guide { background: var(--bg-sidebar); padding: 2rem; margin: 2rem 0; font-family: var(--font-sans); font-size: 0.9rem; border-left: 3px solid var(--accent-gold); }
-.search-guide h4 { font-variant: all-small-caps; margin-top: 0; color: var(--accent-red); }
-.search-guide code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; font-weight: 700; color: var(--accent-red); }
-
-/* Treffer-Karten */
-.result-biblio { margin-bottom: 4rem; padding-left: 2rem; border-left: 1px solid var(--border-fine); }
-.result-biblio .sigle { font-family: var(--font-sans); font-variant: all-small-caps; color: var(--accent-red); font-weight: 700; }
-.result-biblio .snippet { font-size: 1.3rem; margin-top: 0.5rem; }
-
-/* Dark Mode: Luxury Dark */
+/* Dark Mode */
 body[data-theme="dark"] {
-  --bg-paper: #121212; --bg-sidebar: #1a1a1a; --text-ink: #e0e0e0; --text-muted: #a0a0a0; --accent-red: #ff7e67; --border-fine: rgba(255,255,255,0.1);
+  --bg-desktop: #121212; --bg-paper: #1c1a17; --text-ink: #e2dace; --text-muted: #a0968a; --accent-red: #ff7e67; --border-ink: rgba(255,255,255,0.1);
 }
-body[data-theme="dark"] .page-card { background: #1e1e1e; }
