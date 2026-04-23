@@ -322,3 +322,7 @@ body[data-theme="dark"] .legal-footer,
 body[data-theme="dark"] .legal-footer a {
   color: var(--text-muted);
 }
+body[data-theme="dark"] .legal-section a:hover,
+body[data-theme="dark"] .legal-footer a:hover {
+  color: var(--accent);
+}
