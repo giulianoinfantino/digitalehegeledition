@@ -251,3 +251,114 @@ body[data-theme="dark"] .legal-section a {
     flex-direction: column;
   }
 }
+
+/* --- Reader Specific Styles (Restored) --- */
+.reader-toolbar {
+  position: sticky;
+  top: 5rem;
+  background: var(--bg-color);
+  z-index: 900;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  font-family: var(--font-ui);
+}
+
+.toolbar-group { display: flex; align-items: center; gap: 1rem; }
+.toolbar-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--text-muted); }
+
+.jump-input-group {
+  display: flex;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 2px;
+}
+body[data-theme="dark"] .jump-input-group { background: #262626; }
+
+.jump-input-group input {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  width: 60px;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+}
+
+.toolbar-stats { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 1.5rem; }
+.toolbar-stats strong { color: var(--text-main); }
+
+.page-card {
+  background: white;
+  padding: 4rem 5rem;
+  margin-bottom: 4rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+  position: relative;
+  min-height: 400px;
+}
+body[data-theme="dark"] .page-card { background: #1e1a16; box-shadow: none; border: 1px solid var(--border); }
+
+.page-header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+  padding-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.text-unit { margin-bottom: 1.5rem; }
+.text-unit.type-paragraph { font-size: 1.35rem; line-height: 1.75; text-align: justify; }
+.text-unit.type-heading { margin-top: 3rem; color: var(--accent); }
+.text-unit.type-heading[data-level="1"] { font-size: 2rem; }
+.text-unit.type-heading[data-level="2"] { font-size: 1.6rem; }
+
+.text-unit.type-footnote {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border);
+  padding-left: 1.5rem;
+  margin-top: 2rem;
+}
+
+.empty-page-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  padding: 4rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.toc-list { list-style: none; padding: 0; margin: 0; }
+.toc-list li { margin-bottom: 0.75rem; }
+.toc-list a { 
+  text-decoration: none; 
+  color: var(--text-muted); 
+  font-size: 1.05rem; 
+  display: block;
+  transition: all 0.2s;
+}
+.toc-list a:hover { color: var(--accent); }
+.toc-page { float: right; font-size: 0.8rem; opacity: 0.5; font-family: var(--font-ui); }
+
+/* --- Additional Cosmetic Fixes --- */
+.site-footer a, .legal-footer a {
+  color: var(--text-muted) !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--border) !important;
+}
+.site-footer a:hover, .legal-footer a:hover {
+  color: var(--accent) !important;
+}
