@@ -1287,124 +1287,42 @@
   </nav>
 </header>
 
-<main class="search-main">
-  <section class="search-intro">
-    <div class="search-kicker">Scholarly Search</div>
-    <h1>Synoptische Volltextsuche im Extraktor-Korpus</h1>
-    <p>
-      Eine reduzierte Konkordanzsuche über die publizierten GW-Bände. Sie arbeitet mit Boolescher Syntax,
-      Phrasen, Nähe-Suche und Feldfiltern, ohne die Lesefassung mit technischen PDF-Angaben zu überfrachten.
-    </p>
-  </section>
 
-  <div class="search-layout">
-    <aside class="search-sidebar">
-      <section class="side-card">
-        <h2 class="side-title">Korpus</h2>
-        <div class="source-status" id="source-status">
-          Editionskatalog und Suchindex werden geladen…
-        </div>
-      </section>
+<main class="search-container">
+  <header class="search-hero">
+    <h1>Edition durchsuchen</h1>
+    <p>Volltextsuche über alle verfügbaren Bände der digitalen Hegel-Edition.</p>
+  </header>
 
-      <section class="side-card">
-        <h2 class="side-title">Filter</h2>
-        <div class="range-field">
-          <span>Werk</span>
-          <label>
-            <select id="work-filter">
-              <option value="all">Gesamte Edition</option>
-            </select>
-          </label>
-        </div>
-        <div class="toggle-grid">
-          <label><input type="checkbox" id="include-headings" checked> Überschriften durchsuchen</label>
-          <label><input type="checkbox" id="include-paragraphs" checked> Fließtext durchsuchen</label>
-        </div>
-        <div class="visually-hidden-controls" aria-hidden="true">
-          <label><input type="checkbox" id="include-frontmatter" checked> Paratexte durchsuchen</label>
-          <label><input type="checkbox" id="include-toc" checked> Inhaltsverzeichnis durchsuchen</label>
-          <label><input type="checkbox" id="include-footnotes"> Fußnoten durchsuchen</label>
-          <label><input type="checkbox" id="exact-match"> Exakte Phrase</label>
-          <label><input type="checkbox" id="case-sensitive"> Groß/Kleinschreibung beachten</label>
-        </div>
-      </section>
-    </aside>
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Begriff oder Phrase eingeben..." autofocus>
+    <button onclick="handleSearch()">Suchen</button>
+  </div>
 
-    <section class="search-view">
-      <section class="query-card">
-        <div class="query-row">
-          <label>
-            <span class="side-title">Anfrage</span>
-            <input class="query-input" id="query-input" type="search" placeholder='z. B. "reine Quantität" AND Begriff NOT Urteil'>
-          </label>
-          <button class="search-btn primary" id="run-search" type="button">Suche starten</button>
-        </div>
-        <p class="query-note">
-          Boolesche Operatoren, Phrasen, Feldfilter und Nähe-Suche sind direkt im Suchfeld möglich.
-        </p>
-        <details class="advanced-search">
-          <summary>Erweiterte Suche und Syntax</summary>
-          <div class="advanced-body">
-            <div class="query-tools">
-              <label class="sort-field">
-                <span>Sortierung</span>
-                <select id="sort-order">
-                  <option value="relevance">Nach Relevanz</option>
-                  <option value="page">Nach Seitenfolge</option>
-                </select>
-              </label>
-              <label class="sort-field">
-                <span>Mehrwortsuche ohne Operatoren</span>
-                <select id="match-mode">
-                  <option value="all">Alle Wörter</option>
-                  <option value="any">Mindestens eines</option>
-                </select>
-              </label>
-              <button class="search-btn" id="clear-search" type="button">Zurücksetzen</button>
-            </div>
-            <div>
-              <div class="side-title" style="margin-bottom:10px;">Beispielanfragen</div>
-              <div class="example-row">
-                <button class="example-chip" type="button" data-example='"reine Quantität"'>Phrase</button>
-                <button class="example-chip" type="button" data-example='(Sein OR Werden) AND Anfang'>Boolean</button>
-                <button class="example-chip" type="button" data-example='Begriff NEAR/12 Urteil'>Nähe</button>
-                <button class="example-chip" type="button" data-example='type:heading Logik'>Überschriften</button>
-                <button class="example-chip" type="button" data-example='work:gw-12 gw:30-80 Begriff'>GW-Bereich</button>
-              </div>
-            </div>
-            <div class="operator-help" aria-label="Suchsyntax">
-              <div class="side-title">Operatoren und Feldfilter</div>
-              <div class="operator-grid">
-                <div class="operator-card"><code>AND · OR · NOT</code><span>Boolesche Verknüpfung mit Klammern: <em>(Sein OR Werden) AND Anfang</em>.</span></div>
-                <div class="operator-card"><code>"exakte Phrase"</code><span>Phrasensuche für feste Wendungen und terminologische Formeln.</span></div>
-                <div class="operator-card"><code>NEAR/12</code><span>Proximity: <em>Begriff NEAR/12 Urteil</em> findet Nähe im selben Textblock.</span></div>
-                <div class="operator-card"><code>work:gw-12 · band:12</code><span>Werk- oder Bandfilter direkt in der Anfrage.</span></div>
-                <div class="operator-card"><code>type:heading</code><span>Textschichten: <em>text</em>, <em>heading</em>, <em>footnote</em>, <em>toc</em>, <em>paratext</em>.</span></div>
-                <div class="operator-card"><code>gw:30-80 · oa:1-20</code><span>Seitenbereiche der GW- oder Originalausgabe.</span></div>
-              </div>
-            </div>
-          </div>
-        </details>
-      </section>
+  <div class="search-filters">
+    <div class="filter-group">
+      <span>Bereich:</span>
+      <select id="filter-work">
+        <option value="all">Alle Werke</option>
+        <!-- Wird dynamisch gefüllt -->
+      </select>
+    </div>
+    <div class="filter-group">
+      <span>Sortierung:</span>
+      <select id="filter-sort">
+        <option value="score">Relevanz</option>
+        <option value="page">Seitenfolge</option>
+      </select>
+    </div>
+  </div>
 
-      <section class="results-summary" id="results-summary">
-        <div class="summary-head">
-          <div>
-            <h2 class="summary-title">Noch kein Korpus geladen</h2>
-            <p class="summary-subtitle">Edition laden, Suchfrage stellen, Treffer im Lesetext prüfen.</p>
-          </div>
-        </div>
-      </section>
+  <div id="search-status" class="search-results-info">Bereit für die Suche.</div>
 
-      <section class="results-list" id="results-list">
-        <div class="empty-state">
-          <strong>Warte auf Daten.</strong><br>
-          Danach kannst du direkt im aktuellen Hegel-Korpus suchen.
-        </div>
-      </section>
-    </section>
+  <div id="search-results">
+    <!-- Ergebnisse erscheinen hier -->
   </div>
 </main>
+
 
 <footer class="legal-footer">
   <nav>
