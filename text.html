@@ -3,32 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hegel · Werke — Text</title>
+  <title>Hegel · Werke — Text lesen</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
-  <style>
-    /* Lokale Fixes für den Reader */
-    .reader-layout {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 4rem;
-      padding: 0 5% 4rem;
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-    .reader-sidebar {
-      position: sticky;
-      top: 6rem;
-      height: calc(100vh - 8rem);
-      overflow-y: auto;
-      border-right: 1px solid var(--border);
-      padding-right: 2rem;
-      padding-top: 2rem;
-    }
-    .text-content { max-width: 900px; margin: 0 auto; }
-  </style>
 </head>
 <body data-theme="light">
+
 <header class="site-header">
   <a href="index.html" class="site-title">
     <span class="site-title-eyebrow">Digitale Edition</span>
@@ -46,64 +26,50 @@
   </div>
 </header>
 
-
+<main>
   <div class="reader-layout" id="main-layout">
     <aside class="reader-sidebar">
       <h3 class="toc-title">Inhalt</h3>
-      <ul id="toc-list" class="toc-list"></ul>
+      <ul id="toc-list" class="toc-list">
+        <li>Lade Inhaltsverzeichnis...</li>
+      </ul>
     </aside>
 
-    <main class="text-content">
+    <div class="text-content">
       <div id="reader-summary"></div>
+
       <div class="reader-toolbar">
-
-  <aside class="reader-sidebar">
-    <h3 class="toc-title">Inhalt</h3>
-    <ul id="toc-list" class="toc-list">
-      <li>Lade Inhaltsverzeichnis...</li>
-    </ul>
-  </aside>
-
-  <main class="text-content">
-    <div id="reader-summary"></div>
-
-    <div class="reader-toolbar">
-      
-      <div class="toolbar-group">
-        <span class="toolbar-label">Band</span>
-        <select id="work-selector" class="theme-toggle" style="text-transform: none; font-family: var(--font-text); font-size: 1rem; padding: 0 0.5rem;" onchange="switchWork(this.value)">
-          <option value="">Lade Werke...</option>
-        </select>
-      </div>
-
-      <div class="toolbar-group">
-        <span class="toolbar-label">Gehe zu Seite</span>
-        <div class="jump-input-group">
-          <input type="text" id="jump-gw-page" placeholder="GW" title="GW Seitennummer">
-          <input type="text" id="jump-oa-page" placeholder="OA" title="OA Seitennummer">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Band</span>
+          <select id="work-selector" class="theme-toggle" onchange="switchWork(this.value)">
+            <option value="">Lade Werke...</option>
+          </select>
         </div>
-        <button class="theme-toggle" onclick="handleJumpToPage()">Springen</button>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Gehe zu GW-Seite</span>
+          <div class="jump-input-group">
+            <input type="text" id="jump-gw-page" placeholder="S.">
+          </div>
+          <button class="citation-btn" onclick="handleJumpToPage()">Springen</button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="citation-btn" id="btn-sync" onclick="toggleSyncView()">Synchronansicht</button>
+          <button class="citation-btn" onclick="copyCitation()">Zitieren</button>
+        </div>
       </div>
 
-      <div class="toolbar-stats">
-        <span>Seiten: <strong id="stat-pages">—</strong></span>
-        <span>Treffer: <strong id="stat-headings">—</strong></span>
-        <span>Fußnoten: <strong id="stat-footnotes">—</strong></span>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="citation-btn" id="btn-sync" onclick="toggleSyncView()">Synchronansicht</button>
-        <button class="citation-btn" onclick="copyCitation()">Zitieren</button>
-        <button class="theme-toggle" id="toggle-footnotes" onclick="toggleFootnotes()">Fußnoten</button>
+      <div id="reader-pages">
+        <div class="empty-page-placeholder">Initialisiere Reader...</div>
       </div>
     </div>
 
-    <div id="reader-pages">
-      <div class="empty-state">Lade Korpus...</div>
-    </div>
-  </main>
-    <aside id="pdf-viewer-container" style="display:none; flex: 1; height: calc(100vh - 6rem); position: sticky; top: 6rem; border-left: 1px solid var(--border);"><iframe id="pdf-frame" src="" style="width:100%; height:100%; border:none;"></iframe></aside>
+    <aside id="pdf-viewer-container" style="display:none; flex: 1; height: calc(100vh - 150px); position: sticky; top: 100px; border-left: 1px solid var(--border);">
+      <iframe id="pdf-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
+    </aside>
   </div>
+</main>
 
 <footer class="site-footer">
   <div>Digitale Hegel-Edition · Forschungsplattform</div>
@@ -116,49 +82,44 @@
 <script src="assets/edition-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
-  // Der gesamte JS-Code wird hier stabil wiederhergestellt
   const state = {
     corpus: null,
     selectedWork: null,
-    showFootnotes: true,
-    sourceLabel: 'Initial'
+    syncView: false
   };
 
   async function loadWork() {
     const urlParams = new URLSearchParams(window.location.search);
     const workId = urlParams.get('work') || 'gw-21';
     
-    // Wir laden das spezifische Work-Script dynamisch
+    // Dynamisches Laden des Werk-Scripts
     const script = document.createElement('script');
-    script.src = `assets/work-${workId}.js`;
+    script.src = `assets/work-${workId}.js?v=${Date.now()}`;
     script.onload = () => {
       if (window.HEGEL_WORK_DATA) {
-        setCorpus(window.HEGEL_WORK_DATA, workId); saveHistory(workId);
+        state.corpus = window.HEGEL_WORK_DATA;
+        if (window.HEGEL_EDITION) {
+          state.selectedWork = window.HEGEL_EDITION.works.find(w => w.work_id === workId);
+        }
+        renderAll();
+      } else {
+        document.getElementById('reader-pages').innerHTML = '<div class="empty-page-placeholder">Fehler beim Laden der Daten.</div>';
       }
     };
     document.head.appendChild(script);
-  }
-
-  function setCorpus(data, workId) {
-    state.corpus = data;
-    // Suche Metadaten in HEGEL_EDITION
-    if (window.HEGEL_EDITION) {
-      state.selectedWork = window.HEGEL_EDITION.works.find(w => w.work_id === workId);
-    }
-    renderAll();
   }
 
   function renderAll() {
     renderSummary();
     renderToc();
     renderPages();
-    updateStats();
+    populateWorkSelector();
   }
 
   function renderSummary() {
     const summary = document.getElementById('reader-summary');
     const title = state.selectedWork ? state.selectedWork.title : state.corpus.metadata.title;
-    summary.innerHTML = `<h2 class="summary-title">${title}</h2>`;
+    summary.innerHTML = `<h2 style="margin-bottom:2rem; font-size:2.5rem;">${title}</h2>`;
   }
 
   function renderToc() {
@@ -171,141 +132,80 @@
     list.innerHTML = toc.map(entry => `
       <li>
         <a href="#page-${entry.page}" data-page-anchor="page-${entry.page}">
-          ${entry.title} <span class="toc-page">${entry.page}</span>
+          ${entry.title} <span class="toc-page">S. ${entry.page}</span>
         </a>
       </li>
     `).join('');
   }
 
-  function shouldRenderReaderPage(page) {
-    if (page.page_kind === 'toc' && page.page_pdf > 40) return true;
-    if (page.page_kind === 'toc') return false;
-    return true;
+  function renderPages() {
+    const container = document.getElementById('reader-pages');
+    // Filterung von TOC-Seiten am Anfang
+    const visiblePages = state.corpus.pages.filter(p => !(p.page_kind === 'toc' && p.page_pdf < 20));
+    container.innerHTML = visiblePages.map(page => {
+      const units = page.units || [];
+      const contentHtml = units.length > 0 
+        ? units.map(u => `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`).join('')
+        : `<div class="empty-page-placeholder"><p>Seite ${page.page_pdf}</p><small>Forschungsapparat / Leere Seite</small></div>`;
+
+      return `
+        <article class="page-card" id="page-${page.page_pdf}">
+          <header class="page-header">
+            <span>${page.sigel || ''}</span>
+            <span>PDF ${page.page_pdf} ${page.page_book ? `· GW ${page.page_book}` : ''}</span>
+          </header>
+          <div class="page-body">${contentHtml}</div>
+        </article>
+      `;
+    }).join('');
   }
 
-  
-  state.syncView = false;
+  function populateWorkSelector() {
+    const selector = document.getElementById('work-selector');
+    if (!window.HEGEL_EDITION) return;
+    selector.innerHTML = window.HEGEL_EDITION.works.map(w => `
+      <option value="${w.work_id}" ${w.work_id === (state.selectedWork?.work_id) ? 'selected' : ''}>
+        ${w.siglum || w.work_id}
+      </option>
+    `).join('');
+  }
+
+  function switchWork(id) {
+    if (id) window.location.href = `text.html?work=${id}`;
+  }
+
+  function handleJumpToPage() {
+    const gw = document.getElementById('jump-gw-page').value.trim();
+    const page = state.corpus.pages.find(p => String(p.page_book) === gw);
+    if (page) window.location.hash = `page-${page.page_pdf}`;
+  }
 
   function toggleSyncView() {
     state.syncView = !state.syncView;
     const container = document.getElementById('pdf-viewer-container');
     const layout = document.getElementById('main-layout');
-    const btn = document.getElementById('btn-sync');
-    
     if (state.syncView) {
       container.style.display = 'block';
       layout.style.gridTemplateColumns = '250px 1fr 1fr';
       layout.style.maxWidth = '100%';
-      btn.style.background = 'var(--accent)';
-      btn.style.color = 'white';
       updatePdfView();
     } else {
       container.style.display = 'none';
-      layout.style.gridTemplateColumns = '320px 1fr';
-      layout.style.maxWidth = '1600px';
-      btn.style.background = 'var(--accent-soft)';
-      btn.style.color = 'var(--accent)';
+      layout.style.gridTemplateColumns = '300px 1fr';
+      layout.style.maxWidth = '1400px';
     }
   }
 
   function updatePdfView() {
-    if (!state.syncView || !state.corpus) return;
-    const currentPages = Array.from(document.querySelectorAll('.page-card'));
-    let visiblePagePdf = 1;
-    for (const p of currentPages) {
-      if (p.getBoundingClientRect().top >= 0) {
-        visiblePagePdf = p.id.replace('page-', '');
-        break;
-      }
-    }
-    const pdfUrl = `../${state.corpus.metadata.source_pdf}#page=${visiblePagePdf}`;
-    const frame = document.getElementById('pdf-frame');
-    if (frame.src !== pdfUrl) frame.src = pdfUrl;
+    if (!state.syncView) return;
+    const pdfUrl = `../${state.corpus.metadata.source_pdf}`;
+    document.getElementById('pdf-frame').src = pdfUrl;
   }
 
-  // Lazy Loading: Render only shells, fill content on intersection
-  function renderPage(page) {
-    return `
-      <article class="page-card" id="page-${page.page_pdf}" data-loaded="false">
-        <header class="page-header">
-          <span>${page.sigel || ''}</span>
-          <span>PDF ${page.page_pdf} ${page.page_book ? `· GW ${page.page_book}` : ''}</span>
-        </header>
-        <div class="page-body">
-          <div class="empty-page-placeholder">Lade Inhalt...</div>
-        </div>
-      </article>
-    `;
-  }
-
-  function initLazyLoading() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          if (el.dataset.loaded === 'false') {
-            const pagePdf = el.id.replace('page-', '');
-            const pageData = state.corpus.pages.find(p => String(p.page_pdf) === pagePdf);
-            if (pageData) {
-              const body = el.querySelector('.page-body');
-              const units = pageData.units || [];
-              body.innerHTML = units.length > 0 
-                ? units.map(u => `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`).join('')
-                : `<div class="empty-page-placeholder"><p>Seite ${pagePdf}</p><small>Kein Text extrahiert.</small></div>`;
-              el.dataset.loaded = 'true';
-            }
-          }
-          if (state.syncView) updatePdfView();
-        }
-      });
-    }, { rootMargin: '400px' });
-
-    document.querySelectorAll('.page-card').forEach(p => observer.observe(p));
-  }
-
-  const oldRenderPages = renderPages;
-  renderPages = function() {
-    const container = document.getElementById('reader-pages');
-    const pages = state.corpus.pages.filter(shouldRenderReaderPage);
-    container.innerHTML = pages.map(renderPage).join('');
-    initLazyLoading();
-    initScrollSpy();
-  };
-
-  };
-
-  
-  function linkifyRefs(text) {
-    // Erkennt "S. 123" und macht daraus interne Links
-    return text.replace(/S\.\s*(\d+)/g, '<a href="#page-$1" class="internal-ref">S. $1</a>');
-  }
-
-  function saveHistory(workId) {
-    let history = JSON.parse(localStorage.getItem('hegel-history') || '[]');
-    history = [workId, ...history.filter(h => h !== workId)].slice(0, 5);
-    localStorage.setItem('hegel-history', JSON.stringify(history));
-  }
-
-  // Update renderPage to linkify and add hover anchors
-  function renderPage(page) {
-    const units = page.units || [];
-    let contentHtml = units.length > 0 
-      ? units.map(u => {
-          const text = linkifyRefs(u.text_normalized || u.text);
-          return `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">
-            <span class="hover-anchor" onclick="copyLink('page-${page.page_pdf}')">🔗</span>
-            ${text}
-          </div>`;
-        }).join('')
-      : `<div class="empty-page-placeholder"><p>Seite ${page.page_pdf}</p><small>Kein Text extrahiert.</small></div>`;
-
-    return `<article class="page-card" id="page-${page.page_pdf}">${contentHtml}</article>`;
-  }
-
-  function copyLink(id) {
-    const url = window.location.href.split('#')[0] + '#' + id;
-    navigator.clipboard.writeText(url);
-    alert('Direktlink kopiert!');
+  function copyCitation() {
+    const citation = `Hegel, ${state.selectedWork?.title || state.corpus.metadata.title}, GW ${state.corpus.band}.`;
+    navigator.clipboard.writeText(citation);
+    alert('Zitation kopiert!');
   }
 
   window.onload = loadWork;
