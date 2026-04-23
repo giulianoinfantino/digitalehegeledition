@@ -77,7 +77,7 @@
   const state = { corpus: null, selectedWork: null, syncView: false };
 
   function loadWork() {
-    const workId = new URLSearchParams(window.location.search).get('work') || 'gw-21';
+    const workId = new URLSearchParams(window.location.search).get('work') || 'gw-12';
     const script = document.createElement('script');
     script.src = `assets/work-${workId}.js?v=${Date.now()}`;
     script.onload = () => {
