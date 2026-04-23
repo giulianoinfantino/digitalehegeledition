@@ -4,8 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Datenschutz — Hegel Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .legal-container {
+      max-width: 800px;
+      margin: 6rem auto;
+      padding: 0 5%;
+    }
+    .legal-container h1 {
+      font-size: 3.5rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .legal-container h2 {
+      font-size: 1.5rem;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .legal-container p, .legal-container li {
+      font-size: 1.2rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      color: var(--text-main);
+    }
+    .legal-container ul {
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+    }
+  </style>
 </head>
 <body>
 <header class="site-header">
@@ -20,87 +49,66 @@
       <li><a href="search.html">Suche</a></li>
     </ul>
   </nav>
+  <div class="theme-controls">
+    <button class="theme-toggle" onclick="cycleTheme()">Theme</button>
+  </div>
 </header>
 
-<main class="legal-page">
+<main class="legal-container">
   <h1>Datenschutzerklärung</h1>
-
-  <section class="legal-section">
-    <h2>Verantwortlicher</h2>
-    <p class="legal-placeholder">
-      Giuliano Infantino<br>
-      Brüdergasse 29<br>
-      53111 Bonn<br>
-      E-Mail: <a href="mailto:giulianoinfantino@icloud.com">giulianoinfantino[at]icloud.com</a>
-    </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Grundsatz</h2>
+  
+  <section>
+    <h2>1. Datenschutz auf einen Blick</h2>
     <p>
-      Diese Website ist als statische digitale Edition angelegt. Es gibt kein Benutzerkonto, kein Kontaktformular,
-      keinen Newsletter und keine eigene Tracking- oder Analysefunktion innerhalb der Website.
+      Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.
     </p>
   </section>
 
-  <section class="legal-section">
-    <h2>Server-Logfiles</h2>
+  <section>
+    <h2>2. Datenerfassung auf dieser Website</h2>
     <p>
-      Beim Aufruf der Website können durch den Hosting-Anbieter technisch erforderliche Zugriffsdaten verarbeitet
-      werden, etwa IP-Adresse, Zeitpunkt des Abrufs, angeforderte Datei, Referrer, Browsertyp und Betriebssystem.
-      Diese Verarbeitung dient der technischen Bereitstellung, Stabilität und Sicherheit der Website.
+      <strong>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</strong><br>
+      Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen.
     </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Lokale Speicherung im Browser</h2>
     <p>
-      Die Website speichert die gewählte Darstellung, insbesondere den Hell-/Dunkelmodus, lokal im Browser
-      (<code>localStorage</code>). Diese Information wird nicht an den Betreiber übertragen und kann durch Löschen
-      der Browserdaten entfernt werden.
+      <strong>Wie erfassen wir Ihre Daten?</strong><br>
+      Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z. B. um Daten handeln, die Sie in ein Kontaktformular eingeben. Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst.
     </p>
   </section>
 
-  <section class="legal-section">
-    <h2>Externe Schriftarten</h2>
+  <section>
+    <h2>3. Bereitstellung der Website (Server-Log-Files)</h2>
     <p>
-      Die Website bindet Schriftarten über Google Fonts ein. Dabei kann der Browser Verbindung zu Servern von Google
-      herstellen, um die Schriftdateien zu laden. Wenn dies vermieden werden soll, sollten die Schriftdateien lokal
-      gehostet und die externen Google-Fonts-Links aus den HTML-Dateien entfernt werden.
+      Der Provider der Seiten erhebt und speichert automatisch Informationen in so genannten Server-Log-Files, die Ihr Browser automatisch an uns übermittelt. Dies sind:
     </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Suchfunktion</h2>
-    <p>
-      Die Volltextsuche läuft im Browser gegen lokal geladene JSON- beziehungsweise JavaScript-Dateien der Edition.
-      Suchanfragen werden nicht an einen eigenen Server der Edition übermittelt. Wenn Suchanfragen in der Adresszeile
-      stehen, können sie jedoch technisch Teil der Browserhistorie sein.
-    </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Rechte betroffener Personen</h2>
-    <p>
-      Soweit personenbezogene Daten verarbeitet werden, bestehen nach Maßgabe der Datenschutz-Grundverordnung Rechte
-      auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit sowie Widerspruch.
-      Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutzaufsichtsbehörde.
-    </p>
-  </section>
-
-  <section class="legal-section">
-    <h2>Stand</h2>
-    <p>Diese Datenschutzerklärung wurde zuletzt am 23. April 2026 aktualisiert.</p>
+    <ul>
+      <li>Browsertyp und Browserversion</li>
+      <li>verwendetes Betriebssystem</li>
+      <li>Referrer URL</li>
+      <li>Hostname des zugreifenden Rechners</li>
+      <li>Uhrzeit der Serveranfrage</li>
+      <li>IP-Adresse</li>
+    </ul>
   </section>
 </main>
 
-<footer class="legal-footer">
-  <nav>
-    <a href="impressum.html">Impressum</a>
+<footer class="site-footer">
+  <div>Digitale Hegel-Edition · Arbeitsstand</div>
+  <div>
+    <a href="impressum.html">Impressum</a> · 
     <a href="datenschutz.html">Datenschutz</a>
-  </nav>
+  </div>
 </footer>
 
 <script src="assets/theme.js"></script>
+<script>
+  function cycleTheme() {
+    const themes = ['light', 'sepia', 'dark'];
+    const current = document.body.getAttribute('data-theme') || 'light';
+    const next = themes[(themes.indexOf(current) + 1) % themes.length];
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('hegel-theme', next);
+  }
+</script>
 </body>
 </html>
