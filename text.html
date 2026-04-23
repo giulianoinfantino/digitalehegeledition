@@ -82,6 +82,7 @@
       </div>
 
       <div class="toolbar-group">
+        <button class="citation-btn" onclick="copyCitation()">Zitieren</button>
         <button class="theme-toggle" id="toggle-footnotes" onclick="toggleFootnotes()">Fußnoten</button>
       </div>
     </div>
@@ -246,6 +247,45 @@
   setCorpus = function(data, workId) {
     originalSetCorpus(data, workId);
     populateWorkSelector();
+  };
+
+  
+  function copyCitation() {
+    const work = state.selectedWork || state.corpus.metadata;
+    const currentPages = Array.from(document.querySelectorAll('.page-card'));
+    let visiblePage = currentPages[0];
+    for (const p of currentPages) {
+      if (p.getBoundingClientRect().top >= 0) { visiblePage = p; break; }
+    }
+    const pageId = visiblePage ? visiblePage.id.replace('page-', '') : '?';
+    const pageBook = state.corpus.pages.find(p => String(p.page_pdf) === pageId)?.page_book || pageId;
+    
+    const citation = `Hegel, ${work.title}, GW ${state.corpus.band}, S. ${pageBook}.`;
+    navigator.clipboard.writeText(citation);
+    alert('Zitation kopiert: ' + citation);
+  }
+
+  function initScrollSpy() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          document.querySelectorAll('.toc-list a').forEach(a => {
+            const isActive = a.getAttribute('href') === '#' + id;
+            a.classList.toggle('is-active', isActive);
+            if (isActive) a.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.page-card').forEach(p => observer.observe(p));
+  }
+
+  const oldRenderPages = renderPages;
+  renderPages = function() {
+    oldRenderPages();
+    initScrollSpy();
   };
 
   window.onload = loadWork;

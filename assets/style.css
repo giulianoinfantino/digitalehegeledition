@@ -362,3 +362,38 @@ body[data-theme="dark"] .page-card { background: #1e1a16; box-shadow: none; bord
 .site-footer a:hover, .legal-footer a:hover {
   color: var(--accent) !important;
 }
+
+/* --- Philologische Erweiterungen --- */
+.text-unit.type-heading[data-level="1"] { font-size: 2.4rem; margin-top: 5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+.text-unit.type-heading[data-level="2"] { font-size: 1.8rem; margin-top: 4rem; margin-bottom: 1.5rem; }
+.text-unit.type-heading[data-level="3"] { font-size: 1.4rem; font-style: italic; margin-top: 3rem; }
+
+.sperrsatz {
+  letter-spacing: 0.15em;
+  font-style: normal;
+}
+
+/* Aktives TOC-Element */
+.toc-list a.is-active {
+  color: var(--accent) !important;
+  font-weight: 700 !important;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.8rem;
+  transform: translateX(5px);
+}
+
+.citation-btn {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.citation-btn:hover {
+  background: var(--accent);
+  color: white;
+}
