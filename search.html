@@ -1288,32 +1288,52 @@
 </header>
 
 
+
 <main class="search-container">
   <header class="search-hero">
     <h1>Edition durchsuchen</h1>
-    <p>Volltextsuche über alle verfügbaren Bände der digitalen Hegel-Edition.</p>
+    <p>Akademische Volltextsuche über die digitale Hegel-Forschungsplattform.</p>
   </header>
 
   <div class="search-box">
-    <input type="text" id="search-input" placeholder="Begriff oder Phrase eingeben..." autofocus>
+    <input type="text" id="search-input" placeholder="Begriff oder Phrase eingeben..." autofocus onkeydown="if(event.key==='Enter') handleSearch()">
     <button onclick="handleSearch()">Suchen</button>
   </div>
 
   <div class="search-filters">
     <div class="filter-group">
-      <span>Bereich:</span>
-      <select id="filter-work">
-        <option value="all">Alle Werke</option>
-        <!-- Wird dynamisch gefüllt -->
+      <span>Werk:</span>
+      <select id="filter-work" onchange="handleSearch()">
+        <option value="all">Alle Bände</option>
       </select>
     </div>
+    
+    <div class="filter-group">
+      <span>Textgattung:</span>
+      <select id="filter-label" onchange="handleSearch()">
+        <option value="all">Alle Inhalte</option>
+        <option value="paragraph">Haupttext</option>
+        <option value="footnote">Fußnoten/Apparat</option>
+        <option value="heading">Überschriften</option>
+      </select>
+    </div>
+
     <div class="filter-group">
       <span>Sortierung:</span>
-      <select id="filter-sort">
+      <select id="filter-sort" onchange="handleSearch()">
         <option value="score">Relevanz</option>
         <option value="page">Seitenfolge</option>
       </select>
     </div>
+  </div>
+
+  <div class="search-options-row" style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; font-family: var(--font-ui); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+    <label style="cursor:pointer; display: flex; align-items: center; gap: 0.4rem; color: var(--text-muted);">
+      <input type="checkbox" id="check-exact" onchange="handleSearch()"> Exakte Phrase
+    </label>
+    <label style="cursor:pointer; display: flex; align-items: center; gap: 0.4rem; color: var(--text-muted);">
+      <input type="checkbox" id="check-case" onchange="handleSearch()"> Groß/Klein
+    </label>
   </div>
 
   <div id="search-status" class="search-results-info">Bereit für die Suche.</div>
@@ -1322,6 +1342,7 @@
     <!-- Ergebnisse erscheinen hier -->
   </div>
 </main>
+
 
 
 <footer class="legal-footer">
@@ -1509,7 +1530,7 @@ function syncUrl() {
 }
 
 function renderWorkOptions() {
-  const select = document.getElementById('work-filter');
+  const select = document.getElementById('filter-work');
   const options = [
     `<option value="all">Gesamte Edition</option>`,
     ...state.works.map(work => `<option value="${escapeHtml(work.work_id)}">${escapeHtml(displayWorkLabel(work))}</option>`)
@@ -1534,7 +1555,7 @@ function readControls() {
   state.includeFootnotes = document.getElementById('include-footnotes').checked;
   state.sort = document.getElementById('sort-order').value === 'page' ? 'page' : 'relevance';
   state.matchMode = document.getElementById('match-mode').value === 'any' ? 'any' : 'all';
-  state.workFilter = document.getElementById('work-filter').value || 'all';
+  state.workFilter = document.getElementById('filter-work').value || 'all';
 }
 
 function buildSuggestions() {
