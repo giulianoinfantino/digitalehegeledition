@@ -5,7 +5,7 @@ function applyTheme(theme) {
 }
 
 function cycleTheme() {
-  const themes = ['light', 'sepia', 'dark'];
+  const themes = ['light', 'dark'];
   const current = document.body.getAttribute('data-theme') || 'light';
   const next = themes[(themes.indexOf(current) + 1) % themes.length];
   applyTheme(next);

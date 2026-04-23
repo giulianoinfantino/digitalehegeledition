@@ -34,6 +34,12 @@
     <p>Durchsuchen Sie die historisch-kritische Ausgabe mit logischen Operatoren und Nähe-Suche.</p>
   </section>
 
+  <div class="search-box-elegant">
+    <input type="text" id="search-input" placeholder="Suchanfrage formulieren …" autofocus
+           onkeydown="if(event.key==='Enter') handleSearch()">
+    <button class="btn-classic" onclick="handleSearch()">Suchen</button>
+  </div>
+
   <div class="search-guide">
     <h4>Suchanfragen</h4>
     <div class="search-guide-grid">
@@ -49,12 +55,6 @@
         <p><code>Geist NEAR/10 Natur</code> — Innerhalb von 10 Wörtern</p>
       </div>
     </div>
-  </div>
-
-  <div class="search-box-elegant">
-    <input type="text" id="search-input" placeholder="Suchanfrage formulieren …" autofocus
-           onkeydown="if(event.key==='Enter') handleSearch()">
-    <button class="btn-classic" onclick="handleSearch()">Suchen</button>
   </div>
 
   <div class="search-filters">

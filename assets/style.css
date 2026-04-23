@@ -32,28 +32,6 @@
   --shadow-card: 0 2px 12px rgba(0,0,0,0.04), 0 8px 40px rgba(0,0,0,0.05);
 }
 
-/* ── Sepia Theme ─────────────────────────────────────────── */
-[data-theme="sepia"] {
-  --bg-desktop: #dcd3b8;
-  --bg-paper:   #f5ead0;
-  --bg-subtle:  #ece0c4;
-
-  --text-ink:   #28180a;
-  --text-body:  #3a280e;
-  --text-muted: #786040;
-  --text-faint: #b09870;
-
-  --accent:       #7a2c0a;
-  --accent-red:   #7a2c0a;
-  --accent-hover: #5c2008;
-  --accent-gold:  #7a5810;
-
-  --border:        rgba(40, 24, 10, 0.14);
-  --border-fine:   rgba(40, 24, 10, 0.07);
-  --border-strong: rgba(40, 24, 10, 0.24);
-  --border-ink:    rgba(40, 24, 10, 0.14);
-}
-
 /* ── Dark Theme ──────────────────────────────────────────── */
 [data-theme="dark"] {
   --bg-desktop: #0f0e0c;
@@ -702,6 +680,69 @@ body {
   transition: color var(--transition);
 }
 .result-link:hover { color: var(--accent-hover); }
+
+/* ── Impressum / Datenschutz ─────────────────────────────── */
+.legal-container {
+  max-width: 700px;
+  margin: 4rem auto;
+  padding: 0 5%;
+}
+.legal-kicker {
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-gold);
+  margin-bottom: 0.75rem;
+}
+.legal-container h1 {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 400;
+  color: var(--text-ink);
+  margin: 0 0 1.5rem;
+  line-height: 1.1;
+}
+.legal-lead {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 2.5rem;
+}
+.legal-section { margin-bottom: 2rem; }
+.legal-section h2 {
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin: 0 0 0.6rem;
+}
+.legal-section p {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: var(--text-body);
+  margin: 0;
+}
+
+/* ── Content links (alle a außerhalb von Header/Footer/Nav) ── */
+main a:not([class]),
+.legal-container a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+  transition: color var(--transition), text-decoration-color var(--transition);
+}
+main a:not([class]):hover,
+.legal-container a:hover {
+  color: var(--accent-hover);
+  text-decoration-color: var(--accent);
+}
 
 /* ── Footer ──────────────────────────────────────────────── */
 .site-footer {
