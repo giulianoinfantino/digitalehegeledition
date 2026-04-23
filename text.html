@@ -46,7 +46,17 @@
   </div>
 </header>
 
-<div class="reader-layout">
+
+  <div class="reader-layout" id="main-layout">
+    <aside class="reader-sidebar">
+      <h3 class="toc-title">Inhalt</h3>
+      <ul id="toc-list" class="toc-list"></ul>
+    </aside>
+
+    <main class="text-content">
+      <div id="reader-summary"></div>
+      <div class="reader-toolbar">
+
   <aside class="reader-sidebar">
     <h3 class="toc-title">Inhalt</h3>
     <ul id="toc-list" class="toc-list">
@@ -82,6 +92,7 @@
       </div>
 
       <div class="toolbar-group">
+        <button class="citation-btn" id="btn-sync" onclick="toggleSyncView()">Synchronansicht</button>
         <button class="citation-btn" onclick="copyCitation()">Zitieren</button>
         <button class="theme-toggle" id="toggle-footnotes" onclick="toggleFootnotes()">Fußnoten</button>
       </div>
@@ -91,7 +102,8 @@
       <div class="empty-state">Lade Korpus...</div>
     </div>
   </main>
-</div>
+    <aside id="pdf-viewer-container" style="display:none; flex: 1; height: calc(100vh - 6rem); position: sticky; top: 6rem; border-left: 1px solid var(--border);"><iframe id="pdf-frame" src="" style="width:100%; height:100%; border:none;"></iframe></aside>
+  </div>
 
 <footer class="site-footer">
   <div>Digitale Hegel-Edition · Forschungsplattform</div>
@@ -121,7 +133,7 @@
     script.src = `assets/work-${workId}.js`;
     script.onload = () => {
       if (window.HEGEL_WORK_DATA) {
-        setCorpus(window.HEGEL_WORK_DATA, workId);
+        setCorpus(window.HEGEL_WORK_DATA, workId); saveHistory(workId);
       }
     };
     document.head.appendChild(script);
@@ -171,122 +183,130 @@
     return true;
   }
 
-  function renderPage(page) {
-    const units = page.units || [];
-    const hasContent = units.length > 0;
-    
-    let contentHtml = hasContent 
-      ? units.map(u => `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`).join('')
-      : `<div class="empty-page-placeholder"><p>Seite ${page.page_pdf}</p><small>Kein Text extrahiert.</small></div>`;
+  
+  state.syncView = false;
 
+  function toggleSyncView() {
+    state.syncView = !state.syncView;
+    const container = document.getElementById('pdf-viewer-container');
+    const layout = document.getElementById('main-layout');
+    const btn = document.getElementById('btn-sync');
+    
+    if (state.syncView) {
+      container.style.display = 'block';
+      layout.style.gridTemplateColumns = '250px 1fr 1fr';
+      layout.style.maxWidth = '100%';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+      updatePdfView();
+    } else {
+      container.style.display = 'none';
+      layout.style.gridTemplateColumns = '320px 1fr';
+      layout.style.maxWidth = '1600px';
+      btn.style.background = 'var(--accent-soft)';
+      btn.style.color = 'var(--accent)';
+    }
+  }
+
+  function updatePdfView() {
+    if (!state.syncView || !state.corpus) return;
+    const currentPages = Array.from(document.querySelectorAll('.page-card'));
+    let visiblePagePdf = 1;
+    for (const p of currentPages) {
+      if (p.getBoundingClientRect().top >= 0) {
+        visiblePagePdf = p.id.replace('page-', '');
+        break;
+      }
+    }
+    const pdfUrl = `../${state.corpus.metadata.source_pdf}#page=${visiblePagePdf}`;
+    const frame = document.getElementById('pdf-frame');
+    if (frame.src !== pdfUrl) frame.src = pdfUrl;
+  }
+
+  // Lazy Loading: Render only shells, fill content on intersection
+  function renderPage(page) {
     return `
-      <article class="page-card" id="page-${page.page_pdf}">
+      <article class="page-card" id="page-${page.page_pdf}" data-loaded="false">
         <header class="page-header">
           <span>${page.sigel || ''}</span>
           <span>PDF ${page.page_pdf} ${page.page_book ? `· GW ${page.page_book}` : ''}</span>
         </header>
-        <div class="page-body">${contentHtml}</div>
+        <div class="page-body">
+          <div class="empty-page-placeholder">Lade Inhalt...</div>
+        </div>
       </article>
     `;
   }
 
-  function renderPages() {
-    const container = document.getElementById('reader-pages');
-    const pages = state.corpus.pages.filter(shouldRenderReaderPage);
-    container.innerHTML = pages.map(renderPage).join('');
-  }
-
-  function updateStats() {
-    document.getElementById('stat-pages').textContent = state.corpus.pages.length;
-    document.getElementById('stat-footnotes').textContent = state.corpus.pages.reduce((acc, p) => acc + (p.units || []).filter(u => u.type === 'footnote').length, 0);
-  }
-
-  function handleJumpToPage() {
-    const gw = document.getElementById('jump-gw-page').value;
-    const page = state.corpus.pages.find(p => String(p.page_book) === gw);
-    if (page) {
-      window.location.hash = `page-${page.page_pdf}`;
-    }
-  }
-
-  function toggleFootnotes() {
-    state.showFootnotes = !state.showFootnotes;
-    document.querySelectorAll('.type-footnote').forEach(f => f.style.display = state.showFootnotes ? 'block' : 'none');
-  }
-
-  function cycleTheme() {
-    const themes = ['light', 'sepia', 'dark'];
-    const current = document.body.getAttribute('data-theme') || 'light';
-    const next = themes[(themes.indexOf(current) + 1) % themes.length];
-    document.body.setAttribute('data-theme', next);
-    localStorage.setItem('hegel-theme', next);
-  }
-
-  
-  function populateWorkSelector() {
-    const selector = document.getElementById('work-selector');
-    if (!window.HEGEL_EDITION || !window.HEGEL_EDITION.works) return;
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentWorkId = urlParams.get('work') || 'gw-21';
-    
-    selector.innerHTML = window.HEGEL_EDITION.works.map(work => `
-      <option value="${work.work_id}" ${work.work_id === currentWorkId ? 'selected' : ''}>
-        ${work.siglum || work.work_id} · ${work.title}
-      </option>
-    `).join('');
-  }
-
-  function switchWork(workId) {
-    if (!workId) return;
-    window.location.href = `text.html?work=${workId}`;
-  }
-
-  // Update setCorpus to also trigger population
-  const originalSetCorpus = setCorpus;
-  setCorpus = function(data, workId) {
-    originalSetCorpus(data, workId);
-    populateWorkSelector();
-  };
-
-  
-  function copyCitation() {
-    const work = state.selectedWork || state.corpus.metadata;
-    const currentPages = Array.from(document.querySelectorAll('.page-card'));
-    let visiblePage = currentPages[0];
-    for (const p of currentPages) {
-      if (p.getBoundingClientRect().top >= 0) { visiblePage = p; break; }
-    }
-    const pageId = visiblePage ? visiblePage.id.replace('page-', '') : '?';
-    const pageBook = state.corpus.pages.find(p => String(p.page_pdf) === pageId)?.page_book || pageId;
-    
-    const citation = `Hegel, ${work.title}, GW ${state.corpus.band}, S. ${pageBook}.`;
-    navigator.clipboard.writeText(citation);
-    alert('Zitation kopiert: ' + citation);
-  }
-
-  function initScrollSpy() {
+  function initLazyLoading() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const id = entry.target.id;
-          document.querySelectorAll('.toc-list a').forEach(a => {
-            const isActive = a.getAttribute('href') === '#' + id;
-            a.classList.toggle('is-active', isActive);
-            if (isActive) a.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          });
+          const el = entry.target;
+          if (el.dataset.loaded === 'false') {
+            const pagePdf = el.id.replace('page-', '');
+            const pageData = state.corpus.pages.find(p => String(p.page_pdf) === pagePdf);
+            if (pageData) {
+              const body = el.querySelector('.page-body');
+              const units = pageData.units || [];
+              body.innerHTML = units.length > 0 
+                ? units.map(u => `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">${u.text_normalized || u.text}</div>`).join('')
+                : `<div class="empty-page-placeholder"><p>Seite ${pagePdf}</p><small>Kein Text extrahiert.</small></div>`;
+              el.dataset.loaded = 'true';
+            }
+          }
+          if (state.syncView) updatePdfView();
         }
       });
-    }, { threshold: 0.1 });
+    }, { rootMargin: '400px' });
 
     document.querySelectorAll('.page-card').forEach(p => observer.observe(p));
   }
 
   const oldRenderPages = renderPages;
   renderPages = function() {
-    oldRenderPages();
+    const container = document.getElementById('reader-pages');
+    const pages = state.corpus.pages.filter(shouldRenderReaderPage);
+    container.innerHTML = pages.map(renderPage).join('');
+    initLazyLoading();
     initScrollSpy();
   };
+
+  };
+
+  
+  function linkifyRefs(text) {
+    // Erkennt "S. 123" und macht daraus interne Links
+    return text.replace(/S\.\s*(\d+)/g, '<a href="#page-$1" class="internal-ref">S. $1</a>');
+  }
+
+  function saveHistory(workId) {
+    let history = JSON.parse(localStorage.getItem('hegel-history') || '[]');
+    history = [workId, ...history.filter(h => h !== workId)].slice(0, 5);
+    localStorage.setItem('hegel-history', JSON.stringify(history));
+  }
+
+  // Update renderPage to linkify and add hover anchors
+  function renderPage(page) {
+    const units = page.units || [];
+    let contentHtml = units.length > 0 
+      ? units.map(u => {
+          const text = linkifyRefs(u.text_normalized || u.text);
+          return `<div class="text-unit type-${u.type || u.label}" data-level="${u.level || ''}">
+            <span class="hover-anchor" onclick="copyLink('page-${page.page_pdf}')">🔗</span>
+            ${text}
+          </div>`;
+        }).join('')
+      : `<div class="empty-page-placeholder"><p>Seite ${page.page_pdf}</p><small>Kein Text extrahiert.</small></div>`;
+
+    return `<article class="page-card" id="page-${page.page_pdf}">${contentHtml}</article>`;
+  }
+
+  function copyLink(id) {
+    const url = window.location.href.split('#')[0] + '#' + id;
+    navigator.clipboard.writeText(url);
+    alert('Direktlink kopiert!');
+  }
 
   window.onload = loadWork;
 </script>
