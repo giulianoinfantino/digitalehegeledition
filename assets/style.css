@@ -224,3 +224,77 @@ body[data-theme="dark"] .theme-btn:hover {
   margin-bottom: 10px;
   text-align: justify;
 }
+
+.legal-footer {
+  max-width: 1460px;
+  margin: 48px auto 0;
+  padding: 28px 5%;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.legal-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.legal-footer a:hover {
+  color: var(--accent);
+}
+.legal-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.legal-page {
+  max-width: 920px;
+  margin: 0 auto;
+}
+.legal-page h1 {
+  font-family: var(--font-text);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  margin: 0 0 32px;
+}
+.legal-section {
+  padding: 26px 0;
+  border-top: 1px solid var(--border);
+}
+.legal-section h2 {
+  font-family: var(--font-text);
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0 0 12px;
+}
+.legal-section p,
+.legal-section li {
+  color: var(--text-muted);
+  font-family: var(--font-text);
+  font-size: 1.12rem;
+  line-height: 1.7;
+}
+.legal-section code {
+  color: var(--text-main);
+  font-family: var(--font-ui);
+}
+.legal-placeholder {
+  border-left: 2px solid var(--accent);
+  padding-left: 16px;
+  color: var(--text-main);
+}
+body[data-theme="dark"] .legal-footer,
+body[data-theme="dark"] .legal-section {
+  border-color: var(--border);
+}
+body[data-theme="dark"] .legal-page h1,
+body[data-theme="dark"] .legal-section h2,
+body[data-theme="dark"] .legal-section code,
+body[data-theme="dark"] .legal-placeholder {
+  color: var(--text-main);
+}
+body[data-theme="dark"] .legal-section p,
+body[data-theme="dark"] .legal-section li,
+body[data-theme="dark"] .legal-footer,
+body[data-theme="dark"] .legal-footer a {
+  color: var(--text-muted);
+}
