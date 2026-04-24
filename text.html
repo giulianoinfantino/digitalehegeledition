@@ -42,9 +42,9 @@
         <select id="work-selector" onchange="switchWork(this.value)"></select>
       </div>
       <div class="toolbar-group">
-        <span class="small-caps">Gehe zu GW</span>
+        <span class="small-caps">GW-Seite</span>
         <div class="jump-input-group">
-          <input type="text" id="jump-gw-page" placeholder="S.">
+          <input type="text" id="jump-gw-page" placeholder="Nr.">
         </div>
         <button class="btn-classic" onclick="handleJumpToPage()">→</button>
       </div>
@@ -106,7 +106,10 @@
     document.getElementById('toc-list').innerHTML =
       (corpus.toc_printed || []).map(e => {
         const anchor = bookToPdf[e.page] ?? e.page;
-        return `<li><a href="#page-${anchor}">${e.title}</a></li>`;
+        const lvl = /\bAbschnitt\b/i.test(e.title) || /^Vom\b|^Von\b/.test(e.title) ? 1
+                  : /\bKapitel\b/i.test(e.title) ? 2
+                  : 3;
+        return `<li data-level="${lvl}"><a href="#page-${anchor}">${e.title}</a></li>`;
       }).join('');
 
     // Pages

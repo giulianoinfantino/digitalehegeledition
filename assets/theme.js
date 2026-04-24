@@ -2,17 +2,18 @@
 function applyTheme(theme) {
   document.body.setAttribute('data-theme', theme);
   localStorage.setItem('hegel-theme', theme);
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.textContent = theme === 'dark' ? '◑ Hell' : '◐ Dunkel';
+  });
 }
 
 function cycleTheme() {
-  const themes = ['light', 'dark'];
   const current = document.body.getAttribute('data-theme') || 'light';
-  const next = themes[(themes.indexOf(current) + 1) % themes.length];
-  applyTheme(next);
+  applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
 // Initial apply
 (function() {
   const saved = localStorage.getItem('hegel-theme') || 'light';
-  document.body.setAttribute('data-theme', saved);
+  applyTheme(saved);
 })();
