@@ -104,11 +104,14 @@
       </span>
     `;
 
-    // TOC
+    // TOC — map GW book page → PDF page (article IDs use page_pdf)
+    const bookToPdf = {};
+    (corpus.pages || []).forEach(p => { if (p.page_book != null) bookToPdf[p.page_book] = p.page_pdf; });
     document.getElementById('toc-list').innerHTML =
-      (corpus.toc_printed || []).map(e =>
-        `<li><a href="#page-${e.page}">${e.title}</a></li>`
-      ).join('');
+      (corpus.toc_printed || []).map(e => {
+        const anchor = bookToPdf[e.page] ?? e.page;
+        return `<li><a href="#page-${anchor}">${e.title}</a></li>`;
+      }).join('');
 
     // Pages
     renderPages();
@@ -137,12 +140,12 @@
   function renderPages() {
     document.getElementById('reader-pages').innerHTML =
       (state.corpus.pages || [])
-        .filter(p => p.page_kind !== 'toc')
+        .filter(p => p.page_kind === 'body')
         .map(page => `
           <article class="page-card" id="page-${page.page_pdf}">
             <header class="page-header">
               <span>${page.sigel || ''}</span>
-              <span>GW ${page.page_book || page.page_pdf}</span>
+              <span>GW ${page.page_book ?? ''}</span>
             </header>
             <div class="page-body${state.diplomaticMode ? ' page-body--dipl' : ''}">
               ${(page.units || []).map(renderUnit).join('')}
