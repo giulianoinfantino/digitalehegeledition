@@ -614,8 +614,8 @@ body {
 }
 .search-guide-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 2.5rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem 2rem;
 }
 .search-guide p {
   font-family: var(--font-ui);
@@ -822,6 +822,167 @@ main a:not([class]):hover,
 /* ── Main wrapper (Search & Prose pages) ─────────────────── */
 main { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
 
+/* ── Project About (Startseite) ─────────────────────────── */
+.project-about {
+  padding: 5rem 0 5.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.project-eyebrow {
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-gold);
+  display: block;
+  margin-bottom: 1rem;
+}
+.project-about h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  font-weight: 400;
+  color: var(--text-ink);
+  margin: 0 0 1.4rem;
+  line-height: 1.2;
+  max-width: 780px;
+}
+.project-about-lead {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 740px;
+  line-height: 1.75;
+  margin: 0 0 3.5rem;
+}
+.project-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  margin-bottom: 4.5rem;
+}
+.project-col h3 {
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  margin: 0 0 0.9rem;
+}
+.project-col p {
+  font-size: 1.05rem;
+  line-height: 1.78;
+  color: var(--text-body);
+  margin: 0 0 0.75rem;
+}
+
+/* Workflow pipeline */
+.workflow-section {
+  border-top: 1px solid var(--border-fine);
+  padding-top: 3rem;
+}
+.workflow-label {
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  margin-bottom: 1.8rem;
+  display: block;
+}
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.workflow-step {
+  background: var(--bg-paper);
+  border: 1px solid var(--border);
+  border-right: none;
+  padding: 1.6rem 1.4rem 1.5rem;
+  transition: border-color var(--transition);
+}
+.workflow-step:last-child { border-right: 1px solid var(--border); }
+.workflow-step-num {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: 0.14em;
+  display: block;
+  margin-bottom: 0.65rem;
+  font-variant: all-small-caps;
+}
+.workflow-step-name {
+  font-family: var(--font-serif);
+  font-size: 1.0rem;
+  color: var(--text-ink);
+  display: block;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.workflow-step-detail {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+
+/* ── Legal pages (Urheberrecht extended) ─────────────────── */
+.legal-container--wide { max-width: 860px; }
+
+.legal-list {
+  padding-left: 1.4rem;
+  margin: 0.6rem 0 1rem;
+}
+.legal-list li {
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--text-body);
+  margin-bottom: 0.3rem;
+}
+.legal-list li strong { color: var(--text-ink); }
+
+.legal-table {
+  border: 1px solid var(--border);
+  margin: 0.8rem 0 1rem;
+}
+.legal-table-row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  border-bottom: 1px solid var(--border-fine);
+  gap: 0;
+}
+.legal-table-row:last-child { border-bottom: none; }
+.legal-table-norm {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  padding: 0.85rem 1.2rem;
+  border-right: 1px solid var(--border-fine);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: flex-start;
+}
+.legal-table-text {
+  font-size: 1.0rem;
+  line-height: 1.7;
+  color: var(--text-body);
+  padding: 0.85rem 1.4rem;
+}
+
+.legal-quote {
+  border-left: 3px solid var(--accent-gold);
+  margin: 1rem 0;
+  padding: 0.8rem 1.4rem;
+  background: var(--bg-subtle);
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+/* ── Search guide: 3 columns ─────────────────────────────── */
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .reader-layout { grid-template-columns: 240px 1fr; }
@@ -837,6 +998,10 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
   .search-guide-grid { grid-template-columns: 1fr; }
   .feature-grid { grid-template-columns: 1fr; }
   .landing-hero h1 { line-height: 1.0; }
+  .project-cols { grid-template-columns: 1fr; gap: 2.5rem; }
+  .workflow-steps { grid-template-columns: 1fr 1fr; }
+  .legal-table-row { grid-template-columns: 1fr; }
+  .legal-table-norm { border-right: none; border-bottom: 1px solid var(--border-fine); }
 }
 @media (max-width: 600px) {
   .page-card { padding: 3rem 1.5rem; }

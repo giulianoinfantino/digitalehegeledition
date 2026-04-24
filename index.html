@@ -40,6 +40,81 @@
     </div>
   </section>
 
+  <section class="project-about">
+    <span class="project-eyebrow">Über das Projekt</span>
+    <h2>Eine digitale Forschungsplattform für Hegels Gesamtwerk</h2>
+    <p class="project-about-lead">
+      Die Digitale Hegel-Edition erschließt die Primärtexte aus den
+      <em>Gesammelten Werken</em> (GW) von Georg Wilhelm Friedrich Hegel und stellt sie
+      in einer durchsuchbaren, wissenschaftlich strukturierten Webedition bereit.
+      Das Projekt verbindet klassische editorische Methodik mit KI-gestützter Textverarbeitung.
+    </p>
+
+    <div class="project-cols">
+      <div class="project-col">
+        <h3>Quellenkorpus</h3>
+        <p>
+          Grundlage bilden die <em>Gesammelten Werke</em> (GW), die seit 1968 von der
+          Nordrhein-Westfälischen Akademie der Wissenschaften und der Künste in Verbindung
+          mit Felix Meiner Verlag, Hamburg, herausgegeben werden. Die GW sind die maßgebliche
+          historisch-kritische Edition des Hegelschen Gesamtwerks.
+        </p>
+        <p>
+          Da Hegel 1831 starb, sind seine Primärtexte seit 1902 gemeinfrei. Diese Edition
+          veröffentlicht ausschließlich diesen gemeinfreien Primärtext — ohne den
+          urheberrechtlich geschützten GW-Apparat (Fußnoten, kritische Einleitungen,
+          Lesartenverzeichnisse).
+        </p>
+      </div>
+      <div class="project-col">
+        <h3>Editorische Methodik</h3>
+        <p>
+          Die Texte werden aus den GW-PDFs maschinell extrahiert und durch eine
+          mehrstufige Qualitätssicherung aufbereitet. Besondere Aufmerksamkeit gilt dem
+          <em>Sperrsatz</em> — dem im historischen Buchdruck verwendeten Verfahren, bei dem
+          Buchstaben auseinandergezogen werden, um Hervorhebungen zu setzen. OCR-Systeme
+          fragmentieren solche Stellen typischerweise als Einzelbuchstaben.
+        </p>
+        <p>
+          Ein KI-gestützter Korrekturschritt (Claude Vision, Anthropic) erkennt und
+          normalisiert diese Artefakte anhand der Originaldruckseiten. Das Ergebnis
+          ist ein lesbar strukturierter, maschinenlesbar indexierter Primärtext.
+        </p>
+      </div>
+    </div>
+
+    <div class="workflow-section">
+      <span class="workflow-label">KI-gestützter Verarbeitungsworkflow</span>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <span class="workflow-step-num">Schritt 1</span>
+          <span class="workflow-step-name">GW-Quelldateien</span>
+          <span class="workflow-step-detail">PDF-Bände des Felix Meiner Verlags als Ausgangsmaterial</span>
+        </div>
+        <div class="workflow-step">
+          <span class="workflow-step-num">Schritt 2</span>
+          <span class="workflow-step-name">OCR-Extraktion</span>
+          <span class="workflow-step-detail">pdfplumber: seitenweise Textextraktion und Blockanalyse</span>
+        </div>
+        <div class="workflow-step">
+          <span class="workflow-step-num">Schritt 3</span>
+          <span class="workflow-step-name">Regelbasierte Verarbeitung</span>
+          <span class="workflow-step-detail">Erkennung von Absätzen, Überschriften und Seitenstruktur</span>
+        </div>
+        <div class="workflow-step">
+          <span class="workflow-step-num">Schritt 4</span>
+          <span class="workflow-step-name">Claude Vision</span>
+          <span class="workflow-step-detail">KI-Korrektur von Sperrsatz-Artefakten auf Basis der Druckseiten</span>
+        </div>
+        <div class="workflow-step">
+          <span class="workflow-step-num">Schritt 5</span>
+          <span class="workflow-step-name">Webedition</span>
+          <span class="workflow-step-detail">JSON-Aufbereitung, Volltext-Index, statische HTML-Publikation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="feature-grid" id="works-grid">
     <!-- Werke werden hier per JS gerendert -->
   </section>
@@ -47,10 +122,11 @@
 </main>
 
 <footer class="site-footer">
-  <div>Digitale Hegel-Edition · Forschungsplattform</div>
+  <div>Digitale Hegel-Edition · Forschungsportal</div>
   <nav>
     <a href="impressum.html">Impressum</a>
     <a href="datenschutz.html">Datenschutz</a>
+    <a href="urheberrecht.html">Urheberrecht</a>
   </nav>
 </footer>
 
@@ -63,7 +139,7 @@
       <article class="feature-card">
         <h3>${w.siglum}</h3>
         <h2>${w.title}</h2>
-        <p>Band ${w.band} · GW-Edition · ${w.stats ? w.stats.pages + ' Seiten' : ''}</p>
+        <p>Band ${w.band} · GW-Edition · ${w.stats ? w.stats.pages_total + ' Seiten' : ''}</p>
         <a href="text.html?work=${w.work_id}" class="citation-btn">Lesen</a>
       </article>
     `).join('');

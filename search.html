@@ -46,26 +46,33 @@
       <div>
         <p><code>"Begriff an sich"</code> — Exakte Phrase</p>
         <p><code>Begriff AND Geist</code> — Beide Terme</p>
-      </div>
-      <div>
         <p><code>Begriff OR Geist</code> — Mindestens einer</p>
-        <p><code>NOT Verstand</code> — Begriff ausschließen</p>
       </div>
       <div>
+        <p><code>NOT Verstand</code> — Begriff ausschließen</p>
         <p><code>Geist NEAR/10 Natur</code> — Innerhalb von 10 Wörtern</p>
+      </div>
+      <div>
+        <p><code>Begriff*</code> — Präfix (Begriffe, Begriffen …)</p>
+        <p><code>Geist* AND Natur</code> — Kombinierbar mit Operatoren</p>
       </div>
     </div>
   </div>
 
   <div class="search-filters">
-    <div style="display:flex; gap:2rem; align-items:center;">
+    <div style="display:flex; gap:2rem; align-items:center; flex-wrap:wrap;">
       <select id="filter-work"></select>
+      <select id="filter-type">
+        <option value="all">Alle Einträge</option>
+        <option value="heading">Nur Überschriften</option>
+        <option value="paragraph">Nur Absätze</option>
+      </select>
       <select id="filter-sort">
         <option value="score">Nach Relevanz</option>
         <option value="page">Nach Seitenfolge</option>
       </select>
     </div>
-    <div id="search-status">Bereit für Abfrage.</div>
+    <div id="search-status">Lade Suchindex …</div>
   </div>
 
   <div id="search-results"></div>
@@ -77,6 +84,7 @@
   <nav>
     <a href="impressum.html">Impressum</a>
     <a href="datenschutz.html">Datenschutz</a>
+    <a href="urheberrecht.html">Urheberrecht</a>
   </nav>
 </footer>
 
@@ -107,9 +115,15 @@
     // Exakte Phrase in Anführungszeichen
     if (q.startsWith('"') && q.endsWith('"')) return text.includes(q.slice(1, -1).toLowerCase());
 
+    // Wildcard: Begriff* → Präfixsuche (beginnt mit "Begriff")
+    if (q.endsWith('*')) {
+      const prefix = q.slice(0, -1);
+      return text.split(/\s+/).some(w => w.startsWith(prefix));
+    }
+
     // Implizites AND bei mehreren Termen
     const terms = q.split(/\s+/).filter(Boolean);
-    if (terms.length > 1) return terms.every(t => text.includes(t));
+    if (terms.length > 1) return terms.every(t => evaluateQuery(text, t));
 
     return text.includes(q);
   }
@@ -152,14 +166,33 @@
 
   function highlightText(text, terms) {
     if (!terms.length) return text;
-    const pattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const cleaned = terms.map(t => t.replace(/\*$/, '').replace(/^"|"$/g, ''));
+    const pattern = cleaned.filter(Boolean).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    if (!pattern) return text;
     return text.replace(new RegExp(`(${pattern})`, 'gi'), '<mark>$1</mark>');
+  }
+
+  function extractSnippet(text, terms, chars = 220) {
+    if (!terms.length) return text.length > chars ? text.slice(0, chars) + '…' : text;
+    const lower = text.toLowerCase();
+    let best = text.length;
+    for (const t of terms) {
+      const clean = t.replace(/\*$/, '').replace(/^"|"$/g, '');
+      if (!clean) continue;
+      const i = lower.indexOf(clean);
+      if (i !== -1 && i < best) best = i;
+    }
+    if (best === text.length) return text.length > chars ? text.slice(0, chars) + '…' : text;
+    const start = Math.max(0, best - 80);
+    const end = Math.min(text.length, start + chars);
+    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
   }
 
   // ── UI ─────────────────────────────────────────────────────
   function handleSearch() {
     const raw = document.getElementById('search-input').value.trim();
     const workFilter = document.getElementById('filter-work').value;
+    const typeFilter = document.getElementById('filter-type').value;
     const sort = document.getElementById('filter-sort').value;
     const status = document.getElementById('search-status');
     const container = document.getElementById('search-results');
@@ -168,7 +201,12 @@
       status.textContent = 'Suchindex nicht geladen.';
       return;
     }
-    if (!raw) { container.innerHTML = ''; status.textContent = 'Bereit für Abfrage.'; return; }
+    if (!raw) {
+      container.innerHTML = '';
+      const n = window.HEGEL_SEARCH_INDEX.length;
+      status.textContent = `${n.toLocaleString('de')} indexierte Einträge · Bereit für Abfrage`;
+      return;
+    }
 
     const query = raw.toLowerCase();
     const terms = extractHighlightTerms(query);
@@ -176,24 +214,31 @@
     let results = window.HEGEL_SEARCH_INDEX.filter(entry => {
       const text = (entry.text || '').toLowerCase();
       const matchWork = workFilter === 'all' || entry.work_id === workFilter;
-      return matchWork && evaluateQuery(text, query);
+      const matchType = typeFilter === 'all' || entry.type === typeFilter;
+      return matchWork && matchType && evaluateQuery(text, query);
     });
 
     if (sort === 'page') results.sort((a, b) => (a.page_pdf || 0) - (b.page_pdf || 0));
 
-    status.textContent = results.length
-      ? `${results.length} ${results.length === 1 ? 'Treffer' : 'Treffer'}`
-      : 'Keine Treffer gefunden.';
+    if (results.length) {
+      const pages = new Set(results.map(r => r.page_pdf)).size;
+      status.textContent = `${results.length} Treffer auf ${pages} ${pages === 1 ? 'Seite' : 'Seiten'}`;
+    } else {
+      status.textContent = 'Keine Treffer gefunden.';
+    }
 
-    container.innerHTML = results.map(res => `
-      <article class="result-biblio">
-        <div class="sigle">${res.sigel || res.work_id} · GW ${res.page_book || res.page_pdf}</div>
-        <div class="snippet">${highlightText(res.text, terms)}</div>
-        <a class="result-link" href="text.html?work=${res.work_id}#page-${res.page_pdf}">
-          In den Kontext springen →
-        </a>
-      </article>
-    `).join('');
+    container.innerHTML = results.map(res => {
+      const snippet = extractSnippet(res.text, terms);
+      const typeLabel = res.type === 'heading' ? ' · Überschrift' : '';
+      return `
+        <article class="result-biblio">
+          <div class="sigle">${res.sigel || res.work_id} · GW ${res.page_book || res.page_pdf}${typeLabel}</div>
+          <div class="snippet">${highlightText(snippet, terms)}</div>
+          <a class="result-link" href="text.html?work=${res.work_id}#page-${res.page_pdf}">
+            In den Kontext springen →
+          </a>
+        </article>`;
+    }).join('');
   }
 
   window.onload = () => {
@@ -203,6 +248,11 @@
         window.HEGEL_EDITION.works.map(w =>
           `<option value="${w.work_id}">${w.siglum} — ${w.title}</option>`
         ).join('');
+    }
+    if (window.HEGEL_SEARCH_INDEX) {
+      const n = window.HEGEL_SEARCH_INDEX.length;
+      document.getElementById('search-status').textContent =
+        `${n.toLocaleString('de')} indexierte Einträge · Bereit für Abfrage`;
     }
   };
 </script>
