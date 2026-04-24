@@ -73,7 +73,9 @@
 <script>
   const state = { corpus: null, selectedWork: null, syncView: false, diplomaticMode: false };
 
-  function loadWork() {
+  // Start loading immediately — don't wait for window.onload
+  // (all DOM elements are already parsed at this point since this script is at end of body)
+  (function() {
     const workId = new URLSearchParams(window.location.search).get('work') || 'gw-12';
     const script = document.createElement('script');
     script.src = `assets/work-${workId}.js`;
@@ -82,19 +84,18 @@
         state.corpus = window.HEGEL_WORK_DATA;
         state.selectedWork = window.HEGEL_EDITION?.works.find(w => w.work_id === workId) || null;
         renderAll();
-        // Scroll to hash after content is rendered and painted
         const hash = window.location.hash;
         if (hash) {
           const tryScroll = () => {
             const target = document.querySelector(hash);
-            if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           };
           requestAnimationFrame(() => setTimeout(tryScroll, 80));
         }
       }
     };
     document.head.appendChild(script);
-  }
+  })();
 
   function renderAll() {
     const corpus = state.corpus;
@@ -262,7 +263,6 @@
   }
 
 
-  window.onload = loadWork;
 </script>
 
 </body>

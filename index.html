@@ -131,6 +131,17 @@
 </footer>
 
 <script src="assets/edition-data.js"></script>
+<script>
+  // Preload work files immediately after edition-data is parsed
+  if (window.HEGEL_EDITION) {
+    (window.HEGEL_EDITION.works || []).forEach(w => {
+      const s = document.createElement('script');
+      s.src = `assets/work-${w.work_id}.js`;
+      s.async = true;
+      document.head.appendChild(s);
+    });
+  }
+</script>
 <script src="assets/theme.js"></script>
 <script>
   function renderWorks(edition) {
@@ -146,16 +157,7 @@
   }
 
   window.onload = () => {
-    if (window.HEGEL_EDITION) {
-      renderWorks(window.HEGEL_EDITION);
-      // Preload work files in the background so text.html opens instantly
-      (window.HEGEL_EDITION.works || []).forEach(w => {
-        const s = document.createElement('script');
-        s.src = `assets/work-${w.work_id}.js`;
-        s.async = true;
-        document.head.appendChild(s);
-      });
-    }
+    if (window.HEGEL_EDITION) renderWorks(window.HEGEL_EDITION);
   };
 </script>
 
