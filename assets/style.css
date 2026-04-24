@@ -211,6 +211,22 @@ body {
 }
 .btn-classic:hover { background: var(--accent); color: #fff; }
 
+/* In the reader toolbar: borderless text-link style */
+.reader-toolbar .btn-classic {
+  border: none;
+  padding: 0.1rem 0;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+}
+.reader-toolbar .btn-classic:hover {
+  background: transparent;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 .citation-btn {
   display: inline-flex;
   align-items: center;
@@ -362,11 +378,11 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2.5rem;
-  padding: 1rem 0 1.2rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 4rem;
-  background: var(--bg-paper);
+  gap: 2.2rem;
+  padding: 0 0 1.4rem;
+  border-bottom: 1px solid var(--border-fine);
+  margin-bottom: 3.5rem;
+  background: transparent;
 }
 
 .toolbar-group {
@@ -410,15 +426,15 @@ body {
 
 /* ── Reader Summary ──────────────────────────────────────── */
 #reader-summary {
-  margin-bottom: 3rem;
-  padding-bottom: 3rem;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border-fine);
 }
 #reader-summary h2 {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
   font-weight: 400;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.35rem;
   color: var(--text-ink);
   line-height: 1.1;
 }
@@ -426,31 +442,31 @@ body {
 /* ── Page Card ───────────────────────────────────────────── */
 .page-card {
   background-color: var(--bg-paper);
-  padding: 6.5rem 8.5rem;
-  margin-bottom: 5rem;
+  padding: 5.5rem 8.5rem 4.5rem;
+  margin-bottom: 0;
   margin-left: auto;
   margin-right: auto;
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--border-fine);
-  border-top: 2px solid var(--border);
+  border: none;
+  border-top: 1px solid var(--border-fine);
   position: relative;
   max-width: 840px;
   transition: background-color var(--transition);
 }
+.page-card:first-child { border-top: none; }
 
 .page-header {
   position: absolute;
-  top: 2.8rem; left: 0; width: 100%;
+  top: 2.2rem; left: 0; width: 100%;
   padding: 0 8.5rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   box-sizing: border-box;
   font-family: var(--font-ui);
   font-variant: all-small-caps;
-  font-size: 0.68rem;
-  color: var(--accent-gold);
-  letter-spacing: 0.2em;
-  font-weight: 700;
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  letter-spacing: 0.18em;
+  font-weight: 500;
 }
 
 /* ── Text Units ──────────────────────────────────────────── */
