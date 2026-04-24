@@ -146,7 +146,16 @@
   }
 
   window.onload = () => {
-    if (window.HEGEL_EDITION) renderWorks(window.HEGEL_EDITION);
+    if (window.HEGEL_EDITION) {
+      renderWorks(window.HEGEL_EDITION);
+      // Preload work files in the background so text.html opens instantly
+      (window.HEGEL_EDITION.works || []).forEach(w => {
+        const s = document.createElement('script');
+        s.src = `assets/work-${w.work_id}.js`;
+        s.async = true;
+        document.head.appendChild(s);
+      });
+    }
   };
 </script>
 

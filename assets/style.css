@@ -465,6 +465,7 @@ body {
 
 /* ── Page Card ───────────────────────────────────────────── */
 .page-card {
+  scroll-margin-top: 80px;
   background-color: var(--bg-paper);
   padding: 4rem 8rem 4rem;
   margin-bottom: 0;
@@ -717,9 +718,16 @@ body {
 }
 
 /* ── Search Results ──────────────────────────────────────── */
+#search-results { max-width: 860px; }
+
 .result-biblio {
-  padding: 1.8rem 0;
+  padding: 1.4rem 0;
   border-bottom: 1px solid var(--border-fine);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.5rem 2rem;
+  align-items: start;
 }
 .result-biblio:last-child { border-bottom: none; }
 
@@ -730,20 +738,22 @@ body {
   letter-spacing: 0.14em;
   font-weight: 700;
   color: var(--accent-gold);
-  margin-bottom: 0.5rem;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .snippet {
   font-family: var(--font-serif);
-  font-size: 1.12rem;
-  line-height: 1.75;
+  font-size: 1.0rem;
+  line-height: 1.72;
   color: var(--text-body);
-  margin-bottom: 0.7rem;
+  grid-column: 1;
+  grid-row: 2;
 }
 .snippet mark {
-  background: rgba(138, 104, 40, 0.18);
+  background: rgba(138, 104, 40, 0.16);
   color: var(--text-ink);
-  padding: 0.05em 0.15em;
+  padding: 0.05em 0.2em;
   border-radius: 1px;
 }
 
@@ -754,6 +764,10 @@ body {
   letter-spacing: 0.09em;
   text-decoration: none;
   color: var(--accent);
+  white-space: nowrap;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
   transition: color var(--transition);
 }
 .result-link:hover { color: var(--accent-hover); }
