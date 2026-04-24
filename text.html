@@ -48,9 +48,6 @@
         </div>
         <button class="btn-classic" onclick="handleJumpToPage()">→</button>
       </div>
-      <div class="toolbar-group">
-        <button class="btn-classic" id="btn-dipl" onclick="toggleDiplomaticView()">Druckbild</button>
-      </div>
     </div>
 
     <div id="reader-pages"></div>
@@ -71,10 +68,9 @@
 <script src="assets/edition-data.js"></script>
 <script src="assets/theme.js"></script>
 <script>
-  const state = { corpus: null, selectedWork: null, syncView: false, diplomaticMode: false };
+  const state = { corpus: null, selectedWork: null };
 
-  // Start loading immediately — don't wait for window.onload
-  // (all DOM elements are already parsed at this point since this script is at end of body)
+  // Start loading immediately — DOM is already parsed at this point
   (function() {
     const workId = new URLSearchParams(window.location.search).get('work') || 'gw-12';
     const script = document.createElement('script');
@@ -207,16 +203,6 @@
     return out;
   }
 
-  function renderUnit(u) {
-    const type  = u.type || u.label || '';
-    const level = u.level || '';
-    if (state.diplomaticMode && u.lines && u.lines.length > 1) {
-      const body = u.lines.map(l => `<span class="dipl-line">${l}</span>`).join('');
-      return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${body}</div>`;
-    }
-    return `<div class="text-unit type-${type}" data-level="${level}">${u.text || ''}</div>`;
-  }
-
   function renderPages() {
     document.getElementById('reader-pages').innerHTML =
       (state.corpus.pages || [])
@@ -224,29 +210,37 @@
         .map(page => {
           const units = prepareUnits(page.units || []);
           if (!units.length) return '';
+
+          let lineNum = 0;
+          const bodyHTML = units.map(u => {
+            const type  = u.type || u.label || '';
+            const level = u.level || '';
+
+            if (u.lines && u.lines.length > 0) {
+              const linesHTML = u.lines.map(l => {
+                lineNum++;
+                const no = (lineNum % 5 === 0) ? ` data-lineno="${lineNum}"` : '';
+                return `<span class="dipl-line"${no}>${l}</span>`;
+              }).join('');
+              return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${linesHTML}</div>`;
+            }
+            // Heading or short single-line unit
+            lineNum++;
+            return `<div class="text-unit type-${type}" data-level="${level}">${u.text || ''}</div>`;
+          }).join('');
+
           return `
             <article class="page-card" id="page-${page.page_pdf}">
               <header class="page-header">
                 <span>${page.sigel || ''}</span>
               </header>
-              <div class="page-body${state.diplomaticMode ? ' page-body--dipl' : ''}">
-                ${units.map(renderUnit).join('')}
+              <div class="page-body">
+                ${bodyHTML}
               </div>
             </article>`;
         })
         .filter(Boolean)
         .join('');
-  }
-
-  function toggleDiplomaticView() {
-    state.diplomaticMode = !state.diplomaticMode;
-    renderPages();
-    const btn = document.getElementById('btn-dipl');
-    btn.style.color = state.diplomaticMode ? 'var(--accent)' : '';
-    btn.style.borderBottomColor = state.diplomaticMode ? 'var(--accent)' : 'transparent';
-    // Restore scroll position to current visible page after re-render
-    const hash = window.location.hash;
-    if (hash) setTimeout(() => document.querySelector(hash)?.scrollIntoView(), 0);
   }
 
   function switchWork(id) { if (id) window.location.href = `text.html?work=${id}`; }

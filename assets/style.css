@@ -467,24 +467,24 @@ body {
 .page-card {
   scroll-margin-top: 80px;
   background-color: var(--bg-paper);
-  padding: 4rem 8rem 4rem;
+  padding: 4.5rem 7rem 4.5rem 9.5rem;
   margin-bottom: 0;
   margin-left: auto;
   margin-right: auto;
   border: none;
   border-top: 1px solid var(--border-fine);
   position: relative;
-  max-width: 820px;
+  max-width: 860px;
   transition: background-color var(--transition);
 }
 .page-card:first-child { border-top: none; }
 
 .page-header {
   position: absolute;
-  top: 1.6rem; left: 0; width: 100%;
-  padding: 0 8rem;
+  top: 1.8rem; left: 0; width: 100%;
+  padding: 0 7rem 0 9.5rem;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   box-sizing: border-box;
   font-family: var(--font-ui);
   font-variant: all-small-caps;
@@ -495,98 +495,78 @@ body {
 }
 
 /* ── Text Units ──────────────────────────────────────────── */
-.text-unit { margin-bottom: 1.4rem; }
+.text-unit { margin-bottom: 0; }
 
+/* Body paragraphs — all always in Druckbild mode */
 .type-paragraph {
-  font-size: 1.35rem;
-  line-height: 1.85;
-  text-align: justify;
-  hyphens: auto;
+  font-size: 1.18rem;
+  line-height: 1.9;
   color: var(--text-body);
-  text-indent: 1.8em;
+  text-indent: 0;
+  hyphens: none;
+  text-align: left;
 }
-/* Reset indent after headings and at block start */
-.type-heading + .type-paragraph,
-.page-body > .type-paragraph:first-child { text-indent: 0; }
 
+/* Headings — remain typographically styled */
 .type-heading {
   text-indent: 0;
   color: var(--text-ink);
   font-weight: 400;
 }
 .type-heading[data-level="1"] {
-  font-size: 2.2rem;
+  font-size: 1.75rem;
   text-align: center;
-  margin-top: 4.5rem;
-  margin-bottom: 3.5rem;
-  line-height: 1.2;
+  margin-top: 3.5rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.25;
 }
 .type-heading[data-level="2"] {
-  font-size: 1.65rem;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.35rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
   font-style: italic;
 }
 .type-heading[data-level="3"] {
-  font-size: 1.25rem;
-  margin-top: 2rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
-.type-footnote {
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-  width: 55%;
-  margin-top: 2.5rem;
-  text-align: justify;
-  hyphens: auto;
-}
-.type-footnote + .type-footnote {
-  border-top: none;
-  padding-top: 0.3rem;
-  margin-top: 0;
-}
-
-/* ── Diplomatic View ─────────────────────────────────────── */
-
-/* Widen the card by reducing horizontal padding; page-header tracks the same value */
-.page-card:has(.page-body--dipl) {
-  padding-left: 3rem;
-  padding-right: 3rem;
-}
-.page-card:has(.page-body--dipl) .page-header {
-  padding-left: 3rem;
-  padding-right: 3rem;
-}
-
-/* Smaller, denser type — closer to the printed GW point size */
-.page-body--dipl .type-paragraph,
-.page-body--dipl .type-frontmatter {
   font-size: 1.1rem;
-  line-height: 1.95;
-  text-indent: 0;
-  hyphens: none;
-  text-align: left;
+  margin-top: 1.8rem;
+  margin-bottom: 0.6rem;
 }
 
-/* Each original line as its own block line — no wrapping within a line */
+/* ── Druckbild (diplomatic lines + line numbers) ─────────── */
+
+/* Each original print line — no internal wrapping */
 .dipl-line {
   display: block;
   white-space: nowrap;
   overflow: visible;
+  line-height: 1.9;
+  position: relative;
 }
 
-/* Subtle left rule marks unit boundaries */
-.page-body--dipl .text-unit.dipl-mode {
-  border-left: 2px solid var(--border);
-  padding-left: 0.9em;
-  margin-left: -1.1em;
-  overflow-x: auto;
+/* Margin line numbers (every 5th line) */
+.dipl-line[data-lineno]::before {
+  content: attr(data-lineno);
+  position: absolute;
+  left: -3.8rem;
+  top: 0;
+  width: 2.8rem;
+  text-align: right;
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  line-height: 1.9;
+  user-select: none;
+  pointer-events: none;
 }
+
+/* Multi-line text block container */
+.text-unit.dipl-mode {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.text-unit.dipl-mode::-webkit-scrollbar { display: none; }
 
 /* ── Search Page ─────────────────────────────────────────── */
 .search-hero {
@@ -1026,8 +1006,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
   .reader-layout { grid-template-columns: 240px 1fr; }
 }
 @media (max-width: 900px) {
-  .page-card { padding: 3.5rem 3rem; }
-  .page-header { padding: 0 3rem; }
+  .page-card { padding: 4rem 3.5rem 4rem 6rem; }
+  .page-header { padding: 0 3.5rem 0 6rem; }
 }
 @media (max-width: 768px) {
   .reader-layout { grid-template-columns: 1fr; }
@@ -1042,8 +1022,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
   .legal-table-norm { border-right: none; border-bottom: 1px solid var(--border-fine); }
 }
 @media (max-width: 600px) {
-  .page-card { padding: 2.5rem 1.4rem; }
-  .page-header { padding: 0 1.4rem; top: 1.2rem; }
+  .page-card { padding: 2.5rem 1.2rem 2.5rem 3.8rem; }
+  .page-header { padding: 0 1.2rem 0 3.8rem; top: 1.2rem; }
   .site-header { padding: 0 4%; }
   .sitenav a { padding: 0 0.8rem; }
   .workflow-steps { grid-template-columns: 1fr; }
