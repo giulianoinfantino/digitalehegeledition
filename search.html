@@ -63,6 +63,7 @@
     <div style="display:flex; gap:2rem; align-items:center; flex-wrap:wrap;">
       <select id="filter-work"></select>
       <select id="filter-type">
+        <option value="body">Haupttext</option>
         <option value="all">Alle Einträge</option>
         <option value="heading">Nur Überschriften</option>
         <option value="paragraph">Nur Absätze</option>
@@ -214,7 +215,11 @@
     let results = window.HEGEL_SEARCH_INDEX.filter(entry => {
       const text = (entry.text || '').toLowerCase();
       const matchWork = workFilter === 'all' || entry.work_id === workFilter;
-      const matchType = typeFilter === 'all' || entry.type === typeFilter;
+      const matchType = typeFilter === 'all'
+        ? true
+        : typeFilter === 'body'
+          ? (entry.label === 'paragraph' || entry.label === 'heading')
+          : entry.label === typeFilter;
       return matchWork && matchType && evaluateQuery(text, query);
     });
 
@@ -229,10 +234,10 @@
 
     container.innerHTML = results.map(res => {
       const snippet = extractSnippet(res.text, terms);
-      const typeLabel = res.type === 'heading' ? ' · Überschrift' : '';
+      const typeLabel = res.label === 'heading' ? ' · Überschrift' : '';
       return `
         <article class="result-biblio">
-          <div class="sigle">${res.sigel || res.work_id} · GW ${res.page_book || res.page_pdf}${typeLabel}</div>
+          <div class="sigle">${res.sigel || res.work_id}${typeLabel}</div>
           <div class="snippet">${highlightText(snippet, terms)}</div>
           <a class="result-link" href="text.html?work=${res.work_id}#page-${res.page_pdf}">
             In den Kontext springen →
