@@ -125,33 +125,109 @@
     }
   }
 
+  // ── Heading normalisation ────────────────────────────────────────────────
+  const H_NOISE    = new Set(['NUR','NICHT','GLEICH','ERSTLICH',
+                               'SUBJECTIVITÄT','OBJECTIVITÄT','IDEE']);
+  const H_PREFIX   = new Set(['VOM','VON','DIE','DER','DAS']); // Sperrsatz split-prefix
+  const H_STRUCT   = /^(ERST|ZWEIT|ZWEY|DRITT|VIERT)[A-ZÜÖÄY]*\s+(KAPITEL|ABSCHNITT)/i;
+  const SMALL_DE   = new Set(['der','die','das','des','dem','den','im','in','an',
+                               'von','zu','und','oder','als','wie','am','aus','auf',
+                               'bei','mit','zum','zur','für','bis','über','nach',
+                               'seit','beim','vom']);
+
+  function titleDe(raw) {
+    const t = (raw || '').replace(/[.\s]+$/, '').trim();
+    if (t !== t.toUpperCase()) return t; // already mixed-case → keep
+    return t.split(' ').map((w, i) => {
+      const lw = w.toLowerCase();
+      return (SMALL_DE.has(lw) && i > 0) ? lw : w[0].toUpperCase() + w.slice(1).toLowerCase();
+    }).join(' ');
+  }
+
+  // Merge split headings, drop noise, apply title-case, assign sensible levels.
+  function prepareUnits(raw) {
+    const out = [];
+    let i = 0;
+    let afterStructure = false;
+
+    while (i < raw.length) {
+      const u = raw[i];
+      if (u.type !== 'heading') { out.push(u); afterStructure = false; i++; continue; }
+
+      const word = (u.text || '').replace(/[.\s]+$/, '').trim().toUpperCase();
+      if (H_NOISE.has(word)) { i++; continue; }          // drop noise
+
+      if (H_STRUCT.test(word)) {
+        // KAPITEL / ABSCHNITT — look ahead and absorb the chapter title
+        const parts = [u.text];
+        let j = i + 1;
+        while (j < raw.length && raw[j].type === 'heading') {
+          const nw = (raw[j].text || '').replace(/[.\s]+$/, '').trim().toUpperCase();
+          if (H_NOISE.has(nw)) { j++; continue; }         // skip noise between parts
+          if (H_STRUCT.test(nw)) break;                   // another structure → stop
+          // absorb: handle split-prefix like "DIE" + "IDEE DES ERKENNENS."
+          if (H_PREFIX.has(nw) && j + 1 < raw.length && raw[j+1].type === 'heading') {
+            parts.push(raw[j].text); parts.push(raw[j+1].text); j += 2;
+          } else {
+            parts.push(raw[j].text); j++;
+          }
+          break;
+        }
+        const structPart = titleDe(parts[0]);
+        const titlePart  = parts.slice(1).map(titleDe).join(' ');
+        const merged = titlePart ? `${structPart}. ${titlePart}` : structPart;
+        out.push({...u, text: merged, level: 1});
+        afterStructure = true;
+        i = j; continue;
+      }
+
+      if (H_PREFIX.has(word) && i + 1 < raw.length && raw[i+1].type === 'heading') {
+        // Split-prefix (VOM, DIE, …) — merge with next heading
+        const nw = (raw[i+1].text || '').replace(/[.\s]+$/, '').trim().toUpperCase();
+        if (!H_NOISE.has(nw)) {
+          const merged = titleDe(u.text) + ' ' + titleDe(raw[i+1].text);
+          out.push({...u, text: merged, level: 1});
+          afterStructure = false; i += 2; continue;
+        }
+      }
+
+      // Regular heading
+      out.push({...u, text: titleDe(u.text), level: afterStructure ? 2 : (u.level || 2)});
+      afterStructure = false; i++;
+    }
+    return out;
+  }
+
   function renderUnit(u) {
-    const type = u.type || u.label || '';
+    const type  = u.type || u.label || '';
     const level = u.level || '';
     if (state.diplomaticMode && u.lines && u.lines.length > 1) {
-      const body = u.lines
-        .map(l => `<span class="dipl-line">${l}</span>`)
-        .join('');
+      const body = u.lines.map(l => `<span class="dipl-line">${l}</span>`).join('');
       return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${body}</div>`;
     }
-    return `<div class="text-unit type-${type}" data-level="${level}">${u.text_normalized || u.text || ''}</div>`;
+    return `<div class="text-unit type-${type}" data-level="${level}">${u.text || ''}</div>`;
   }
 
   function renderPages() {
     document.getElementById('reader-pages').innerHTML =
       (state.corpus.pages || [])
-        .filter(p => p.page_kind === 'body')
-        .map(page => `
-          <article class="page-card" id="page-${page.page_pdf}">
-            <header class="page-header">
-              <span>${page.sigel || ''}</span>
-              <span>GW ${page.page_book ?? ''}</span>
-            </header>
-            <div class="page-body${state.diplomaticMode ? ' page-body--dipl' : ''}">
-              ${(page.units || []).map(renderUnit).join('')}
-            </div>
-          </article>
-        `).join('');
+        .filter(p => p.page_kind === 'body' && p.page_book != null)
+        .map(page => {
+          const units = prepareUnits(page.units || []);
+          if (!units.length) return '';
+          return `
+            <article class="page-card" id="page-${page.page_pdf}">
+              <header class="page-header">
+                <span>${page.sigel || ''}</span>
+                <span>GW ${page.page_book}</span>
+              </header>
+              <div class="page-body${state.diplomaticMode ? ' page-body--dipl' : ''}">
+                ${units.map(renderUnit).join('')}
+              </div>
+            </article>`;
+        })
+        .filter(Boolean)
+        .join('');
   }
 
   function toggleDiplomaticView() {
