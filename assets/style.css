@@ -516,13 +516,13 @@ body {
 .page-card + .page-card::before {
   content: "❦";
   position: absolute;
-  top: 1.8rem;
+  top: 1rem;
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-serif);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--text-faint);
-  opacity: 0.6;
+  opacity: 0.55;
   letter-spacing: 0;
   pointer-events: none;
 }
