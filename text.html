@@ -215,7 +215,20 @@
           const bodyHTML = units.map(u => {
             const type  = u.type || u.label || '';
             const level = u.level || '';
+            const gwLines = u.metadata && u.metadata.gw_lines;
 
+            // Authoritative GW line numbers from the extractor — each entry has its own gw_line.
+            if (gwLines && gwLines.length > 0) {
+              const linesHTML = gwLines.map(entry => {
+                const n = entry.gw_line;
+                const showNumber = (n === 1) || (n % 5 === 0);
+                const attr = showNumber ? ` data-lineno="${n}"` : '';
+                return `<span class="dipl-line"${attr}>${entry.text || ''}</span>`;
+              }).join('');
+              return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${linesHTML}</div>`;
+            }
+
+            // Legacy fallback: `lines` array without GW numbers — sequential counter.
             if (u.lines && u.lines.length > 0) {
               const linesHTML = u.lines.map(l => {
                 lineNum++;
@@ -224,9 +237,12 @@
               }).join('');
               return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${linesHTML}</div>`;
             }
-            // Heading or short single-line unit
+
+            // Heading or short single-line unit — no gutter number, but expose gw_line_start for tooltips.
             lineNum++;
-            return `<div class="text-unit type-${type}" data-level="${level}">${u.text || ''}</div>`;
+            const startLine = u.metadata && u.metadata.gw_line_start;
+            const lineAttr = startLine ? ` data-gw-line="${startLine}"` : '';
+            return `<div class="text-unit type-${type}" data-level="${level}"${lineAttr}>${u.text || ''}</div>`;
           }).join('');
 
           return `
