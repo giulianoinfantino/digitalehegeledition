@@ -561,11 +561,27 @@ body {
   text-indent: 0;
   hyphens: none;
   text-align: left;
+  font-feature-settings: "onum", "kern", "liga";
 }
 /* In reading mode (Lesefassung): classical first-line indent, no margin
    between consecutive paragraphs — the standard rhythm of a printed edition. */
 body.reflow-mode .type-paragraph .reflow-content { text-indent: 1.4em; }
 body.reflow-mode .text-unit + .text-unit .reflow-content { text-indent: 1.4em; }
+
+/* Drop cap on the first paragraph after a level-1 heading — only in reflow
+   mode, where the first letter of a flowing paragraph is the natural anchor.
+   In Druckbild mode the line-by-line layout would fight the dropped initial. */
+body.reflow-mode .type-heading[data-level="1"] + .type-paragraph .reflow-content::first-letter {
+  font-family: var(--font-serif);
+  font-size: 3.4em;
+  line-height: 0.86;
+  float: left;
+  padding: 0.08em 0.12em 0 0;
+  margin: 0.12em 0.05em 0 0;
+  color: var(--text-ink);
+  font-weight: 500;
+  font-feature-settings: "onum";
+}
 
 /* Headings — refined scholarly hierarchy. */
 .type-heading {
