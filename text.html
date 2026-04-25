@@ -31,9 +31,6 @@
   <aside class="reader-sidebar">
     <span class="small-caps" style="color:var(--accent-gold); display:block; margin-bottom:1.2rem; font-size:0.68rem; letter-spacing:0.18em;">Inhaltsverzeichnis</span>
     <ul id="toc-list" class="toc-list"></ul>
-
-    <span class="small-caps" style="color:var(--accent-gold); display:block; margin:2.4rem 0 1.2rem; font-size:0.68rem; letter-spacing:0.18em;">Begriffsindex</span>
-    <ul id="term-index" class="term-index"></ul>
   </aside>
 
   <main class="text-content">
@@ -117,42 +114,83 @@
     const bookToPdf = {};
     (corpus.pages || []).forEach(p => { if (p.page_book != null) bookToPdf[p.page_book] = p.page_pdf; });
 
-    // Drop OCR-mangled TOC entries: spaced-out single chars, very low alpha
-    // density, accidental fragments (ebendas, see-references), or sub-3-char titles.
+    // Clean OCR contamination from TOC titles. The GW PDF embeds running-header
+    // signature glyphs that pdfplumber pulls into the TOC text — they appear as
+    // *xxx* segments and as lowercase letters glued to all-caps structural words
+    // (e.g. "aERSTESKAPITELnu" → "ERSTES KAPITEL").
+    const cleanTocTitle = (raw) => {
+      if (!raw) return '';
+      let t = String(raw).trim();
+      // Strip *xxx* asterisk-wrapped junk anywhere in the string
+      t = t.replace(/\*[^*]*\*/g, ' ');
+      // Trailing "S 36-" or "SaersteFigurS" type signature trails
+      t = t.replace(/\s+S\s*\d+\s*-?\s*$/g, '');
+      t = t.replace(/\s+S[a-zA-ZäöüÄÖÜ]+S\b\s*$/g, '');
+      // Repair lowercase letters glued onto an all-caps structural word
+      t = t.replace(/(^|\s)[a-zäöüß]{1,3}([A-ZÄÖÜ]{4,})/g, '$1$2');
+      t = t.replace(/([A-ZÄÖÜ]{4,})[a-zäöüß]{1,3}(?=\s|$)/g, '$1');
+      // Insert space inside KAPITELDer / ABSCHNITTDie etc.
+      t = t.replace(/([A-ZÄÖÜ]{3,})([A-ZÄÖÜ][a-zäöüß]+)/g, '$1 $2');
+      // Insert space between the cardinal and the structural word
+      t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES|FUENFTES|FÜNFTES)\s*KAPITEL\b/g, '$1 KAPITEL');
+      t = t.replace(/(ERSTER|ZWEY?TER|ZWEITER|DRITTER|VIERTER)\s*ABSCHNITT\b/g, '$1 ABSCHNITT');
+      t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES)\s*BUCH\b/g, '$1 BUCH');
+      // Title-case the first letter after a leading article when over-uppercase
+      t = t.replace(/\s+/g, ' ').trim();
+      return t;
+    };
+
     const isJunkTocEntry = (title) => {
       if (!title) return true;
       const t = title.trim();
       if (t.length < 4) return true;
-      // Spaced-out letters like "u s t" or "ätsr e i" — many isolated single chars
+      if (/^ebendas\.?$/i.test(t)) return true;
+      const letters = (t.match(/[A-Za-zÄÖÜäöüß]/g) || []).length;
+      if (letters / t.length < 0.55) return true;
+      // Many isolated single chars after cleaning → still junk
       const tokens = t.split(/\s+/);
       const singles = tokens.filter(w => w.length === 1).length;
       if (tokens.length >= 4 && singles / tokens.length > 0.35) return true;
-      // Reference-only entries ("ebendas.", "ebendas")
-      if (/^ebendas\.?$/i.test(t)) return true;
-      // Mostly non-letter
-      const letters = (t.match(/[A-Za-zÄÖÜäöüß]/g) || []).length;
-      if (letters / t.length < 0.55) return true;
-      // Gibberish typo-runs ("Absclmitt", "Beschaffenheit n b.")
-      if (/\b[a-z]{2,}lm[a-z]/.test(t)) return true;  // "Absclmitt"
+      // OCR typo runs (e.g. "Absclmitt") — uncommon "lm" inside a lowercase word
+      if (/\b[a-zäöüß]{2,}lm[a-zäöüß]/.test(t)) return true;
       return false;
+    };
+
+    const tocLevel = (title) => {
+      const t = title.trim();
+      // ERSTES BUCH, ZWEYTES BUCH — top-level book divisions
+      if (/^(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES)\s+BUCH\b/i.test(t)) return 1;
+      // ALL-CAPS super-section like "VOM BEGRIFF IM ALLGEMEINEN"
+      if (/^[A-ZÄÖÜ][A-ZÄÖÜ\s\.\-]+$/.test(t) && t.length >= 5) return 1;
+      // ERSTES KAPITEL, ERSTER ABSCHNITT
+      if (/^(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES|FÜNFTES)\s+KAPITEL\b/i.test(t)) return 2;
+      if (/^(ERSTER|ZWEY?TER|ZWEITER|DRITTER|VIERTER)\s+ABSCHNITT\b/i.test(t)) return 2;
+      if (/\bABSCHNITT\b/i.test(t) || /^Vom\b|^Von\b/.test(t)) return 2;
+      if (/\bKapitel\b/i.test(t)) return 2;
+      // Capital-letter sections: "A. Das Urtheil ..."
+      if (/^[A-ZÄÖÜ]\.\s/.test(t)) return 3;
+      // Anmerkung / Einleitung / Eintheilung — at sub-section level
+      if (/^(Anm\.|Anmerkung|Eintheilung|Einleitung|Vorrede)\b/i.test(t)) return 3;
+      // Lowercase letter sub-sub-sections: "a. das positive"
+      if (/^[a-zäöüß]\.\s/.test(t)) return 4;
+      // Numeric sub-sub-sections: "1. ..."
+      if (/^\d{1,2}\.\s/.test(t)) return 4;
+      // Default: same as A./B./C.
+      return 3;
     };
 
     document.getElementById('toc-list').innerHTML =
       (corpus.toc_printed || [])
+        .map(e => ({ ...e, title: cleanTocTitle(e.title) }))
         .filter(e => !isJunkTocEntry(e.title))
         .map(e => {
           const anchor = bookToPdf[e.page] ?? e.page;
-          const lvl = /\bAbschnitt\b/i.test(e.title) || /^Vom\b|^Von\b/.test(e.title) ? 1
-                    : /\bKapitel\b/i.test(e.title) ? 2
-                    : 3;
+          const lvl = tocLevel(e.title);
           return `<li data-level="${lvl}"><a href="#page-${anchor}">${e.title}</a></li>`;
         }).join('');
 
     // Pages
     renderPages();
-
-    // Begriffsindex
-    renderTermIndex();
 
     // Work selector
     if (window.HEGEL_EDITION) {
@@ -365,84 +403,6 @@
       e.target.click();
     }
   });
-
-  // ── Begriffsindex (curated termini) ──────────────────────────────
-  // Curated set of central termini in Hegel's Logic. Patterns are case-insensitive
-  // and use \b word boundaries. Variants are grouped under one canonical label.
-  const HEGEL_TERMS = [
-    { label: 'Seyn',           pattern: /\bSeyn\b/gi },
-    { label: 'Nichts',         pattern: /\bNichts\b/g },
-    { label: 'Werden',         pattern: /\bWerden\b/g },
-    { label: 'Daseyn',         pattern: /\bDaseyn\b/gi },
-    { label: 'Etwas',          pattern: /\bEtwas\b/g },
-    { label: 'Bestimmung',     pattern: /\bBestimmung(?:en)?\b/gi },
-    { label: 'Endlichkeit',    pattern: /\bEndlich(?:keit|en|er|es)?\b/gi },
-    { label: 'Unendlichkeit',  pattern: /\bUnendlich(?:keit|en|er|es)?\b/gi },
-    { label: 'Quantität',      pattern: /\bQuantit(?:ät|äten)\b/gi },
-    { label: 'Maß',            pattern: /\bMa(?:ß|ss)\b/gi },
-    { label: 'Wesen',          pattern: /\bWesen\b/g },
-    { label: 'Reflexion',      pattern: /\bReflexion(?:en)?\b/gi },
-    { label: 'Identität',      pattern: /\bIdentit(?:ät|äten)\b/gi },
-    { label: 'Widerspruch',    pattern: /\bWiderspru(?:ch|che|chs)\b/gi },
-    { label: 'Grund',          pattern: /\bGrund(?:e|es)?\b/gi },
-    { label: 'Erscheinung',    pattern: /\bErscheinung(?:en)?\b/gi },
-    { label: 'Verhältniß',     pattern: /\bVerh(?:ä|a)ltni(?:ß|ss)(?:e|es)?\b/gi },
-    { label: 'Substanz',       pattern: /\bSubstanz(?:en)?\b/gi },
-    { label: 'Causalität',     pattern: /\bCausalit(?:ä|a)t\b/gi },
-    { label: 'Wechselwirkung', pattern: /\bWechselwirkung\b/gi },
-    { label: 'Begriff',        pattern: /\bBegriff(?:e|s|es)?\b/gi },
-    { label: 'Urtheil',        pattern: /\bUrth?eil(?:e|s|es)?\b/gi },
-    { label: 'Schluß',         pattern: /\bSchlu(?:ß|ss)(?:e|es)?\b/gi },
-    { label: 'Idee',           pattern: /\bIdee(?:n)?\b/gi },
-    { label: 'Allgemeinheit',  pattern: /\bAllgemein(?:heit|e|en|er|es)?\b/gi },
-    { label: 'Besonderheit',   pattern: /\bBesonder(?:heit|e|en|er|es)?\b/gi },
-    { label: 'Einzelheit',     pattern: /\bEinzeln?(?:heit|en|er|es)?\b/gi },
-    { label: 'Vermittlung',    pattern: /\bVermittl?ung\b/gi },
-    { label: 'Negation',       pattern: /\bNegation(?:en)?\b/gi },
-    { label: 'Aufhebung',      pattern: /\bAufhebung(?:en)?\b/gi },
-  ];
-
-  function buildTermIndex() {
-    const index = HEGEL_TERMS.map(t => ({ label: t.label, pattern: t.pattern, count: 0, first: null }));
-    const pages = state.corpus?.pages || [];
-    for (const page of pages) {
-      if (page.page_kind !== 'body') continue;
-      for (const u of page.units || []) {
-        const md = u.metadata || {};
-        const lines = md.gw_lines || [];
-        if (!lines.length) continue;
-        for (const ln of lines) {
-          const text = ln.text || '';
-          if (!text) continue;
-          for (const entry of index) {
-            entry.pattern.lastIndex = 0;
-            const matches = text.match(entry.pattern);
-            if (!matches) continue;
-            entry.count += matches.length;
-            if (!entry.first) {
-              entry.first = { page_pdf: page.page_pdf, gw_page: page.gw_page, gw_line: ln.gw_line };
-            }
-          }
-        }
-      }
-    }
-    return index;
-  }
-
-  function renderTermIndex() {
-    const list = document.getElementById('term-index');
-    if (!list) return;
-    const idx = buildTermIndex().filter(e => e.count > 0).sort((a, b) => a.label.localeCompare(b.label, 'de'));
-    list.innerHTML = idx.map(entry => {
-      const f = entry.first;
-      const href = f ? `#line-${f.page_pdf}-${f.gw_line}` : '#';
-      const cite = f ? `${f.gw_page}.${f.gw_line}` : '';
-      return `<li><a href="${href}" title="${entry.label} — erste Stelle: ${cite} (${entry.count} Treffer)">
-                <span class="term-label">${entry.label}</span>
-                <span class="term-count">${entry.count}</span>
-              </a></li>`;
-    }).join('') || '<li><em style="color:var(--text-faint); font-size:0.78rem;">keine Treffer</em></li>';
-  }
 
   // ── Druckbild / Lesefassung toggle ───────────────────────────────
   function toggleReflow() {

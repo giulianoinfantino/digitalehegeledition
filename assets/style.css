@@ -370,64 +370,37 @@ body {
   padding-left: 1.1rem;
 }
 
-/* TOC hierarchy */
-.toc-list li[data-level="1"] { margin-top: 1.1rem; }
+/* TOC hierarchy — book / chapter / section / sub-section */
+.toc-list li[data-level="1"] { margin-top: 1.4rem; }
 .toc-list li[data-level="1"]:first-child { margin-top: 0; }
 .toc-list li[data-level="1"] > a {
   color: var(--text-ink);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-family: var(--font-ui);
   font-variant: all-small-caps;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   padding-left: 0.5rem;
 }
-.toc-list li[data-level="2"] { margin-top: 0.3rem; }
+.toc-list li[data-level="2"] { margin-top: 0.55rem; }
 .toc-list li[data-level="2"] > a {
   color: var(--text-body);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
+  font-style: italic;
   padding-left: 0.75rem;
 }
+.toc-list li[data-level="3"] { margin-top: 0.18rem; }
 .toc-list li[data-level="3"] > a {
   padding-left: 1.4rem;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
-
-/* Begriffsindex */
-.term-index { list-style: none; padding: 0; margin: 0; }
-.term-index li { margin: 0; }
-.term-index a {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 0.22rem 0.5rem;
-  color: var(--text-body);
-  font-size: 0.86rem;
-  font-family: var(--font-serif, 'EB Garamond', serif);
-  text-decoration: none;
-  border-bottom: 1px dotted transparent;
-  transition: color var(--transition), border-color var(--transition);
-}
-.term-index a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-.term-index .term-label {
-  font-style: italic;
-}
-.term-index .term-count {
-  font-family: var(--font-ui);
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
+.toc-list li[data-level="4"] > a {
+  padding-left: 2.3rem;
+  font-size: 0.8rem;
   color: var(--text-faint);
-  margin-left: 0.6rem;
-  min-width: 1.5rem;
-  text-align: right;
 }
-.term-index a:hover .term-count {
-  color: var(--accent);
-}
+
 
 .text-content {
   padding: 3rem 5% 8rem;
