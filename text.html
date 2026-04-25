@@ -31,6 +31,9 @@
   <aside class="reader-sidebar">
     <span class="small-caps" style="color:var(--accent-gold); display:block; margin-bottom:1.2rem; font-size:0.68rem; letter-spacing:0.18em;">Inhaltsverzeichnis</span>
     <ul id="toc-list" class="toc-list"></ul>
+
+    <span class="small-caps" style="color:var(--accent-gold); display:block; margin:2.4rem 0 1.2rem; font-size:0.68rem; letter-spacing:0.18em;">Begriffsindex</span>
+    <ul id="term-index" class="term-index"></ul>
   </aside>
 
   <main class="text-content">
@@ -47,6 +50,10 @@
           <input type="text" id="jump-gw-page" placeholder="Nr.">
         </div>
         <button class="btn-classic" onclick="handleJumpToPage()">→</button>
+      </div>
+      <div class="toolbar-group">
+        <span class="small-caps">Ansicht</span>
+        <button class="btn-classic" id="btn-reflow" onclick="toggleReflow()">Lesefassung</button>
       </div>
     </div>
 
@@ -109,17 +116,43 @@
     // TOC — map GW book page → PDF page (article IDs use page_pdf)
     const bookToPdf = {};
     (corpus.pages || []).forEach(p => { if (p.page_book != null) bookToPdf[p.page_book] = p.page_pdf; });
+
+    // Drop OCR-mangled TOC entries: spaced-out single chars, very low alpha
+    // density, accidental fragments (ebendas, see-references), or sub-3-char titles.
+    const isJunkTocEntry = (title) => {
+      if (!title) return true;
+      const t = title.trim();
+      if (t.length < 4) return true;
+      // Spaced-out letters like "u s t" or "ätsr e i" — many isolated single chars
+      const tokens = t.split(/\s+/);
+      const singles = tokens.filter(w => w.length === 1).length;
+      if (tokens.length >= 4 && singles / tokens.length > 0.35) return true;
+      // Reference-only entries ("ebendas.", "ebendas")
+      if (/^ebendas\.?$/i.test(t)) return true;
+      // Mostly non-letter
+      const letters = (t.match(/[A-Za-zÄÖÜäöüß]/g) || []).length;
+      if (letters / t.length < 0.55) return true;
+      // Gibberish typo-runs ("Absclmitt", "Beschaffenheit n b.")
+      if (/\b[a-z]{2,}lm[a-z]/.test(t)) return true;  // "Absclmitt"
+      return false;
+    };
+
     document.getElementById('toc-list').innerHTML =
-      (corpus.toc_printed || []).map(e => {
-        const anchor = bookToPdf[e.page] ?? e.page;
-        const lvl = /\bAbschnitt\b/i.test(e.title) || /^Vom\b|^Von\b/.test(e.title) ? 1
-                  : /\bKapitel\b/i.test(e.title) ? 2
-                  : 3;
-        return `<li data-level="${lvl}"><a href="#page-${anchor}">${e.title}</a></li>`;
-      }).join('');
+      (corpus.toc_printed || [])
+        .filter(e => !isJunkTocEntry(e.title))
+        .map(e => {
+          const anchor = bookToPdf[e.page] ?? e.page;
+          const lvl = /\bAbschnitt\b/i.test(e.title) || /^Vom\b|^Von\b/.test(e.title) ? 1
+                    : /\bKapitel\b/i.test(e.title) ? 2
+                    : 3;
+          return `<li data-level="${lvl}"><a href="#page-${anchor}">${e.title}</a></li>`;
+        }).join('');
 
     // Pages
     renderPages();
+
+    // Begriffsindex
+    renderTermIndex();
 
     // Work selector
     if (window.HEGEL_EDITION) {
@@ -219,13 +252,21 @@
 
             // Authoritative GW line numbers from the extractor — each entry has its own gw_line.
             if (gwLines && gwLines.length > 0) {
+              const gwPage = page.gw_page || page.page_book || '';
               const linesHTML = gwLines.map(entry => {
                 const n = entry.gw_line;
                 const showNumber = (n === 1) || (n % 5 === 0);
-                const attr = showNumber ? ` data-lineno="${n}"` : '';
-                return `<span class="dipl-line"${attr}>${entry.text || ''}</span>`;
+                const lineId = `line-${page.page_pdf}-${n}`;
+                const numEl = showNumber
+                  ? `<span class="dipl-line-no" role="button" tabindex="0" title="Zitat kopieren" data-page-pdf="${page.page_pdf}" data-gw-page="${gwPage}" data-gw-line="${n}">${n}</span>`
+                  : '';
+                return `<span class="dipl-line" id="${lineId}" data-gw-line="${n}">${numEl}${entry.text || ''}</span>`;
               }).join('');
-              return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">${linesHTML}</div>`;
+              const reflowText = u.text || '';
+              return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">
+                        <div class="dipl-content">${linesHTML}</div>
+                        <div class="reflow-content">${reflowText}</div>
+                      </div>`;
             }
 
             // Legacy fallback: `lines` array without GW numbers — sequential counter.
@@ -271,6 +312,157 @@
       setTimeout(() => document.getElementById('jump-gw-page').style.borderBottomColor = '', 1500);
     }
   }
+
+  // ── Citation copy ────────────────────────────────────────────────
+  function siglumForCitation() {
+    const w = state.selectedWork;
+    if (w?.siglum) return w.siglum;
+    return state.corpus?.metadata?.siglum || 'GW';
+  }
+
+  function showToast(msg) {
+    let toast = document.getElementById('reader-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'reader-toast';
+      toast.className = 'reader-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  function copyCitation(pagePdf, gwPage, gwLine) {
+    const citation = `${siglumForCitation()}, ${gwPage}.${gwLine}`;
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = citation; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(citation).catch(fallback);
+    } else { fallback(); }
+    history.replaceState(null, '', `#line-${pagePdf}-${gwLine}`);
+    showToast(`Zitat kopiert: ${citation}`);
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.dipl-line-no');
+    if (!t) return;
+    e.preventDefault();
+    copyCitation(
+      Number(t.dataset.pagePdf),
+      t.dataset.gwPage,
+      Number(t.dataset.gwLine),
+    );
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList?.contains('dipl-line-no')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+
+  // ── Begriffsindex (curated termini) ──────────────────────────────
+  // Curated set of central termini in Hegel's Logic. Patterns are case-insensitive
+  // and use \b word boundaries. Variants are grouped under one canonical label.
+  const HEGEL_TERMS = [
+    { label: 'Seyn',           pattern: /\bSeyn\b/gi },
+    { label: 'Nichts',         pattern: /\bNichts\b/g },
+    { label: 'Werden',         pattern: /\bWerden\b/g },
+    { label: 'Daseyn',         pattern: /\bDaseyn\b/gi },
+    { label: 'Etwas',          pattern: /\bEtwas\b/g },
+    { label: 'Bestimmung',     pattern: /\bBestimmung(?:en)?\b/gi },
+    { label: 'Endlichkeit',    pattern: /\bEndlich(?:keit|en|er|es)?\b/gi },
+    { label: 'Unendlichkeit',  pattern: /\bUnendlich(?:keit|en|er|es)?\b/gi },
+    { label: 'Quantität',      pattern: /\bQuantit(?:ät|äten)\b/gi },
+    { label: 'Maß',            pattern: /\bMa(?:ß|ss)\b/gi },
+    { label: 'Wesen',          pattern: /\bWesen\b/g },
+    { label: 'Reflexion',      pattern: /\bReflexion(?:en)?\b/gi },
+    { label: 'Identität',      pattern: /\bIdentit(?:ät|äten)\b/gi },
+    { label: 'Widerspruch',    pattern: /\bWiderspru(?:ch|che|chs)\b/gi },
+    { label: 'Grund',          pattern: /\bGrund(?:e|es)?\b/gi },
+    { label: 'Erscheinung',    pattern: /\bErscheinung(?:en)?\b/gi },
+    { label: 'Verhältniß',     pattern: /\bVerh(?:ä|a)ltni(?:ß|ss)(?:e|es)?\b/gi },
+    { label: 'Substanz',       pattern: /\bSubstanz(?:en)?\b/gi },
+    { label: 'Causalität',     pattern: /\bCausalit(?:ä|a)t\b/gi },
+    { label: 'Wechselwirkung', pattern: /\bWechselwirkung\b/gi },
+    { label: 'Begriff',        pattern: /\bBegriff(?:e|s|es)?\b/gi },
+    { label: 'Urtheil',        pattern: /\bUrth?eil(?:e|s|es)?\b/gi },
+    { label: 'Schluß',         pattern: /\bSchlu(?:ß|ss)(?:e|es)?\b/gi },
+    { label: 'Idee',           pattern: /\bIdee(?:n)?\b/gi },
+    { label: 'Allgemeinheit',  pattern: /\bAllgemein(?:heit|e|en|er|es)?\b/gi },
+    { label: 'Besonderheit',   pattern: /\bBesonder(?:heit|e|en|er|es)?\b/gi },
+    { label: 'Einzelheit',     pattern: /\bEinzeln?(?:heit|en|er|es)?\b/gi },
+    { label: 'Vermittlung',    pattern: /\bVermittl?ung\b/gi },
+    { label: 'Negation',       pattern: /\bNegation(?:en)?\b/gi },
+    { label: 'Aufhebung',      pattern: /\bAufhebung(?:en)?\b/gi },
+  ];
+
+  function buildTermIndex() {
+    const index = HEGEL_TERMS.map(t => ({ label: t.label, pattern: t.pattern, count: 0, first: null }));
+    const pages = state.corpus?.pages || [];
+    for (const page of pages) {
+      if (page.page_kind !== 'body') continue;
+      for (const u of page.units || []) {
+        const md = u.metadata || {};
+        const lines = md.gw_lines || [];
+        if (!lines.length) continue;
+        for (const ln of lines) {
+          const text = ln.text || '';
+          if (!text) continue;
+          for (const entry of index) {
+            entry.pattern.lastIndex = 0;
+            const matches = text.match(entry.pattern);
+            if (!matches) continue;
+            entry.count += matches.length;
+            if (!entry.first) {
+              entry.first = { page_pdf: page.page_pdf, gw_page: page.gw_page, gw_line: ln.gw_line };
+            }
+          }
+        }
+      }
+    }
+    return index;
+  }
+
+  function renderTermIndex() {
+    const list = document.getElementById('term-index');
+    if (!list) return;
+    const idx = buildTermIndex().filter(e => e.count > 0).sort((a, b) => a.label.localeCompare(b.label, 'de'));
+    list.innerHTML = idx.map(entry => {
+      const f = entry.first;
+      const href = f ? `#line-${f.page_pdf}-${f.gw_line}` : '#';
+      const cite = f ? `${f.gw_page}.${f.gw_line}` : '';
+      return `<li><a href="${href}" title="${entry.label} — erste Stelle: ${cite} (${entry.count} Treffer)">
+                <span class="term-label">${entry.label}</span>
+                <span class="term-count">${entry.count}</span>
+              </a></li>`;
+    }).join('') || '<li><em style="color:var(--text-faint); font-size:0.78rem;">keine Treffer</em></li>';
+  }
+
+  // ── Druckbild / Lesefassung toggle ───────────────────────────────
+  function toggleReflow() {
+    const on = document.body.classList.toggle('reflow-mode');
+    const btn = document.getElementById('btn-reflow');
+    if (btn) btn.textContent = on ? 'Druckbild' : 'Lesefassung';
+    try { localStorage.setItem('hegel-reader-mode', on ? 'reflow' : 'dipl'); } catch (_) {}
+  }
+
+  (function restoreReaderMode() {
+    try {
+      if (localStorage.getItem('hegel-reader-mode') === 'reflow') {
+        document.body.classList.add('reflow-mode');
+        document.addEventListener('DOMContentLoaded', () => {
+          const btn = document.getElementById('btn-reflow');
+          if (btn) btn.textContent = 'Druckbild';
+        });
+      }
+    } catch (_) {}
+  })();
 
 
 </script>
