@@ -658,6 +658,13 @@ body.reflow-mode .type-heading[data-level="1"] + .type-paragraph .reflow-content
 
 /* ── Druckbild (diplomatic lines + line numbers) ─────────── */
 
+/* Sperrsatz (originally letter-spaced emphasis in the GW print) — rendered
+   as italic in the reader, which is the modern editorial convention. */
+em.sperrsatz {
+  font-style: italic;
+  font-feature-settings: "onum", "kern", "liga";
+}
+
 /* Each original print line — Blocksatz, allows reflow if a line is wider
    than the column. The gw_line number stays anchored at the start. */
 .dipl-line {

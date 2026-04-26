@@ -279,6 +279,13 @@
     return out;
   }
 
+  // Convert the extractor's *foo* Sperrsatz markers to <em> italic.
+  // Footnote markers like *), **, * (without a closing partner) are left alone.
+  function renderInline(text) {
+    if (!text) return '';
+    return String(text).replace(/\*([^*\n]{1,80}?)\*/g, '<em class="sperrsatz">$1</em>');
+  }
+
   function renderPages() {
     document.getElementById('reader-pages').innerHTML =
       (state.corpus.pages || [])
@@ -303,9 +310,9 @@
                 const numEl = showNumber
                   ? `<span class="dipl-line-no" role="button" tabindex="0" title="Zitat kopieren" data-page-pdf="${page.page_pdf}" data-gw-page="${gwPage}" data-gw-line="${n}">${n}</span>`
                   : '';
-                return `<span class="dipl-line" id="${lineId}" data-gw-line="${n}">${numEl}${entry.text || ''}</span>`;
+                return `<span class="dipl-line" id="${lineId}" data-gw-line="${n}">${numEl}${renderInline(entry.text)}</span>`;
               }).join('');
-              const reflowText = u.text || '';
+              const reflowText = renderInline(u.text);
               return `<div class="text-unit type-${type} dipl-mode" data-level="${level}">
                         <div class="dipl-content">${linesHTML}</div>
                         <div class="reflow-content">${reflowText}</div>
@@ -326,7 +333,7 @@
             lineNum++;
             const startLine = u.metadata && u.metadata.gw_line_start;
             const lineAttr = startLine ? ` data-gw-line="${startLine}"` : '';
-            return `<div class="text-unit type-${type}" data-level="${level}"${lineAttr}>${u.text || ''}</div>`;
+            return `<div class="text-unit type-${type}" data-level="${level}"${lineAttr}>${renderInline(u.text)}</div>`;
           }).join('');
 
           return `
