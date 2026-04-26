@@ -123,9 +123,12 @@
       let t = String(raw).trim();
       // Strip *xxx* asterisk-wrapped junk anywhere in the string
       t = t.replace(/\*[^*]*\*/g, ' ');
-      // Trailing "S 36-" or "SaersteFigurS" type signature trails
-      t = t.replace(/\s+S\s*\d+\s*-?\s*$/g, '');
+      // Trailing signature "S<word>S" (e.g. "SaersteFigurS")
       t = t.replace(/\s+S[a-zA-ZäöüÄÖÜ]+S\b\s*$/g, '');
+      // Trailing single-letter signature + page number ("S 36-", "B 12")
+      t = t.replace(/[A-ZÄÖÜ]\s*\d{1,3}\s*-?\s*$/g, '');
+      // Trailing trailing-signature single capital glued to the last word ("BegriffS")
+      t = t.replace(/(\w)S\s*$/g, '$1');
       // Repair lowercase letters glued onto an all-caps structural word
       t = t.replace(/(^|\s)[a-zäöüß]{1,3}([A-ZÄÖÜ]{4,})/g, '$1$2');
       t = t.replace(/([A-ZÄÖÜ]{4,})[a-zäöüß]{1,3}(?=\s|$)/g, '$1');
@@ -135,7 +138,9 @@
       t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES|FUENFTES|FÜNFTES)\s*KAPITEL\b/g, '$1 KAPITEL');
       t = t.replace(/(ERSTER|ZWEY?TER|ZWEITER|DRITTER|VIERTER)\s*ABSCHNITT\b/g, '$1 ABSCHNITT');
       t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES)\s*BUCH\b/g, '$1 BUCH');
-      // Title-case the first letter after a leading article when over-uppercase
+      // Drop accidental immediate duplicates ("Der Der Schluß" → "Der Schluß")
+      t = t.replace(/\b(\S+)\s+\1\b/gi, '$1');
+      // Final whitespace cleanup
       t = t.replace(/\s+/g, ' ').trim();
       return t;
     };
