@@ -427,6 +427,39 @@ body {
 }
 .toc-list li[data-level="4"] > a:hover { color: var(--accent); }
 
+/* Orphan TOC entries — section titles whose page is outside the extracted body */
+.toc-list .toc-orphan {
+  display: block;
+  padding: 0.28rem 0.5rem 0.28rem 0.75rem;
+  color: var(--text-faint);
+  font-style: italic;
+  cursor: help;
+  border-left: 2px dotted var(--rule);
+  font-size: inherit;
+}
+.toc-list li[data-level="1"][data-unlinked="1"] .toc-orphan {
+  font-style: normal;
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding-left: 0.5rem;
+}
+.toc-list li[data-level="2"][data-unlinked="1"] .toc-orphan {
+  font-size: 0.92rem;
+  padding-left: 0.75rem;
+}
+.toc-list li[data-level="3"][data-unlinked="1"] .toc-orphan {
+  font-size: 0.86rem;
+  padding-left: 1.4rem;
+}
+.toc-list li[data-level="4"][data-unlinked="1"] .toc-orphan {
+  font-size: 0.8rem;
+  padding-left: 2.3rem;
+}
+
 
 .text-content {
   padding: 3rem 5% 8rem;

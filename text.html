@@ -191,9 +191,15 @@
         .map(e => ({ ...e, title: cleanTocTitle(e.title) }))
         .filter(e => !isJunkTocEntry(e.title))
         .map(e => {
-          const anchor = bookToPdf[e.page] ?? e.page;
           const lvl = tocLevel(e.title);
-          return `<li data-level="${lvl}"><a href="#page-${anchor}">${e.title}</a></li>`;
+          const directPdf = bookToPdf[e.page];
+          if (directPdf != null) {
+            return `<li data-level="${lvl}"><a href="#page-${directPdf}">${e.title}</a></li>`;
+          }
+          // page_ref refers to an OA-page that's outside our extracted body
+          // (the GW edition stops earlier than the original 1816 print numbering).
+          // Show the entry without a link, marked as outside-of-edition.
+          return `<li data-level="${lvl}" data-unlinked="1"><span class="toc-orphan" title="Verweis ausserhalb der extrahierten Edition (S. ${e.page})">${e.title}</span></li>`;
         }).join('');
 
     // Pages
