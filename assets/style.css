@@ -407,69 +407,137 @@ body {
 }
 
 /* ── Reader Toolbar ──────────────────────────────────────── */
+/* ── Reader frontispiece (title block + toolbar) ─────────── */
+#reader-summary {
+  text-align: center;
+  margin: 1.2rem 0 2.4rem;
+  padding: 0;
+  border: none;
+}
+#reader-summary h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  font-style: italic;
+  font-weight: 400;
+  margin: 0 0 0.6rem;
+  color: var(--text-ink);
+  line-height: 1.18;
+  letter-spacing: 0.005em;
+}
+#reader-summary .small-caps {
+  display: inline-block;
+  color: var(--text-muted) !important;
+  font-family: var(--font-ui);
+  font-variant: all-small-caps;
+  font-weight: 500;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.26em !important;
+  margin-top: 0.2rem;
+}
+/* Centered fleuron under the frontispiece title */
+#reader-summary::after {
+  content: "❦";
+  display: block;
+  margin: 1.6rem auto 0;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  opacity: 0.55;
+  letter-spacing: 0;
+}
+
 .reader-toolbar {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 2rem;
-  padding: 0 0 1rem;
-  border-bottom: 1px solid var(--border-fine);
-  margin-bottom: 2.5rem;
+  gap: 2.4rem;
+  padding: 0;
+  margin: 0 auto 2.6rem;
   background: transparent;
+  border: none;
+  font-family: var(--font-serif);
+  color: var(--text-muted);
 }
 
 .toolbar-group {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 .toolbar-group .small-caps {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  font-family: var(--font-serif) !important;
+  font-style: italic;
+  font-variant: normal !important;
+  text-transform: lowercase;
+  font-size: 0.86rem !important;
+  letter-spacing: 0 !important;
+  color: var(--text-faint);
+  font-weight: 400;
   white-space: nowrap;
 }
 .toolbar-group select {
   border: none;
   background: transparent;
   font-family: var(--font-serif);
-  font-size: 1rem;
-  color: var(--accent);
+  font-size: 0.98rem;
+  color: var(--text-ink);
   cursor: pointer;
   outline: none;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+                    linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
+  background-position: calc(100% - 7px) 0.7em, calc(100% - 3px) 0.7em;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  padding-right: 14px;
+  transition: color var(--transition);
 }
+.toolbar-group select:hover { color: var(--accent); }
 .jump-input-group {
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 .jump-input-group input {
-  width: 5rem;
+  width: 4rem;
   border: none;
-  border-bottom: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-fine);
   background: transparent;
   font-family: var(--font-serif);
-  font-size: 1rem;
+  font-size: 0.98rem;
+  font-style: italic;
   color: var(--text-ink);
-  padding: 0.15rem 0.4rem;
+  padding: 0.05rem 0.3rem;
   outline: none;
   text-align: center;
   transition: border-color var(--transition);
 }
 .jump-input-group input:focus { border-bottom-color: var(--accent); }
-.jump-input-group input::placeholder { color: var(--text-faint); }
+.jump-input-group input::placeholder { color: var(--text-faint); font-style: italic; }
 
-/* ── Reader Summary ──────────────────────────────────────── */
-#reader-summary {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border-fine);
-}
-#reader-summary h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 2vw, 2rem);
-  font-weight: 400;
-  margin: 0 0 0.3rem;
+.reader-toolbar .btn-classic {
+  border: none;
+  padding: 0;
+  background: transparent;
   color: var(--text-ink);
-  line-height: 1.15;
+  font-family: var(--font-serif);
+  font-variant: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.98rem;
+  font-style: italic;
+  font-weight: 400;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.reader-toolbar .btn-classic:hover {
+  background: transparent;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* ── Page Card ───────────────────────────────────────────── */
@@ -590,13 +658,23 @@ body.reflow-mode .type-heading[data-level="1"] + .type-paragraph .reflow-content
 
 /* ── Druckbild (diplomatic lines + line numbers) ─────────── */
 
-/* Each original print line — no internal wrapping */
+/* Each original print line — Blocksatz, allows reflow if a line is wider
+   than the column. The gw_line number stays anchored at the start. */
 .dipl-line {
   display: block;
-  white-space: nowrap;
   overflow: visible;
   line-height: 1.72;
   position: relative;
+  text-align: justify;
+  text-align-last: justify;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-justify: inter-word;
+}
+/* The very last line of a paragraph block should NOT be over-justified
+   (otherwise a short closing line is stretched to the column edge). */
+.dipl-content .dipl-line:last-child {
+  text-align-last: left;
 }
 
 /* Margin line numbers (every 5th line) — clickable to copy a citation.
