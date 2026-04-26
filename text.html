@@ -125,6 +125,9 @@
       let t = String(raw).trim();
       // Strip *xxx* asterisk-wrapped junk anywhere in the string
       t = t.replace(/\*[^*]*\*/g, ' ');
+      // Drop redundant leading "INHALTSANZEIGE." that bleeds into the first
+      // entry of the TOC.
+      t = t.replace(/^\s*INHALTSANZEIGE\.\s*/i, '');
       // Trailing signature "S<word>S" (e.g. "SaersteFigurS")
       t = t.replace(/\s+S[a-zA-ZäöüÄÖÜ]+S\b\s*$/g, '');
       // Trailing single-letter signature + page number ("S 36-", "B 12")
@@ -208,7 +211,7 @@
       .map(e => ({ ...e, title: cleanTocTitle(e.title) }))
       .filter(e => !isJunkTocEntry(e.title));
     const firstPrimaryIdx = cleanedToc.findIndex(e =>
-      /^VOM\s+BEGRIFF\s+IM\s+ALLGEMEINEN\b/i.test(e.title)
+      /\bVOM\s+BEGRIFF\s+IM\s+ALLGEMEINEN\b/i.test(e.title)
     );
     const startIdx = firstPrimaryIdx >= 0 ? firstPrimaryIdx : 0;
 
