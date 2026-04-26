@@ -3,78 +3,77 @@
    ============================================================ */
 
 /* ── Design-Tokens: Light (Default) ───────────────────────
-   "Geistesabend" — warm scholarly palette inspired by 18th-century
-   bookbinding: cream linen paper, deep coffee ink, burgundy & gold
-   accents, with a sage-green secondary for playful contrast.        */
+   Inspired by hegelsinversionofphilosophy.com — restrained scholarly
+   palette: warm cream paper, deep warm-brown ink, oxblood accent,
+   warm-tan rules. Quiet, not playful; classical-minimalist.       */
 :root {
-  --bg-desktop: #d8cdb4;       /* tan canvas behind the page */
-  --bg-paper:   #faf2dc;       /* cream linen paper */
-  --bg-subtle:  #efe4c5;       /* subtle paper variant for sidebars */
-  --bg-paper-edge: #e9dcb6;    /* paper-edge tone for borders */
+  --bg-desktop: #ebe3d4;       /* warm beige canvas behind the page */
+  --bg-paper:   #f4efe6;       /* warm off-white paper */
+  --bg-subtle:  #ebe3d4;       /* deeper paper variant */
+  --bg-paper-edge: #e3d8c4;    /* paper-edge tone for borders */
 
-  --text-ink:   #1f1408;       /* deep coffee */
-  --text-body:  #38271a;       /* rich warm brown */
-  --text-muted: #7a5f3f;       /* warm khaki */
-  --text-faint: #b0967a;       /* sandstone */
+  --text-ink:   #1a1612;       /* deep warm-brown ink */
+  --text-body:  #2a2520;       /* slightly softer body */
+  --text-muted: #6b5f50;       /* warm taupe */
+  --text-faint: #9a8c7a;       /* warm sand */
 
-  --accent:        #8a1f3a;    /* burgundy wine */
-  --accent-red:    #8a1f3a;
-  --accent-hover:  #a82d4a;
-  --accent-gold:   #b58a2c;    /* dark goldenrod */
-  --accent-gold-2: #d4a948;    /* lighter gold for highlights */
-  --accent-sage:   #5b7a5e;    /* forest sage — playful secondary */
-  --accent-teal:   #4a6e6e;    /* dusty teal */
-  --accent-soft:   rgba(138, 31, 58, 0.10);
-  --accent-sage-soft: rgba(91, 122, 94, 0.12);
+  --accent:        #7a1e1e;    /* oxblood */
+  --accent-red:    #7a1e1e;
+  --accent-hover:  #a84a3a;    /* terracotta — softer accent on hover */
+  --accent-soft-fg:#a84a3a;    /* same terracotta as foreground variant */
+  --accent-rule:   #b8a88e;    /* warm tan rule colour */
+  --accent-gold:   #8a6b2b;    /* aged-gold for ornament glints */
+  --accent-soft:   rgba(122, 30, 30, 0.07);
 
-  --border:        rgba(31, 20, 8, 0.16);
-  --border-fine:   rgba(31, 20, 8, 0.09);
-  --border-strong: rgba(31, 20, 8, 0.26);
-  --border-ink:    rgba(31, 20, 8, 0.16);
+  --border:        rgba(26, 22, 18, 0.14);
+  --border-fine:   rgba(26, 22, 18, 0.07);
+  --border-strong: rgba(26, 22, 18, 0.22);
+  --border-ink:    rgba(26, 22, 18, 0.14);
+  --rule:          #b8a88e;
 
-  --font-serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
-  --font-ui:    'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Cormorant Garamond', 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --font-ui:    'JetBrains Mono', 'Inter Tight', 'Helvetica Neue', monospace;
+  --font-mono:  'JetBrains Mono', ui-monospace, monospace;
   --font-sans:  'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
 
   --radius: 2px;
   --transition: 0.22s ease;
-  --shadow-card: 0 1px 2px rgba(70, 45, 15, 0.06),
-                 0 6px 18px rgba(70, 45, 15, 0.08),
-                 0 22px 50px rgba(70, 45, 15, 0.06);
+  --shadow-card: 0 1px 2px rgba(40, 30, 20, 0.05),
+                 0 6px 18px rgba(40, 30, 20, 0.06),
+                 0 22px 50px rgba(40, 30, 20, 0.05);
 }
 
 /* ── Dark Theme ──────────────────────────────────────────────
-   "Bibliothek bei Nacht" — warm dark, not stark; cream text on
-   coffee ground, with coral & gold accents that glow.            */
+   Same restrained palette inverted: deep ink ground, warm cream
+   text, oxblood-going-to-terracotta accent, warm rule.            */
 [data-theme="dark"] {
-  --bg-desktop: #110d09;
-  --bg-paper:   #1d1812;
-  --bg-subtle:  #271f17;
-  --bg-paper-edge: #2c241a;
+  --bg-desktop: #131110;
+  --bg-paper:   #1d1916;
+  --bg-subtle:  #15120f;
+  --bg-paper-edge: #221d18;
 
-  --text-ink:   #f4e4c4;        /* warm cream */
-  --text-body:  #d6c4a3;        /* parchment */
-  --text-muted: #a48f6e;        /* aged paper edge */
-  --text-faint: #6b5b46;        /* shadow */
+  --text-ink:   #f4efe6;
+  --text-body:  #d8d0c2;
+  --text-muted: #9a8c78;
+  --text-faint: #635749;
 
-  --accent:        #d4694e;     /* warm coral */
-  --accent-red:    #d4694e;
-  --accent-hover:  #e58060;
-  --accent-gold:   #d6b04a;     /* warm rich gold */
-  --accent-gold-2: #e8c870;
-  --accent-sage:   #8aaa8d;     /* moonlit sage */
-  --accent-teal:   #7faaa7;     /* nightfall teal */
-  --accent-soft:   rgba(212, 105, 78, 0.14);
-  --accent-sage-soft: rgba(138, 170, 141, 0.14);
+  --accent:        #c9523f;     /* oxblood reads warmer at night */
+  --accent-red:    #c9523f;
+  --accent-hover:  #e0664f;
+  --accent-soft-fg:#e0664f;
+  --accent-rule:   #5a4f40;
+  --accent-gold:   #c69a4a;
+  --accent-soft:   rgba(201, 82, 63, 0.10);
 
-  --border:        rgba(244, 228, 196, 0.10);
-  --border-fine:   rgba(244, 228, 196, 0.06);
-  --border-strong: rgba(244, 228, 196, 0.20);
-  --border-ink:    rgba(244, 228, 196, 0.10);
+  --border:        rgba(244, 239, 230, 0.10);
+  --border-fine:   rgba(244, 239, 230, 0.06);
+  --border-strong: rgba(244, 239, 230, 0.20);
+  --border-ink:    rgba(244, 239, 230, 0.10);
+  --rule:          #5a4f40;
 
   --shadow-card: 0 1px 2px rgba(0,0,0,0.55),
                  0 6px 22px rgba(0,0,0,0.5),
-                 0 24px 60px rgba(0,0,0,0.45);
+                 0 24px 60px rgba(0,0,0,0.4);
 }
 
 /* ── Reset & Base ────────────────────────────────────────── */
@@ -85,15 +84,16 @@ body {
   margin: 0;
   background-color: var(--bg-desktop);
   background-image:
-    radial-gradient(at 12% 8%, var(--accent-sage-soft) 0, transparent 38%),
-    radial-gradient(at 88% 92%, var(--accent-soft) 0, transparent 42%);
+    radial-gradient(circle at 20% 10%, var(--accent-soft) 0%, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(26, 22, 18, 0.025) 0%, transparent 38%);
   color: var(--text-body);
   font-family: var(--font-serif);
-  line-height: 1.75;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--transition), color var(--transition);
 }
+::selection { background: var(--accent); color: var(--bg-paper); }
 
 /* ── Utilities ───────────────────────────────────────────── */
 .small-caps {
