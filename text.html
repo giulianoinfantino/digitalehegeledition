@@ -140,6 +140,20 @@
       t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES|FUENFTES|FÜNFTES)\s*KAPITEL\b/g, '$1 KAPITEL');
       t = t.replace(/(ERSTER|ZWEY?TER|ZWEITER|DRITTER|VIERTER)\s*ABSCHNITT\b/g, '$1 ABSCHNITT');
       t = t.replace(/(ERSTES|ZWEY?TES|ZWEITES|DRITTES|VIERTES)\s*BUCH\b/g, '$1 BUCH');
+      // Sperrsatz titles arrive as "a b s o l u t e" — collapse runs of
+      // single letters/digits (≥3) into one word.
+      t = t.replace(/(?:\b[a-zäöüß0-9])(?:\s+[a-zäöüß0-9]){2,}\b/g,
+                    (m) => m.replace(/\s+/g, ''));
+      // Same for Sperrsatz capitals like "I D E E"
+      t = t.replace(/(?:\b[A-ZÄÖÜ])(?:\s+[A-ZÄÖÜ]){2,}\b/g,
+                    (m) => m.replace(/\s+/g, ''));
+      // OCR: "1" sandwiched between lowercase letters is usually a misread "l"
+      t = t.replace(/([a-zäöüß])1([a-zäöüß])/g, '$1l$2');
+      // OCR: "<word> 1 <word>" with short surrounding words is a Sperrsatz "l"
+      // ("abso 1 uteIdee" → "absoluteIdee")
+      t = t.replace(/\b([a-zäöüß]{2,7})\s+1\s+([a-zäöüß]{2,7})\b/gi, '$1l$2');
+      // Split merged camelCase fragments ("absoluteIdee" → "absolute Idee")
+      t = t.replace(/\b([a-zäöüß]{4,})([A-ZÄÖÜ][a-zäöüß]+)\b/g, '$1 $2');
       // Drop accidental immediate duplicates ("Der Der Schluß" → "Der Schluß")
       t = t.replace(/\b(\S+)\s+\1\b/gi, '$1');
       // Final whitespace cleanup
@@ -186,11 +200,20 @@
       return 3;
     };
 
+    // Drop everything that appears before the primary text starts —
+    // the GW PDF embeds an extra Beilagen/Anhang index at the front of
+    // the volume, and those entries (Editorischer Bericht, Anmerkungen,
+    // Personenverzeichnis, ZUM MECHANISMUS, ..., INHALTSANZEIGE etc.) clutter the TOC.
+    const cleanedToc = (corpus.toc_printed || [])
+      .map(e => ({ ...e, title: cleanTocTitle(e.title) }))
+      .filter(e => !isJunkTocEntry(e.title));
+    const firstPrimaryIdx = cleanedToc.findIndex(e =>
+      /^VOM\s+BEGRIFF\s+IM\s+ALLGEMEINEN\b/i.test(e.title)
+    );
+    const startIdx = firstPrimaryIdx >= 0 ? firstPrimaryIdx : 0;
+
     document.getElementById('toc-list').innerHTML =
-      (corpus.toc_printed || [])
-        .map(e => ({ ...e, title: cleanTocTitle(e.title) }))
-        .filter(e => !isJunkTocEntry(e.title))
-        .map(e => {
+      cleanedToc.slice(startIdx).map(e => {
           const lvl = tocLevel(e.title);
           const directPdf = bookToPdf[e.page];
           if (directPdf != null) {
