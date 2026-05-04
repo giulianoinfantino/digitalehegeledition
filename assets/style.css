@@ -714,6 +714,36 @@ body.reflow-mode .type-heading[data-level="1"] + .type-paragraph .reflow-content
   color: var(--text-body);
 }
 
+/* Subheadings — same scale as headings but lighter weight. */
+.type-subheading {
+  text-indent: 0;
+  text-align: center;
+  color: var(--text-ink);
+  font-feature-settings: "onum";
+}
+.type-subheading[data-level="3"] {
+  font-size: 1.05rem;
+  margin-top: 0.6rem;
+  margin-bottom: 1.4rem;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+.type-subheading[data-level="4"] {
+  font-size: 1rem;
+  margin-top: 2.2rem;
+  margin-bottom: 0.4rem;
+  font-style: italic;
+}
+
+/* Spacer — preserves visible vertical separation between two centered
+   heading lines (e.g. "a)" and "DER ALLGEMEINE BEGRIFF.") that the GW
+   print sets with whitespace between them. See project.md §3b. */
+.type-spacer {
+  display: block;
+  height: 0.6rem;
+}
+
 /* ── Druckbild (diplomatic lines + line numbers) ─────────── */
 
 /* Sperrsatz (originally letter-spaced emphasis in the GW print) — rendered
@@ -723,23 +753,16 @@ em.sperrsatz {
   font-feature-settings: "onum", "kern", "liga";
 }
 
-/* Each original print line — Blocksatz, allows reflow if a line is wider
-   than the column. The gw_line number stays anchored at the start. */
+/* Each original print line — left-aligned (Flattersatz) for readability.
+   The gw_line number stays anchored at the start. */
 .dipl-line {
   display: block;
   overflow: visible;
   line-height: 1.72;
   position: relative;
-  text-align: justify;
-  text-align-last: justify;
+  text-align: left;
   hyphens: none;
   -webkit-hyphens: none;
-  text-justify: inter-word;
-}
-/* The very last line of a paragraph block should NOT be over-justified
-   (otherwise a short closing line is stretched to the column edge). */
-.dipl-content .dipl-line:last-child {
-  text-align-last: left;
 }
 
 /* Margin line numbers (every 5th line) — clickable to copy a citation.
